@@ -12,20 +12,20 @@
   --muted: #888888;
   --quiet: #b0b0b0;
   --red: #d84f4f;
-  --syntax-attribute: #9d5b00;
-  --syntax-comment: #6a737d;
-  --syntax-constant: #005cc5;
-  --syntax-function: #005cc5;
-  --syntax-keyword: #6f42c1;
-  --syntax-module: #6f42c1;
-  --syntax-number: #b08800;
-  --syntax-operator: #586069;
-  --syntax-property: #e36209;
-  --syntax-punctuation: #6a737d;
-  --syntax-string: #22863a;
-  --syntax-tag: #22863a;
-  --syntax-type: #d73a49;
-  --syntax-variable: #24292e;
+  --syntax-attribute: var(--text);
+  --syntax-comment: #6b6b6b;
+  --syntax-constant: #2d7f3e;
+  --syntax-function: var(--text);
+  --syntax-keyword: #3b5bdb;
+  --syntax-module: var(--text);
+  --syntax-number: #2d7f3e;
+  --syntax-operator: var(--text);
+  --syntax-property: var(--text);
+  --syntax-punctuation: var(--text);
+  --syntax-string: #2d7f3e;
+  --syntax-tag: var(--text);
+  --syntax-type: var(--text);
+  --syntax-variable: var(--text);
   font-family: "Signifier", ui-serif, Georgia, serif;
   font-style: normal;
   font-weight: 300;
@@ -39,20 +39,20 @@
     --muted: #666666;
     --quiet: #555555;
     --red: #ff6b6b;
-    --syntax-attribute: #d19a66;
-    --syntax-comment: #7f848e;
-    --syntax-constant: #56b6c2;
-    --syntax-function: #61afef;
-    --syntax-keyword: #c678dd;
-    --syntax-module: #c678dd;
-    --syntax-number: #d19a66;
-    --syntax-operator: #abb2bf;
-    --syntax-property: #e06c75;
-    --syntax-punctuation: #7f848e;
+    --syntax-attribute: var(--text);
+    --syntax-comment: #666666;
+    --syntax-constant: #98c379;
+    --syntax-function: var(--text);
+    --syntax-keyword: #7aa2f7;
+    --syntax-module: var(--text);
+    --syntax-number: #98c379;
+    --syntax-operator: var(--text);
+    --syntax-property: var(--text);
+    --syntax-punctuation: var(--text);
     --syntax-string: #98c379;
-    --syntax-tag: #e06c75;
-    --syntax-type: #e5c07b;
-    --syntax-variable: #e0e0e0;
+    --syntax-tag: var(--text);
+    --syntax-type: var(--text);
+    --syntax-variable: var(--text);
   }
 }
 
@@ -250,60 +250,60 @@ button.selected {
   white-space: pre-wrap;
 }
 
-.practice-window.syntax-highlighting .char.syntax-attribute {
+.practice-window.syntax-highlighting .char.typed.syntax-attribute {
   color: var(--syntax-attribute);
 }
 
-.practice-window.syntax-highlighting .char.syntax-comment {
+.practice-window.syntax-highlighting .char.typed.syntax-comment {
   color: var(--syntax-comment);
   font-style: italic;
 }
 
-.practice-window.syntax-highlighting .char.syntax-constant {
+.practice-window.syntax-highlighting .char.typed.syntax-constant {
   color: var(--syntax-constant);
 }
 
-.practice-window.syntax-highlighting .char.syntax-function {
+.practice-window.syntax-highlighting .char.typed.syntax-function {
   color: var(--syntax-function);
 }
 
-.practice-window.syntax-highlighting .char.syntax-keyword {
+.practice-window.syntax-highlighting .char.typed.syntax-keyword {
   color: var(--syntax-keyword);
 }
 
-.practice-window.syntax-highlighting .char.syntax-module {
+.practice-window.syntax-highlighting .char.typed.syntax-module {
   color: var(--syntax-module);
 }
 
-.practice-window.syntax-highlighting .char.syntax-number {
+.practice-window.syntax-highlighting .char.typed.syntax-number {
   color: var(--syntax-number);
 }
 
-.practice-window.syntax-highlighting .char.syntax-operator {
+.practice-window.syntax-highlighting .char.typed.syntax-operator {
   color: var(--syntax-operator);
 }
 
-.practice-window.syntax-highlighting .char.syntax-property {
+.practice-window.syntax-highlighting .char.typed.syntax-property {
   color: var(--syntax-property);
 }
 
-.practice-window.syntax-highlighting .char.syntax-punctuation {
+.practice-window.syntax-highlighting .char.typed.syntax-punctuation {
   color: var(--syntax-punctuation);
 }
 
-.practice-window.syntax-highlighting .char.syntax-string {
+.practice-window.syntax-highlighting .char.typed.syntax-string {
   color: var(--syntax-string);
 }
 
-.practice-window.syntax-highlighting .char.syntax-tag {
+.practice-window.syntax-highlighting .char.typed.syntax-tag {
   color: var(--syntax-tag);
 }
 
-.practice-window.syntax-highlighting .char.syntax-type {
+.practice-window.syntax-highlighting .char.typed.syntax-type {
   color: var(--syntax-type);
 }
 
-.practice-window.syntax-highlighting .char.syntax-variable {
+.practice-window.syntax-highlighting .char.typed.syntax-variable {
   color: var(--syntax-variable);
 }
 
