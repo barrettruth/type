@@ -1,0 +1,11 @@
+name: Feature request
+description: Suggest a feature
+title: "Feature: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    attributes:
+      label: Description
+  - type: textarea
+    attributes:
+      label: Use case
