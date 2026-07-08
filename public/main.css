@@ -71,12 +71,6 @@ button.selected {
   font-style: normal;
 }
 
-.controls {
-  display: grid;
-  gap: 0.45rem;
-  justify-items: start;
-}
-
 .layouts {
   display: flex;
   flex-wrap: wrap;
@@ -111,6 +105,29 @@ button.selected {
   white-space: nowrap;
 }
 
+.stage {
+  display: grid;
+  grid-template-columns: minmax(9rem, 1fr) minmax(0, 70rem) minmax(9rem, 1fr);
+  align-items: center;
+  width: 100vw;
+  min-height: 0;
+  margin-inline: calc(50% - 50vw);
+  transform: translateY(-12.5vh);
+}
+
+.sidebar {
+  align-self: start;
+  justify-self: center;
+  margin-top: clamp(1.5rem, 6vh, 4rem);
+  font-family:
+    "Berkeley Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  font-size: clamp(0.8rem, 1vw, 0.95rem);
+}
+
+.rail {
+  min-width: 0;
+}
+
 .type-window {
   align-self: center;
   height: min(62vh, 42rem);
@@ -124,14 +141,12 @@ button.selected {
   margin: 0 auto;
   color: var(--quiet);
   font-size: clamp(2.05rem, 4.2vw, 4.2rem);
-  letter-spacing: 0.04em;
   line-height: 1.45;
   overflow-wrap: normal;
   padding: min(26vh, 17rem) 0;
   text-align: center;
   white-space: pre-wrap;
   word-break: normal;
-  word-spacing: 0.18em;
 }
 
 .char {
@@ -191,9 +206,7 @@ button.selected {
   .word-stream {
     max-width: 100%;
     font-size: clamp(1.9rem, 8vw, 3.1rem);
-    letter-spacing: 0.035em;
     line-height: 1.48;
     padding: 30vh 0;
-    word-spacing: 0.12em;
   }
 }
