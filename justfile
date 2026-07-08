@@ -17,6 +17,7 @@ lint:
 
 build:
     scripts/update-corpus.sh public
+    scripts/update-code-corpus.sh public
     install -d dist
     rsync -a --delete public/ dist/
 

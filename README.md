@@ -26,7 +26,7 @@ the selected keyboard layout (for example, "home" tests asdf/aeou on QWERTY/Dvor
 | 08 | numbers | Miscellant of generated numeric phrases including dates, times, counts, versions, etc. |
 | 09 | symbols | Uniform random symbol tokens from the active layout's symbol set |
 | 10 | sentences | Excerpts of Project Gutenberg texts sentences |
-| 11 | code | Short code snippets of various languages including C++, Lua, and Python |
+| 11 | code | Tree-sitter-highlighted snippets spanning Nix, C, C++, Lua, Python, shell/Bash, HTML, CSS, JavaScript, and TypeScript |
 
 ## Baremak
 

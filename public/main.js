@@ -1,3 +1,4 @@
+import { codeSnippets } from "./code-corpus.js";
 import {
   acronyms as corpusAcronyms,
   sentences as corpusSentences,
@@ -43,12 +44,6 @@ const layoutRows = {
 };
 
 const practiceSize = 900;
-const codeWords = [
-  "const value = items[index];",
-  "if (value === null) return;",
-  "function render(target) { return target.map(String).join(', '); }",
-  "for (const item of items) total += item.count;",
-];
 
 const levels = [
   ["01", "home", () => rowDrill(["home"], 0.1)],
@@ -61,7 +56,7 @@ const levels = [
   ["08", "numbers", numberDrill],
   ["09", "symbols", symbolDrill],
   ["10", "sentences", sentenceDrill],
-  ["11", "code", () => shuffle(codeWords)],
+  ["11", "code", codeDrill],
 ].map(([id, name, words]) => ({ id, name, words }));
 
 const layouts = Object.entries(layoutRows).map(([id, layout]) => [id, layout.name]);
@@ -100,6 +95,22 @@ function activeLayout() {
 
 function activeLevel() {
   return levels.find((level) => level.id === levelId) ?? levels[0];
+}
+
+function isCodeLevel() {
+  return activeLevel().id === "11";
+}
+
+function itemText(item) {
+  return typeof item === "string" ? item : item.code;
+}
+
+function itemSpans(item) {
+  return typeof item === "string" ? [] : item.spans;
+}
+
+function streamSeparator() {
+  return isCodeLevel() ? "\n\n" : " ";
 }
 
 function readLayoutId() {
@@ -348,24 +359,53 @@ function sentenceDrill() {
   return shuffle(corpusSentences).slice(0, 240);
 }
 
+function codeDrill() {
+  return shuffle(codeSnippets);
+}
+
 function activeWords() {
   return currentWords;
 }
 
 function streamTextUntil(minLength) {
   const words = activeWords();
+  const separator = streamSeparator();
   let text = "";
   let index = 0;
 
   while (words.length > 0 && text.length <= minLength) {
     if (text) {
-      text += " ";
+      text += separator;
     }
-    text += words[index % words.length];
+    text += itemText(words[index % words.length]);
     index += 1;
   }
 
   return text;
+}
+
+function streamSyntaxUntil(minLength) {
+  const words = activeWords();
+  const classes = [];
+  const separator = streamSeparator();
+  let length = 0;
+  let index = 0;
+
+  while (isCodeLevel() && words.length > 0 && length <= minLength) {
+    if (length > 0) {
+      length += separator.length;
+    }
+    const item = words[index % words.length];
+    for (const span of itemSpans(item)) {
+      for (let offset = span.start; offset < span.end; offset += 1) {
+        classes[length + offset] = span.className;
+      }
+    }
+    length += itemText(item).length;
+    index += 1;
+  }
+
+  return classes;
 }
 
 function streamChar(index) {
@@ -382,16 +422,24 @@ function streamWindow() {
 }
 
 function printableKey(key) {
+  if (key === "Enter" && isCodeLevel()) {
+    return "\n";
+  }
   if (key === " " || key === "Spacebar") {
     return " ";
   }
   return Array.from(key).length === 1 ? key : null;
 }
 
-function charClass(index, char) {
+function charClass(index, char, syntaxClass) {
   const classNames = ["char"];
+  if (syntaxClass) {
+    classNames.push(syntaxClass);
+  }
   if (char === " ") {
     classNames.push("space");
+  } else if (char === "\n") {
+    classNames.push("break");
   }
   if (index < cursor) {
     classNames.push("typed");
@@ -532,7 +580,10 @@ function positionCursor() {
 
   const style = getComputedStyle(wordStream);
   const lineHeight = Number.parseFloat(style.lineHeight);
-  const anchor = current.classList.contains("space") ? current.previousElementSibling : null;
+  const anchor =
+    current.classList.contains("space") || current.classList.contains("break")
+      ? current.previousElementSibling
+      : null;
   const x = anchor === null ? current.offsetLeft : anchor.offsetLeft + anchor.offsetWidth;
   const y = (anchor === null ? current.offsetTop : anchor.offsetTop) + lineHeight * 0.78;
   cursorElement.style.transform = `translate(${x}px, ${y}px)`;
@@ -540,10 +591,11 @@ function positionCursor() {
 
 function renderStream() {
   const fragment = document.createDocumentFragment();
+  const syntaxClasses = streamSyntaxUntil(cursor + 900);
 
   for (const [index, char] of streamWindow()) {
     const span = document.createElement("span");
-    span.className = charClass(index, char);
+    span.className = charClass(index, char, syntaxClasses[index]);
     span.textContent = char;
     if (index === cursor) {
       span.id = "current-char";
@@ -552,6 +604,7 @@ function renderStream() {
   }
 
   practiceWindow.classList.toggle("blocked", lastWrong !== null);
+  practiceWindow.classList.toggle("syntax-highlighting", isCodeLevel());
   wordStream.replaceChildren(fragment, cursorElement);
   requestAnimationFrame(() => {
     positionCursor();

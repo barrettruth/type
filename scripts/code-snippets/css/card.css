@@ -1,0 +1,6 @@
+.card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border-radius: 0.5rem;
+}
