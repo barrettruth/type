@@ -9,10 +9,13 @@
     <script type="module" src="/main.js"></script>
   </head>
   <body>
-    <main id="app" class="shell" tabindex="0">
-      <nav class="topline">
-        <div id="layouts" class="layouts"></div>
-        <div id="wpm" class="wpm">0</div>
+    <main id="app" class="shell" tabindex="0" aria-label="Typing trainer">
+      <nav class="topline" aria-label="Typing controls">
+        <div class="controls">
+          <div id="layouts" class="layouts" role="group" aria-label="Layouts"></div>
+          <div id="levels" class="levels" role="group" aria-label="Levels"></div>
+        </div>
+        <div id="stats" class="stats" aria-live="polite">0 wpm / 100 % / 0s</div>
       </nav>
       <section id="type-window" class="type-window">
         <div id="word-stream" class="word-stream"></div>

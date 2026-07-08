@@ -1,52 +1,50 @@
-const words = [
-  "truth",
-  "stone",
-  "train",
-  "notes",
-  "calm",
-  "hands",
-  "clear",
-  "steady",
-  "practice",
-  "layout",
-  "baremak",
-  "colemak",
-  "dvorak",
-  "qwerty",
-  "focus",
-  "signal",
-  "rhythm",
-  "line",
-  "cursor",
-  "letter",
-  "quiet",
-  "exact",
-  "typing",
-  "speed",
-  "memory",
-  "repeat",
-  "system",
-  "syntax",
-  "buffer",
-  "window",
-  "branch",
-  "commit",
-  "vector",
-  "string",
-  "result",
-  "module",
-  "match",
-  "async",
-  "struct",
-  "public",
-  "private",
-  "render",
-  "scroll",
-  "target",
-  "symbol",
-  "layer",
-  "right",
-  "index",
+const levelStorageKey = "type.activeLevel";
+
+const levels = [
+  {
+    id: "1",
+    name: "1",
+    words: ["truth", "stone", "train", "notes", "calm", "hands", "clear", "steady"],
+  },
+  {
+    id: "2",
+    name: "2",
+    words: ["practice", "layout", "baremak", "colemak", "dvorak", "qwerty", "focus", "signal"],
+  },
+  {
+    id: "3",
+    name: "3",
+    words: ["rhythm", "cursor", "letter", "quiet", "exact", "typing", "speed", "memory"],
+  },
+  {
+    id: "4",
+    name: "4",
+    words: [
+      "repeat",
+      "system",
+      "syntax",
+      "buffer",
+      "window",
+      "branch",
+      "commit",
+      "vector",
+      "string",
+      "result",
+      "module",
+      "match",
+      "async",
+      "struct",
+      "public",
+      "private",
+      "render",
+      "scroll",
+      "target",
+      "symbol",
+      "layer",
+      "right",
+      "index",
+    ],
+  },
 ];
 
 const layouts = [
@@ -58,17 +56,31 @@ const layouts = [
 
 const app = document.getElementById("app");
 const layoutList = document.getElementById("layouts");
+const levelList = document.getElementById("levels");
 const typeWindow = document.getElementById("type-window");
 const wordStream = document.getElementById("word-stream");
-const wpmElement = document.getElementById("wpm");
+const statsElement = document.getElementById("stats");
 
 let layoutId = "baremak";
+let levelId = readLevelId();
 let cursor = 0;
+let errors = 0;
 let lastWrong = null;
 let startedAt = null;
 let now = performance.now();
 
+function readLevelId() {
+  const fallback = levels[0].id;
+  const stored = localStorage.getItem(levelStorageKey);
+  return levels.some((level) => level.id === stored) ? stored : fallback;
+}
+
+function activeWords() {
+  return levels.find((level) => level.id === levelId)?.words ?? levels[0].words;
+}
+
 function streamTextUntil(minLength) {
+  const words = activeWords();
   let text = "";
   let index = 0;
 
@@ -121,12 +133,12 @@ function charClass(index, char) {
   return classNames.join(" ");
 }
 
-function calculateWpm() {
-  if (startedAt === null) {
-    return 0;
-  }
+function elapsedMs() {
+  return startedAt === null ? 0 : Math.max(now - startedAt, 0);
+}
 
-  const elapsedMinutes = (now - startedAt) / 60000;
+function calculateWpm() {
+  const elapsedMinutes = elapsedMs() / 60000;
   if (elapsedMinutes <= 0) {
     return 0;
   }
@@ -134,21 +146,92 @@ function calculateWpm() {
   return Math.round(cursor / 5 / elapsedMinutes);
 }
 
+function calculateAccuracy() {
+  const total = cursor + errors;
+  if (total === 0) {
+    return 100;
+  }
+
+  return Math.round((cursor / total) * 100);
+}
+
+function formatElapsed() {
+  const totalSeconds = Math.floor(elapsedMs() / 1000);
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = totalSeconds % 60;
+
+  if (minutes === 0) {
+    return `${seconds}s`;
+  }
+  if (seconds === 0) {
+    return `${minutes}m`;
+  }
+  return `${minutes}m${seconds}s`;
+}
+
+function buttonFor({ active, label, onClick }) {
+  const button = document.createElement("button");
+  button.type = "button";
+  button.textContent = label;
+  button.classList.toggle("selected", active);
+  if (active) {
+    button.setAttribute("aria-current", "true");
+  }
+  button.addEventListener("click", onClick);
+  return button;
+}
+
 function renderLayouts() {
   layoutList.replaceChildren(
-    ...layouts.map(([id, name]) => {
-      const button = document.createElement("button");
-      button.type = "button";
-      button.textContent = name;
-      button.classList.toggle("selected", layoutId === id);
-      button.addEventListener("click", () => {
-        layoutId = id;
-        reset();
-        requestAnimationFrame(() => app.focus());
-      });
-      return button;
-    }),
+    ...layouts.map(([id, name]) =>
+      buttonFor({
+        active: layoutId === id,
+        label: name,
+        onClick: () => {
+          layoutId = id;
+          reset();
+          requestAnimationFrame(() => app.focus());
+        },
+      }),
+    ),
   );
+}
+
+function renderLevels() {
+  levelList.replaceChildren(
+    ...levels.map((level) =>
+      buttonFor({
+        active: levelId === level.id,
+        label: level.name,
+        onClick: () => {
+          levelId = level.id;
+          localStorage.setItem(levelStorageKey, levelId);
+          reset();
+          requestAnimationFrame(() => app.focus());
+        },
+      }),
+    ),
+  );
+}
+
+function revealCurrent() {
+  const current = document.getElementById("current-char");
+  if (current === null) {
+    return;
+  }
+
+  const windowRect = typeWindow.getBoundingClientRect();
+  const currentRect = current.getBoundingClientRect();
+  const topEdge = windowRect.top + windowRect.height * 0.34;
+  const bottomEdge = windowRect.top + windowRect.height * 0.66;
+
+  if (currentRect.top < topEdge || currentRect.bottom > bottomEdge) {
+    current.scrollIntoView({
+      behavior: "smooth",
+      block: "center",
+      inline: "nearest",
+    });
+  }
 }
 
 function renderStream() {
@@ -166,28 +249,26 @@ function renderStream() {
 
   typeWindow.classList.toggle("blocked", lastWrong !== null);
   wordStream.replaceChildren(fragment);
-  document.getElementById("current-char")?.scrollIntoView({
-    behavior: "smooth",
-    block: "center",
-    inline: "nearest",
-  });
+  requestAnimationFrame(revealCurrent);
 }
 
-function renderWpm() {
-  wpmElement.textContent = String(calculateWpm());
+function renderStats() {
+  statsElement.textContent = `${calculateWpm()} wpm / ${calculateAccuracy()} % / ${formatElapsed()}`;
 }
 
 function render() {
-  renderLayouts();
   renderStream();
-  renderWpm();
+  renderStats();
 }
 
 function reset() {
   cursor = 0;
+  errors = 0;
   lastWrong = null;
   startedAt = null;
   now = performance.now();
+  renderLayouts();
+  renderLevels();
   render();
 }
 
@@ -224,6 +305,7 @@ function handleKeydown(event) {
     cursor += 1;
     lastWrong = null;
   } else {
+    errors += 1;
     lastWrong = typed;
   }
 
@@ -234,7 +316,7 @@ app.addEventListener("keydown", handleKeydown);
 app.addEventListener("pointerdown", () => app.focus());
 setInterval(() => {
   now = performance.now();
-  renderWpm();
+  renderStats();
 }, 500);
-render();
+reset();
 app.focus();

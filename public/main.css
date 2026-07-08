@@ -48,6 +48,12 @@ button.selected {
   color: var(--text);
 }
 
+button:focus-visible,
+.shell:focus-visible {
+  outline: 1px solid var(--muted);
+  outline-offset: 0.35rem;
+}
+
 .shell {
   display: grid;
   grid-template-rows: auto 1fr;
@@ -62,6 +68,8 @@ button.selected {
   display: flex;
   justify-content: space-between;
   gap: 2rem;
+  width: min(70rem, 100%);
+  margin: 0 auto;
   color: var(--muted);
   font-family:
     "Berkeley Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
@@ -69,17 +77,28 @@ button.selected {
   font-style: normal;
 }
 
-.layouts {
+.controls {
+  display: grid;
+  gap: 0.45rem;
+  justify-items: start;
+}
+
+.layouts,
+.levels {
   display: flex;
   flex-wrap: wrap;
   gap: 1.25rem;
   justify-content: flex-start;
 }
 
-.wpm {
+.levels {
+  gap: 0.85rem;
+}
+
+.stats {
   color: var(--muted);
-  min-width: 3ch;
   text-align: right;
+  white-space: nowrap;
 }
 
 .type-window {
@@ -118,21 +137,15 @@ button.selected {
 }
 
 .char.current {
-  text-decoration-line: underline;
-  text-decoration-color: var(--text);
-  text-decoration-thickness: 0.055em;
-  text-underline-offset: 0.1em;
-}
-
-.char.space.current {
-  display: inline-block;
-  min-width: 0.55em;
+  background-image: linear-gradient(var(--text), var(--text));
+  background-position: 0 88%;
+  background-repeat: no-repeat;
+  background-size: 100% 0.055em;
 }
 
 .char.current.wrong,
 .type-window.blocked .char.current {
-  color: var(--red);
-  text-decoration-color: var(--red);
+  background-image: linear-gradient(var(--red), var(--red));
 }
 
 @media (max-width: 760px) {
