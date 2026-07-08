@@ -155,7 +155,7 @@ button.selected {
   line-height: 1.45;
   overflow-wrap: normal;
   padding: min(26vh, 17rem) 0;
-  text-align: center;
+  text-align: left;
   white-space: pre-wrap;
   word-break: normal;
 }

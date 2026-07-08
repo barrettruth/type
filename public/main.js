@@ -1,3 +1,9 @@
+import {
+  acronyms as corpusAcronyms,
+  sentences as corpusSentences,
+  words as corpusWords,
+} from "./corpus.js";
+
 const layoutStorageKey = "type.activeLayout";
 const levelStorageKey = "type.activeLevel";
 
@@ -36,67 +42,26 @@ const layoutRows = {
   },
 };
 
-const shortWords = [
-  "a",
-  "i",
-  "as",
-  "at",
-  "in",
-  "it",
-  "no",
-  "on",
-  "or",
-  "to",
-  "we",
-  "if",
-  "run",
-  "set",
-  "map",
-  "row",
-  "key",
-  "code",
-  "type",
-  "word",
-];
-const proseWords = [
-  "truth",
-  "stone",
-  "train",
-  "notes",
-  "calm",
-  "hands",
-  "clear",
-  "steady",
-  "focus",
-  "signal",
-];
-const capsWords = proseWords.map(capitalize);
-const numberWords = ["line 42", "port 8080", "5 keys", "12 rows", "80 wpm", "v2", "0.12", "2026"];
-const sentenceWords = [
-  "The hands return home.",
-  "Clear notes keep focus.",
-  "Steady practice builds rhythm.",
-];
+const practiceSize = 900;
 const codeWords = [
-  "const value = 1;",
-  "return result;",
-  "if (match) { render(); }",
-  "target[key] = value;",
+  "const value = items[index];",
+  "if (value === null) return;",
+  "function render(target) { return target.map(String).join(', '); }",
+  "for (const item of items) total += item.count;",
 ];
 
 const levels = [
-  ["01", "home", () => rowDrill(["home"])],
-  ["02", "top", () => rowDrill(["home", "top"])],
-  ["03", "bottom", () => rowDrill(["home", "top", "bottom"])],
-  ["04", "short", () => shortWords],
-  ["05", "ngrams", ngramDrill],
-  ["06", "prose", () => proseWords],
-  ["07", "caps", () => capsWords],
-  ["08", "punct", punctuationDrill],
-  ["09", "numbers", () => numberWords],
-  ["10", "symbols", symbolDrill],
-  ["11", "sentences", () => sentenceWords],
-  ["12", "code", () => codeWords],
+  ["01", "home", () => rowDrill(["home"], 0.1)],
+  ["02", "top", () => rowDrill(["home", "top"], 0.5)],
+  ["03", "bottom", () => rowDrill(["home", "top", "bottom"], 0.5)],
+  ["04", "short", shortDrill],
+  ["05", "prose", proseDrill],
+  ["06", "caps", capsDrill],
+  ["07", "punct", punctuationDrill],
+  ["08", "numbers", numberDrill],
+  ["09", "symbols", symbolDrill],
+  ["10", "sentences", sentenceDrill],
+  ["11", "code", () => shuffle(codeWords)],
 ].map(([id, name, words]) => ({ id, name, words }));
 
 const layouts = Object.entries(layoutRows).map(([id, layout]) => [id, layout.name]);
@@ -110,6 +75,7 @@ const statsElement = document.getElementById("stats");
 
 let layoutId = readLayoutId();
 let levelId = readLevelId();
+let currentWords = [];
 let cursor = 0;
 let errors = 0;
 let lastWrong = null;
@@ -170,18 +136,6 @@ function rowSet(rowNames) {
   return unique(rowNames.flatMap(rowLetters));
 }
 
-function baseLetters() {
-  return charsForLayer("base").filter(letter);
-}
-
-function basePunctuation() {
-  return charsForLayer("base").filter((char) => !letter(char));
-}
-
-function shiftPunctuation() {
-  return charsForLayer("shift").filter((char) => !/^[A-Z]$/.test(char));
-}
-
 function altgrSymbols() {
   return charsForLayer("altgr");
 }
@@ -190,49 +144,210 @@ function unique(chars) {
   return [...new Set(chars)];
 }
 
-function chunks(chars, size) {
-  const words = [];
-  for (let index = 0; index < chars.length; index += size) {
-    words.push(chars.slice(index, index + size).join(""));
+function randomInt(min, max) {
+  return min + Math.floor(Math.random() * (max - min + 1));
+}
+
+function pick(items) {
+  return items[randomInt(0, items.length - 1)];
+}
+
+function shuffle(items) {
+  const result = [...items];
+  for (let index = result.length - 1; index > 0; index -= 1) {
+    const swapIndex = randomInt(0, index);
+    [result[index], result[swapIndex]] = [result[swapIndex], result[index]];
   }
-  return words;
+  return result;
 }
 
-function ngrams(chars, size) {
-  const words = [];
-  for (let index = 0; index <= chars.length - size; index += 1) {
-    words.push(chars.slice(index, index + size).join(""));
-  }
-  return words;
+function wordBank() {
+  return corpusWords.filter((word) => /^[a-z]+$/.test(word));
 }
 
-function drillChars(chars) {
-  return [...chunks(chars, 5), ...ngrams(chars, 2), chars.join("")].filter(Boolean);
+function acronymBank() {
+  return corpusAcronyms.filter((word) => /^[A-Z]{2,6}$/.test(word));
 }
 
-function rowDrill(rowNames) {
-  return drillChars(rowSet(rowNames));
+function wordsFrom(chars, minLength = 1, maxLength = Number.POSITIVE_INFINITY) {
+  const allowed = new Set(chars);
+  return wordBank().filter(
+    (word) =>
+      word.length >= minLength &&
+      word.length <= maxLength &&
+      Array.from(word).every((char) => allowed.has(char)),
+  );
 }
 
-function ngramDrill() {
-  const letters = baseLetters();
-  return [...ngrams(letters, 2), ...ngrams(letters, 3)];
+function generatedWord(chars, minLength = 3, maxLength = 6) {
+  return Array.from({ length: randomInt(minLength, maxLength) }, () => pick(chars)).join("");
+}
+
+function mixedGeneratedAndReal(chars, realRatio) {
+  const realWords = wordsFrom(chars, 3, 6);
+  return Array.from({ length: practiceSize }, () => {
+    if (realWords.length > 0 && Math.random() < realRatio) {
+      return pick(realWords);
+    }
+    return generatedWord(chars);
+  });
+}
+
+function rowDrill(rowNames, realRatio) {
+  return mixedGeneratedAndReal(rowSet(rowNames), realRatio);
+}
+
+function shortDrill() {
+  return shuffle(wordBank().filter((word) => word.length < 5));
+}
+
+function proseDrill() {
+  return shuffle(wordBank()).slice(0, practiceSize);
+}
+
+function capsDrill() {
+  const words = wordBank();
+  const acronyms = acronymBank();
+  return Array.from({ length: practiceSize }, () => {
+    const roll = Math.random();
+    if (roll < 0.125 && acronyms.length > 0) {
+      return pick(acronyms);
+    }
+    if (roll < 0.25) {
+      return capitalize(pick(words));
+    }
+    return pick(words);
+  });
+}
+
+function proseMarks() {
+  return [",", ".", ";", ":", "?", "!", '"'];
 }
 
 function punctuationDrill() {
-  const marks = unique([...basePunctuation(), ...shiftPunctuation()]);
-  return proseWords.map((word, index) => `${word}${marks[index % marks.length]}`);
+  const marks = proseMarks();
+  const words = wordBank();
+  return Array.from({ length: 260 }, () => punctuatedRun(words, marks));
+}
+
+function punctuatedRun(words, marks) {
+  const length = randomInt(4, 12);
+  const result = [];
+  let capitalizeNext = Math.random() < 0.35;
+  let quoted = false;
+  const quoteStart = Math.random() < 0.25 ? randomInt(0, length - 2) : -1;
+  const quoteEnd = quoteStart >= 0 ? randomInt(quoteStart + 1, length - 1) : -1;
+
+  for (let index = 0; index < length; index += 1) {
+    let word = pick(words);
+    if (capitalizeNext) {
+      word = capitalize(word);
+      capitalizeNext = false;
+    }
+    if (index === quoteStart && marks.includes('"')) {
+      word = `"${word}`;
+      quoted = true;
+    }
+    if (quoted && index === quoteEnd) {
+      word = `${word}"`;
+      quoted = false;
+    }
+    if (index < length - 1 && Math.random() < 0.22) {
+      const mark = pick(marks.filter((item) => item !== '"'));
+      word = `${word}${mark}`;
+      capitalizeNext = [".", "?", "!"].includes(mark);
+    }
+    result.push(word);
+  }
+
+  if (![".", "?", "!", '"'].some((mark) => result.at(-1).endsWith(mark))) {
+    result[result.length - 1] = `${result.at(-1)}${pick([".", "?", "!"])}`;
+  }
+  return result.join(" ");
+}
+
+function numberDrill() {
+  const months = [
+    "january",
+    "february",
+    "march",
+    "april",
+    "may",
+    "june",
+    "july",
+    "august",
+    "september",
+    "october",
+    "november",
+    "december",
+  ];
+  const nouns = ["files", "rows", "keys", "lines", "tabs", "words", "items"];
+  const units = ["wpm", "px", "rem", "ms", "kb"];
+  return Array.from({ length: 320 }, () => {
+    const kind = randomInt(1, 8);
+    if (kind === 1) return `${pick(months)} ${randomInt(1, 28)}`;
+    if (kind === 2) return `${randomInt(1, 12)}:${String(randomInt(0, 59)).padStart(2, "0")}`;
+    if (kind === 3) return `${randomInt(2, 99)} ${pick(nouns)}`;
+    if (kind === 4) return `v${randomInt(0, 4)}.${randomInt(0, 20)}`;
+    if (kind === 5) return `${randomInt(1, 120)} ${pick(units)}`;
+    if (kind === 6) return `line ${randomInt(1, 500)}`;
+    if (kind === 7) return `port ${pick([3000, 5173, 8080, 9000])}`;
+    return `${randomInt(2020, 2030)}`;
+  });
+}
+
+function symbolSet() {
+  const symbols = unique(altgrSymbols());
+  if (symbols.length > 0) {
+    return symbols;
+  }
+  return unique([
+    "!",
+    "@",
+    "#",
+    "$",
+    "%",
+    "^",
+    "&",
+    "*",
+    "(",
+    ")",
+    "-",
+    "_",
+    "=",
+    "+",
+    "[",
+    "]",
+    "{",
+    "}",
+    "\\",
+    "|",
+    ";",
+    ":",
+    "'",
+    '"',
+    ",",
+    ".",
+    "<",
+    ">",
+    "/",
+    "?",
+    "`",
+    "~",
+  ]);
 }
 
 function symbolDrill() {
-  const symbols = unique(altgrSymbols());
-  const chars =
-    symbols.length > 0 ? symbols : unique([...basePunctuation(), ...shiftPunctuation()]);
-  return [...chunks(chars, 5), ...ngrams(chars, 2), ...ngrams(chars, 3)].filter(Boolean);
+  const symbols = symbolSet();
+  return Array.from({ length: practiceSize }, () => generatedWord(symbols, 1, 5));
+}
+
+function sentenceDrill() {
+  return shuffle(corpusSentences).slice(0, 240);
 }
 
 function activeWords() {
-  return activeLevel().words();
+  return currentWords;
 }
 
 function streamTextUntil(minLength) {
@@ -240,7 +355,7 @@ function streamTextUntil(minLength) {
   let text = "";
   let index = 0;
 
-  while (text.length <= minLength) {
+  while (words.length > 0 && text.length <= minLength) {
     if (text) {
       text += " ";
     }
@@ -435,6 +550,7 @@ function render() {
 }
 
 function reset() {
+  currentWords = activeLevel().words();
   cursor = 0;
   errors = 0;
   lastWrong = null;

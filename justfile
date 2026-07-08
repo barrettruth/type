@@ -14,6 +14,7 @@ lint:
     biome lint public/index.html public/main.js public/main.css biome.json
 
 build:
+    scripts/update-corpus.sh public
     install -d dist
     rsync -a --delete public/ dist/
 
