@@ -53,7 +53,11 @@ fn printable_key(key: &str) -> Option<char> {
 }
 
 fn char_text(ch: char) -> String {
-    ch.to_string()
+    if ch == ' ' {
+        " ".to_string()
+    } else {
+        ch.to_string()
+    }
 }
 
 fn char_class(index: usize, cursor: usize, ch: char, wrong: bool) -> String {
@@ -86,6 +90,7 @@ fn scroll_current_into_view() {
     };
 
     let options = web_sys::ScrollIntoViewOptions::new();
+    options.set_behavior(web_sys::ScrollBehavior::Smooth);
     options.set_block(web_sys::ScrollLogicalPosition::Center);
     options.set_inline(web_sys::ScrollLogicalPosition::Nearest);
     element.scroll_into_view_with_scroll_into_view_options(&options);
@@ -111,6 +116,10 @@ fn App() -> impl IntoView {
     });
 
     let on_keydown = move |event: web_sys::KeyboardEvent| {
+        if event.ctrl_key() || event.meta_key() || event.alt_key() {
+            return;
+        }
+
         let index = cursor.get();
 
         if event.key() == "Backspace" {

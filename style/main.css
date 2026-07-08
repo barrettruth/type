@@ -80,28 +80,26 @@ button.selected {
   height: min(62vh, 42rem);
   margin: 0;
   overflow: hidden;
-  scroll-behavior: auto;
+  scroll-behavior: smooth;
 }
 
 .word-stream {
   max-width: min(70rem, 100%);
   margin: 0 auto;
   color: var(--quiet);
-  font-size: clamp(2.75rem, 5.6vw, 5.6rem);
+  font-size: clamp(2.05rem, 4.2vw, 4.2rem);
   letter-spacing: 0.04em;
   line-height: 1.45;
   overflow-wrap: normal;
   padding: min(26vh, 17rem) 0;
   text-align: center;
-  white-space: normal;
+  white-space: pre-wrap;
   word-break: normal;
   word-spacing: 0.18em;
 }
 
 .char {
-  display: inline-block;
-  position: relative;
-  vertical-align: baseline;
+  display: inline;
 }
 
 .char.typed {
@@ -113,30 +111,21 @@ button.selected {
 }
 
 .char.current {
-  color: var(--text);
+  text-decoration-line: underline;
+  text-decoration-color: var(--text);
+  text-decoration-thickness: 0.055em;
+  text-underline-offset: 0.1em;
 }
 
-.char.current::before {
-  position: absolute;
-  top: 0.17em;
-  bottom: 0.17em;
-  left: -0.09em;
-  width: 0.035em;
-  background: var(--text);
-  content: "";
+.char.space.current {
+  display: inline-block;
+  min-width: 0.55em;
 }
 
-.char.current.wrong {
-  color: var(--red);
-}
-
-.char.current.wrong::before,
-.type-window.blocked .char.current::before {
-  background: var(--red);
-}
-
+.char.current.wrong,
 .type-window.blocked .char.current {
   color: var(--red);
+  text-decoration-color: var(--red);
 }
 
 
@@ -157,7 +146,7 @@ button.selected {
 
   .word-stream {
     max-width: 100%;
-    font-size: clamp(2.5rem, 10.5vw, 4.1rem);
+    font-size: clamp(1.9rem, 8vw, 3.1rem);
     letter-spacing: 0.035em;
     line-height: 1.48;
     padding: 30vh 0;
