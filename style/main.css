@@ -13,7 +13,6 @@
   --accent: #7aa2f7;
   --green: #98c379;
   --red: #ff6b6b;
-  --yellow: #e5c07b;
   font-family: "Signifier", ui-serif, Georgia, serif;
   font-weight: 300;
 }
@@ -119,74 +118,6 @@ button.selected {
   color: var(--red);
 }
 
-.keyboard-panel {
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 1.25rem;
-  align-items: start;
-  color: var(--muted);
-}
-
-.alt-layer {
-  color: var(--quiet);
-  font-size: 1rem;
-  font-style: italic;
-}
-
-.alt-layer.active {
-  color: var(--yellow);
-}
-
-.keyboard {
-  display: grid;
-  gap: 0.45rem;
-  overflow-x: auto;
-  scrollbar-width: none;
-}
-
-.keyboard::-webkit-scrollbar {
-  display: none;
-}
-
-.key-row {
-  display: flex;
-  gap: 0.65rem;
-}
-
-.row-1 {
-  margin-left: 1.35rem;
-}
-
-.row-2 {
-  margin-left: 2.7rem;
-}
-
-.key {
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: 2.4rem;
-  height: 2.1rem;
-  color: var(--quiet);
-  flex: 0 0 auto;
-  font-size: clamp(1rem, 1.8vw, 1.25rem);
-}
-
-.key small {
-  position: absolute;
-  right: -0.05rem;
-  bottom: -0.45rem;
-  color: var(--quiet);
-  font-size: 0.68rem;
-}
-
-.key.expected {
-  color: var(--text);
-}
-
-.key.needs-alt small {
-  color: var(--yellow);
-}
 
 @media (max-width: 760px) {
   .shell {
@@ -194,8 +125,7 @@ button.selected {
     padding-top: 2rem;
   }
 
-  .topline,
-  .keyboard-panel {
+  .topline {
     display: grid;
   }
 
@@ -208,11 +138,4 @@ button.selected {
     margin: 4rem 0 3rem;
   }
 
-  .key-row {
-    gap: 0.4rem;
-  }
-
-  .key {
-    width: 1.9rem;
-  }
 }

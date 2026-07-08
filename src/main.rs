@@ -1,6 +1,6 @@
 mod keyboard;
 
-use keyboard::{KeyboardPane, LayoutId, LAYOUTS};
+use keyboard::{LayoutId, LAYOUTS};
 use leptos::*;
 
 const WORDS: &[&str] = &[
@@ -101,7 +101,6 @@ fn App() -> impl IntoView {
     let (cursor, set_cursor) = create_signal(0usize);
     let (mistakes, set_mistakes) = create_signal(0usize);
     let (last_wrong, set_last_wrong) = create_signal(None::<char>);
-    let (alt_preview, set_alt_preview) = create_signal(false);
 
     create_effect(move |_| {
         layout_id.get();
@@ -115,7 +114,6 @@ fn App() -> impl IntoView {
         scroll_current_into_view();
     });
 
-    let expected = create_memo(move |_| stream_char(cursor.get()));
     let accuracy = create_memo(move |_| {
         let correct = cursor.get();
         let total = correct + mistakes.get();
@@ -126,11 +124,6 @@ fn App() -> impl IntoView {
     });
 
     let on_keydown = move |event: web_sys::KeyboardEvent| {
-        if event.code() == "AltRight" || event.key() == "AltGraph" {
-            set_alt_preview.set(true);
-            return;
-        }
-
         let index = cursor.get();
 
         if event.key() == "Backspace" {
@@ -158,14 +151,8 @@ fn App() -> impl IntoView {
         }
     };
 
-    let on_keyup = move |event: web_sys::KeyboardEvent| {
-        if event.code() == "AltRight" || event.key() == "AltGraph" {
-            set_alt_preview.set(false);
-        }
-    };
-
     view! {
-        <main class="shell" tabindex="0" on:keydown=on_keydown on:keyup=on_keyup>
+        <main class="shell" tabindex="0" on:keydown=on_keydown>
             <nav class="topline">
                 <div class="layouts">
                     {LAYOUTS.iter().map(|layout| {
@@ -201,7 +188,6 @@ fn App() -> impl IntoView {
                 </div>
             </section>
 
-            <KeyboardPane layout_id=layout_id expected=expected alt_preview=alt_preview />
         </main>
     }
 }
