@@ -4,8 +4,8 @@ import {
   words as corpusWords,
 } from "./corpus.js";
 
-const layoutStorageKey = "type.activeLayout";
-const levelStorageKey = "type.activeLevel";
+const layoutStorageKey = "ts.activeLayout";
+const levelStorageKey = "ts.activeLevel";
 
 const layoutRows = {
   qwerty: {
@@ -69,7 +69,7 @@ const layouts = Object.entries(layoutRows).map(([id, layout]) => [id, layout.nam
 const app = document.getElementById("app");
 const layoutList = document.getElementById("layouts");
 const levelList = document.getElementById("levels");
-const typeWindow = document.getElementById("type-window");
+const practiceWindow = document.getElementById("practice-window");
 const wordStream = document.getElementById("word-stream");
 const statsElement = document.getElementById("stats");
 const cursorElement = document.createElement("span");
@@ -510,7 +510,7 @@ function revealCurrent() {
     return;
   }
 
-  const windowRect = typeWindow.getBoundingClientRect();
+  const windowRect = practiceWindow.getBoundingClientRect();
   const currentRect = current.getBoundingClientRect();
   const topEdge = windowRect.top + windowRect.height * 0.34;
   const bottomEdge = windowRect.top + windowRect.height * 0.66;
@@ -551,7 +551,7 @@ function renderStream() {
     fragment.append(span);
   }
 
-  typeWindow.classList.toggle("blocked", lastWrong !== null);
+  practiceWindow.classList.toggle("blocked", lastWrong !== null);
   wordStream.replaceChildren(fragment, cursorElement);
   requestAnimationFrame(() => {
     positionCursor();

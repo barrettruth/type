@@ -1,11 +1,11 @@
-# type
+# ts
 
 Minimal typing trainer for QWERTY, Dvorak, Colemak-DH, and my custom keyboard
 layout "Baremak".
 
 > [!NOTE]
 > Due to GitHub's historic unreliability, active development is hosted on
-> [Forgejo](https://forge.barrettruth.com/barrettruth/type).
+> [Forgejo](https://forge.barrettruth.com/barrettruth/ts).
 > GitHub is maintained as a read-only mirror.
 
 ## Levels

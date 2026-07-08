@@ -148,7 +148,7 @@ button.selected {
   grid-column: 3;
 }
 
-.type-window {
+.practice-window {
   grid-column: 2;
   align-self: center;
   height: calc(1.45em * 8);
@@ -209,11 +209,11 @@ button.selected {
 }
 
 .char.current.wrong,
-.type-window.blocked .char.current {
+.practice-window.blocked .char.current {
   color: var(--red);
 }
 
-.type-window.blocked .typing-cursor {
+.practice-window.blocked .typing-cursor {
   background: var(--red);
 }
 
@@ -236,7 +236,7 @@ button.selected {
   }
 
   .sidebar,
-  .type-window {
+  .practice-window {
     grid-column: 1;
   }
 
@@ -265,7 +265,7 @@ button.selected {
     gap: 1rem;
   }
 
-  .type-window {
+  .practice-window {
     height: calc(1.48em * 7);
     font-size: clamp(1.45rem, 6vw, 2.35rem);
     line-height: 1.48;

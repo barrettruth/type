@@ -23,7 +23,7 @@ jobs:
         env:
           BUILD_DIR: dist
           DEPLOY_HOST: 127.0.0.1
-          DEPLOY_ROOT: /srv/www/type.barrettruth.com
+          DEPLOY_ROOT: /srv/www/ts.barrettruth.com
           DEPLOY_USER: web-deploy
           VPS_WEB_DEPLOY_KEY: ${{ secrets.VPS_WEB_DEPLOY_KEY }}
         run: |

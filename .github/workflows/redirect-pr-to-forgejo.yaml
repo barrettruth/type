@@ -15,7 +15,7 @@ jobs:
       - uses: actions/github-script@v7
         with:
           script: |
-            const forgejoUrl = 'https://forge.barrettruth.com/barrettruth/type/pulls';
+            const forgejoUrl = 'https://forge.barrettruth.com/barrettruth/ts/pulls';
             const body = [
               'Thank you for the contribution.',
               '',

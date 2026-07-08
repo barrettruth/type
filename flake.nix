@@ -1,5 +1,5 @@
 {
-  description = "type.barrettruth.com";
+  description = "ts.barrettruth.com";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";

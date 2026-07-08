@@ -7,7 +7,7 @@ abbrev_url=${TYPE_SCOWL_ABBREV_URL:-https://raw.githubusercontent.com/rdeits/SCO
 gutenberg_urls=${TYPE_GUTENBERG_URLS:-"https://www.gutenberg.org/files/1342/1342-0.txt https://www.gutenberg.org/files/84/84-0.txt https://www.gutenberg.org/files/1661/1661-0.txt"}
 
 mkdir -p "$out_dir"
-tmp=${TMPDIR:-/tmp}/type-corpus-$$
+tmp=${TMPDIR:-/tmp}/ts-corpus-$$
 mkdir -p "$tmp"
 trap 'rm -rf "$tmp"' EXIT HUP INT TERM
 
