@@ -255,7 +255,7 @@ button.selected {
   overflow-wrap: normal;
   tab-size: 2;
   text-align: left;
-  white-space: pre-wrap;
+  white-space: break-spaces;
 }
 
 .practice-window.syntax-highlighting .char.typed.syntax-attribute {
