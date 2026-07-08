@@ -36,7 +36,7 @@ const layoutRows = {
     name: "Baremak",
     rows: {
       top: row("qwfpbjluy;", "QWFPBJLUY:", "!@#</\\>&$|"),
-      home: row("arstgmneio'", 'ARSTGMNEIO"', "[{=(+-)~}]`"),
+      home: row("arstgmneio'", 'ARSTGMNEIO"', "~=[{()}]-+`"),
       bottom: row("zxcdvkh,./", "ZXCDVKH<>?", "%^*_?:;'\""),
     },
   },
