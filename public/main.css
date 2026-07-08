@@ -167,7 +167,7 @@ button.selected {
   color: var(--quiet);
   overflow-wrap: normal;
   padding: 0 0 calc(1.45em * 4);
-  text-align: left;
+  text-align: justify;
   white-space: normal;
   word-break: normal;
 }
