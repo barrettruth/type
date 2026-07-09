@@ -1,73 +1,61 @@
-            // esbuild converts calls to "require" to "__require"; this function
-            // calls the real require if it exists, or throws if it does not (rather than
-            // throwing an error like "require not defined"). But, since we want typescript
-            // to be consumable by other bundlers, we need to convert these calls back to
-            // require so our imports are visible again.
-            //
-            // To fix this, we redefine "require" to a name we're unlikely to use with the
-            // same length as "require", then replace it back to "require" after bundling,
-            // ensuring that source maps still work.
-            //
-            // See: https://github.com/evanw/esbuild/issues/1905
-            const require = "require";
-            const fakeName = "Q".repeat(require.length);
-            const fakeNameRegExp = new RegExp(fakeName, "g");
-            options.define = { [require]: fakeName };
+export const generateTypesMap = task({
+    name: "generate-types-map",
+    run: async () => {
+        await fs.promises.mkdir("./built/local", { recursive: true });
+        const source = "src/server/typesMap.json";
+        const target = "built/local/typesMap.json";
+        const contents = await fs.promises.readFile(source, "utf-8");
+        JSON.parse(contents); // Validates that the JSON parses.
+        await fs.promises.writeFile(target, contents.replace(/\r\n/g, "\n"));
+    },
+});
 
-            // For historical reasons, TypeScript does not set __esModule. Hack esbuild's __toCommonJS to be a noop.
-            // We reference `__copyProps` to ensure the final bundle doesn't have any unreferenced code.
-            const toCommonJsRegExp = /var __toCommonJS .*/;
-            const toCommonJsRegExpReplacement = "var __toCommonJS = (mod) => (__copyProps, mod); // Modified helper to skip setting __esModule.";
+// Drop a copy of diagnosticMessages.generated.json into the built/local folder. This allows
+// it to be synced to the Azure DevOps repo, so that it can get picked up by the build
+// pipeline that generates the localization artifacts that are then fed into the translation process.
+const builtLocalDiagnosticMessagesGeneratedJson = "built/local/diagnosticMessages.generated.json";
+const copyBuiltLocalDiagnosticMessages = task({
+    name: "copy-built-local-diagnostic-messages",
+    dependencies: [generateDiagnostics],
+    run: async () => {
+        const contents = await fs.promises.readFile(diagnosticMessagesGeneratedJson, "utf-8");
+        JSON.parse(contents); // Validates that the JSON parses.
+        await fs.promises.writeFile(builtLocalDiagnosticMessagesGeneratedJson, contents);
+    },
+});
 
-            options.plugins = options.plugins || [];
-            options.plugins.push(
-                {
-                    name: "post-process",
-                    setup: build => {
-                        build.onEnd(async () => {
-                            let contents = await fs.promises.readFile(outfile, "utf-8");
-                            contents = contents.replace(fakeNameRegExp, require);
-                            let matches = 0;
-                            contents = contents.replace(toCommonJsRegExp, () => {
-                                matches++;
-                                return toCommonJsRegExpReplacement;
-                            });
-                            assert(matches === 1, "Expected exactly one match for __toCommonJS");
-                            await fs.promises.writeFile(outfile, contents);
-                        });
-                    },
-                },
-            );
-        }
+export const otherOutputs = task({
+    name: "other-outputs",
+    description: "Builds miscelaneous scripts and documents distributed with the LKG",
+    dependencies: [typingsInstaller, watchGuard, generateTypesMap, copyBuiltLocalDiagnosticMessages],
+});
 
-        return options;
-    });
+export const watchOtherOutputs = task({
+    name: "watch-other-outputs",
+    description: "Builds miscelaneous scripts and documents distributed with the LKG",
+    hiddenFromTaskList: true,
+    dependencies: [watchTypingsInstaller, watchWatchGuard, generateTypesMap, copyBuiltLocalDiagnosticMessages],
+});
 
-    return {
-        build: async () => esbuild.build(await getOptions()),
-        watch: async () => {
-            /** @type {esbuild.BuildOptions} */
-            const options = { ...await getOptions(), logLevel: "info" };
-            if (taskOptions.onWatchRebuild) {
-                const onRebuild = taskOptions.onWatchRebuild;
-                options.plugins = (options.plugins?.slice(0) ?? []).concat([{
-                    name: "watch",
-                    setup: build => {
-                        let firstBuild = true;
-                        build.onEnd(() => {
-                            if (firstBuild) {
-                                firstBuild = false;
-                            }
-                            else {
-                                onRebuild();
-                            }
-                        });
-                    },
-                }]);
-            }
+export const local = task({
+    name: "local",
+    description: "Builds the full compiler and services",
+    dependencies: [localize, tsc, tsserver, services, lssl, otherOutputs, dts],
+});
+export default local;
 
-            const ctx = await esbuild.context(options);
-            ctx.watch();
-        },
-    };
-}
+export const watchLocal = task({
+    name: "watch-local",
+    description: "Watches the full compiler and services",
+    hiddenFromTaskList: true,
+    dependencies: [localize, watchTsc, watchTsserver, watchServices, lssl, watchOtherOutputs, dts, watchSrc],
+});
+
+const runtestsDeps = [tests, generateLibs].concat(cmdLineOptions.typecheck ? [dts] : []);
+
+export const runTests = task({
+    name: "runtests",
+    description: "Runs the tests using the built run.js file.",
+    dependencies: runtestsDeps,
+    run: () => runConsoleTests(testRunner, "mocha-fivemat-progress-reporter", /*runInParallel*/ false),
+});

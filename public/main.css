@@ -185,7 +185,11 @@ button.selected {
   scroll-behavior: smooth;
   font-family:
     "Berkeley Mono", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Monaco, Consolas, monospace;
+  font-feature-settings:
+    "liga" 0,
+    "calt" 0;
   font-size: clamp(1.55rem, 3.15vw, 3.15rem);
+  font-variant-ligatures: none;
   line-height: 1.45;
 }
 

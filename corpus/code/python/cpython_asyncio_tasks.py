@@ -1,94 +1,96 @@
-# Helper to generate new task names
-# This uses itertools.count() instead of a "+= 1" operation because the latter
-# is not thread safe. See bpo-11866 for a longer explanation.
-_task_name_counter = itertools.count(1).__next__
+    def _done_callback(fut):
+        nonlocal nfinished
+        nfinished += 1
 
+        if outer is None or outer.done():
+            if not fut.cancelled():
+                # Mark exception retrieved.
+                fut.exception()
+            return
 
-def current_task(loop=None):
-    """Return a currently executed task."""
-    if loop is None:
-        loop = events.get_running_loop()
-    return _current_tasks.get(loop)
+        if not return_exceptions:
+            if fut.cancelled():
+                # Check if 'fut' is cancelled first, as
+                # 'fut.exception()' will *raise* a CancelledError
+                # instead of returning it.
+                exc = fut._make_cancelled_error()
+                outer.set_exception(exc)
+                return
+            else:
+                exc = fut.exception()
+                if exc is not None:
+                    outer.set_exception(exc)
+                    return
 
+        if nfinished == nfuts:
+            # All futures are done; create a list of results
+            # and set it to the 'outer' future.
+            results = []
 
-def all_tasks(loop=None):
-    """Return a set of all tasks for the loop."""
-    if loop is None:
-        loop = events.get_running_loop()
-    # capturing the set of eager tasks first, so if an eager task "graduates"
-    # to a regular task in another thread, we don't risk missing it.
-    eager_tasks = list(_eager_tasks)
-    # Looping over the WeakSet isn't safe as it can be updated from another
-    # thread, therefore we cast it to list prior to filtering. The list cast
-    # itself requires iteration, so we repeat it several times ignoring
-    # RuntimeErrors (which are not very likely to occur).
-    # See issues 34970 and 36607 for details.
-    scheduled_tasks = None
-    i = 0
-    while True:
-        try:
-            scheduled_tasks = list(_scheduled_tasks)
-        except RuntimeError:
-            i += 1
-            if i >= 1000:
-                raise
+            for fut in children:
+                if fut.cancelled():
+                    # Check if 'fut' is cancelled first, as 'fut.exception()'
+                    # will *raise* a CancelledError instead of returning it.
+                    # Also, since we're adding the exception return value
+                    # to 'results' instead of raising it, don't bother
+                    # setting __context__.  This also lets us preserve
+                    # calling '_make_cancelled_error()' at most once.
+                    res = exceptions.CancelledError(
+                        '' if fut._cancel_message is None else
+                        fut._cancel_message)
+                else:
+                    res = fut.exception()
+                    if res is None:
+                        res = fut.result()
+                results.append(res)
+
+            if outer._cancel_requested:
+                # If gather is being cancelled we must propagate the
+                # cancellation regardless of *return_exceptions* argument.
+                # See issue 32684.
+                exc = fut._make_cancelled_error()
+                outer.set_exception(exc)
+            else:
+                outer.set_result(results)
+
+    arg_to_fut = {}
+    children = []
+    nfuts = 0
+    nfinished = 0
+    done_futs = []
+    loop = None
+    outer = None  # bpo-46672
+    for arg in coros_or_futures:
+        if arg not in arg_to_fut:
+            fut = ensure_future(arg, loop=loop)
+            if loop is None:
+                loop = futures._get_loop(fut)
+            if fut is not arg:
+                # 'arg' was not a Future, therefore, 'fut' is a new
+                # Future created specifically for 'arg'.  Since the caller
+                # can't control it, disable the "destroy pending task"
+                # warning.
+                fut._log_destroy_pending = False
+
+            nfuts += 1
+            arg_to_fut[arg] = fut
+            if fut.done():
+                done_futs.append(fut)
+            else:
+                fut.add_done_callback(_done_callback)
+
         else:
-            break
-    return {t for t in itertools.chain(scheduled_tasks, eager_tasks)
-            if futures._get_loop(t) is loop and not t.done()}
+            # There's a duplicate Future object in coros_or_futures.
+            fut = arg_to_fut[arg]
 
+        children.append(fut)
 
-class Task(futures._PyFuture):  # Inherit Python Task implementation
-                                # from a Python Future implementation.
-
-    """A coroutine wrapped in a Future."""
-
-    # An important invariant maintained while a Task not done:
-    # _fut_waiter is either None or a Future.  The Future
-    # can be either done() or not done().
-    # The task can be in any of 3 states:
-    #
-    # - 1: _fut_waiter is not None and not _fut_waiter.done():
-    #      __step() is *not* scheduled and the Task is waiting for _fut_waiter.
-    # - 2: (_fut_waiter is None or _fut_waiter.done()) and __step() is scheduled:
-    #       the Task is waiting for __step() to be executed.
-    # - 3:  _fut_waiter is None and __step() is *not* scheduled:
-    #       the Task is currently executing (in __step()).
-    #
-    # * In state 1, one of the callbacks of __fut_waiter must be __wakeup().
-    # * The transition from 1 to 2 happens when _fut_waiter becomes done(),
-    #   as it schedules __wakeup() to be called (which calls __step() so
-    #   we way that __step() is scheduled).
-    # * It transitions from 2 to 3 when __step() is executed, and it clears
-    #   _fut_waiter to None.
-
-    # If False, don't log a message if the task is destroyed while its
-    # status is still pending
-    _log_destroy_pending = True
-
-    def __init__(self, coro, *, loop=None, name=None, context=None,
-                 eager_start=False):
-        super().__init__(loop=loop)
-        if self._source_traceback:
-            del self._source_traceback[-1]
-        if not coroutines.iscoroutine(coro):
-            # raise after Future.__init__(), attrs are required for __del__
-            # prevent logging for pending task in __del__
-            self._log_destroy_pending = False
-            raise TypeError(f"a coroutine was expected, got {coro!r}")
-
-        if name is None:
-            self._name = f'Task-{_task_name_counter()}'
-        else:
-            self._name = str(name)
-
-        self._num_cancels_requested = 0
-        self._must_cancel = False
-        self._fut_waiter = None
-        self._coro = coro
-        if context is None:
-            self._context = contextvars.copy_context()
-        else:
-            self._context = context
-
-        if eager_start and self._loop.is_running():
+    outer = _GatheringFuture(children, loop=loop)
+    # Run done callbacks after GatheringFuture created so any post-processing
+    # can be performed at this point
+    # optimization: in the special case that *all* futures finished eagerly,
+    # this will effectively complete the gather eagerly, with the last
+    # callback setting the result (or exception) on outer before returning it
+    for fut in done_futs:
+        _done_callback(fut)
+    return outer

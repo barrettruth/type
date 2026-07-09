@@ -1,74 +1,67 @@
-export function getModuleSpecifiers(
-    moduleSymbol: Symbol,
-    checker: TypeChecker,
+export function getLocalModuleSpecifierBetweenFileNames(
+    importingFile: Pick<SourceFile, "fileName" | "impliedNodeFormat">,
+    targetFileName: string,
     compilerOptions: CompilerOptions,
-    importingSourceFile: SourceFile,
     host: ModuleSpecifierResolutionHost,
-    userPreferences: UserPreferences,
+    preferences: UserPreferences,
     options: ModuleSpecifierOptions = {},
-): readonly string[] {
-    return getModuleSpecifiersWithCacheInfo(
-        moduleSymbol,
-        checker,
+): string {
+    const info = getInfo(importingFile.fileName, host);
+    const importMode = options.overrideImportMode ?? importingFile.impliedNodeFormat;
+    return getLocalModuleSpecifier(
+        targetFileName,
+        info,
         compilerOptions,
-        importingSourceFile,
         host,
-        userPreferences,
-        options,
-        /*forAutoImport*/ false,
-    ).moduleSpecifiers;
+        importMode,
+        getModuleSpecifierPreferences(preferences, host, compilerOptions, importingFile),
+    );
 }
 
-/** @internal */
-export interface ModuleSpecifierResult {
-    kind: ResolvedModuleSpecifierInfo["kind"];
-    moduleSpecifiers: readonly string[];
-    computedWithoutCache: boolean;
-}
-
-/** @internal */
-export function getModuleSpecifiersWithCacheInfo(
-    moduleSymbol: Symbol,
-    checker: TypeChecker,
+function computeModuleSpecifiers(
+    modulePaths: readonly ModulePath[],
     compilerOptions: CompilerOptions,
     importingSourceFile: SourceFile | FutureSourceFile,
     host: ModuleSpecifierResolutionHost,
     userPreferences: UserPreferences,
-    options: ModuleSpecifierOptions | undefined = {},
+    options: ModuleSpecifierOptions = {},
     forAutoImport: boolean,
 ): ModuleSpecifierResult {
-    let computedWithoutCache = false;
-    const ambient = tryGetModuleNameFromAmbientModule(moduleSymbol, checker);
-    if (ambient) {
-        return {
-            kind: "ambient",
-            moduleSpecifiers: !(forAutoImport && isExcludedByRegex(ambient, userPreferences.autoImportSpecifierExcludeRegexes)) ? [ambient] : emptyArray,
-            computedWithoutCache,
-        };
+    const info = getInfo(importingSourceFile.fileName, host);
+    const preferences = getModuleSpecifierPreferences(userPreferences, host, compilerOptions, importingSourceFile);
+    const existingSpecifier = isFullSourceFile(importingSourceFile) && forEach(modulePaths, modulePath =>
+        forEach(
+            host.getFileIncludeReasons().get(toPath(modulePath.path, host.getCurrentDirectory(), info.getCanonicalFileName)),
+            reason => {
+                if (reason.kind !== FileIncludeKind.Import || reason.file !== importingSourceFile.path) return undefined;
+                // If the candidate import mode doesn't match the mode we're generating for, don't consider it
+                // TODO: maybe useful to keep around as an alternative option for certain contexts where the mode is overridable
+                const existingMode = host.getModeForResolutionAtIndex(importingSourceFile, reason.index);
+                const targetMode = options.overrideImportMode ?? host.getDefaultResolutionModeForFile(importingSourceFile);
+                if (existingMode !== targetMode && existingMode !== undefined && targetMode !== undefined) {
+                    return undefined;
+                }
+                const specifier = getModuleNameStringLiteralAt(importingSourceFile, reason.index).text;
+                // If the preference is for non relative and the module specifier is relative, ignore it
+                return preferences.relativePreference !== RelativePreference.NonRelative || !pathIsRelative(specifier) ?
+                    specifier :
+                    undefined;
+            },
+        ));
+    if (existingSpecifier) {
+        return { kind: undefined, moduleSpecifiers: [existingSpecifier], computedWithoutCache: true };
     }
 
-    // eslint-disable-next-line prefer-const
-    let [kind, specifiers, moduleSourceFile, modulePaths, cache] = tryGetModuleSpecifiersFromCacheWorker(
-        moduleSymbol,
-        importingSourceFile,
-        host,
-        userPreferences,
-        options,
-    );
-    if (specifiers) return { kind, moduleSpecifiers: specifiers, computedWithoutCache };
-    if (!moduleSourceFile) return { kind: undefined, moduleSpecifiers: emptyArray, computedWithoutCache };
+    const importedFileIsInNodeModules = some(modulePaths, p => p.isInNodeModules);
 
-    computedWithoutCache = true;
-    modulePaths ||= getAllModulePathsWorker(getInfo(importingSourceFile.fileName, host), moduleSourceFile.originalFileName, host, compilerOptions, options);
-    const result = computeModuleSpecifiers(
-        modulePaths,
-        compilerOptions,
-        importingSourceFile,
-        host,
-        userPreferences,
-        options,
-        forAutoImport,
-    );
-    cache?.set(importingSourceFile.path, moduleSourceFile.path, userPreferences, options, result.kind, modulePaths, result.moduleSpecifiers);
-    return result;
-}
+    // Module specifier priority:
+    //   1. "Bare package specifiers" (e.g. "@foo/bar") resulting from a path through node_modules to a package.json's "types" entry
+    //   2. Specifiers generated using "paths" from tsconfig
+    //   3. Non-relative specfiers resulting from a path through node_modules (e.g. "@foo/bar/path/to/file")
+    //   4. Relative paths
+    let nodeModulesSpecifiers: string[] | undefined;
+    let pathsSpecifiers: string[] | undefined;
+    let redirectPathsSpecifiers: string[] | undefined;
+    let relativeSpecifiers: string[] | undefined;
+    for (const modulePath of modulePaths) {
+        const specifier = modulePath.isInNodeModules

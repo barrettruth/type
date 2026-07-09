@@ -1,14 +1,3 @@
-/* Fast memmem algorithm with guaranteed linear-time performance.
-   Small needles up to size 2 use a dedicated linear search.  Longer needles
-   up to size 256 use a novel modified Horspool algorithm.  It hashes pairs
-   of characters to quickly skip past mismatches.  The main search loop only
-   exits if the last 2 characters match, avoiding unnecessary calls to memcmp
-   and allowing for a larger skip if there is no match.  A self-adapting
-   filtering check is used to quickly detect mismatches in long needles.
-   By limiting the needle length to 256, the shift table can be reduced to 8
-   bits per entry, lowering preprocessing overhead and minimizing cache effects.
-   The limit also implies worst-case performance is linear.
-   Needles larger than 256 characters use the linear-time Two-Way algorithm.  */
 void *
 __memmem (const void *haystack, size_t hs_len,
           const void *needle, size_t ne_len)

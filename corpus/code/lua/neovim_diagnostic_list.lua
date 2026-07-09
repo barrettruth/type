@@ -1,19 +1,3 @@
---- @param title string
---- @return integer?
-local function get_qf_id_for_title(title)
-  local lastqflist = vim.fn.getqflist({ nr = '$' })
-  for i = 1, lastqflist.nr do
-    local qflist = vim.fn.getqflist({ nr = i, id = 0, title = 0 })
-    if qflist.title == title then
-      return qflist.id
-    end
-  end
-
-  return nil
-end
-
---- @param loclist boolean
---- @param opts? vim.diagnostic.setqflist.Opts|vim.diagnostic.setloclist.Opts
 local function set_list(loclist, opts)
   opts = opts or {}
   local open = vim.nonnil(opts.open, true)
@@ -59,28 +43,3 @@ local function set_list(loclist, opts)
     end
   end
 end
-
---- Configuration table with the following keys:
---- @class vim.diagnostic.setqflist.Opts
---- @inlinedoc
----
---- Only add diagnostics from the given namespace(s).
---- @field namespace? integer[]|integer
----
---- Open quickfix list after setting.
---- (default: `true`)
---- @field open? boolean
----
---- Title of quickfix list. Defaults to "Diagnostics". If there's already a quickfix list with this
---- title, it's updated. If not, a new quickfix list is created.
---- @field title? string
----
---- See |diagnostic-severity|.
---- @field severity? vim.diagnostic.SeverityFilter
----
---- A function that takes a diagnostic as input and returns a string or nil.
---- If the return value is nil, the diagnostic is not displayed in the quickfix list.
---- Else the output text is used to display the diagnostic.
---- @field format? fun(diagnostic:vim.Diagnostic): string?
-
---- Add all diagnostics to the quickfix list.

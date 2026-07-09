@@ -1,13 +1,3 @@
-/*
-  ------------------------- malloc_consolidate -------------------------
-
-  malloc_consolidate is a specialized version of free() that tears
-  down chunks held in fastbins.  Free itself cannot be used for this
-  purpose since, among other things, it might place chunks back onto
-  fastbins.  So, instead, we need to use a minor variant of the same
-  code.
-*/
-
 static void malloc_consolidate(mstate av)
 {
   mfastbinptr*    fb;                 /* current fastbin being consolidated */

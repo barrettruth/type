@@ -1,99 +1,83 @@
-/// The default value for MaxUsesToExplore argument. It's relatively small to
-/// keep the cost of analysis reasonable for clients like BasicAliasAnalysis,
-/// where the results can't be cached.
-/// TODO: we should probably introduce a caching CaptureTracking analysis and
-/// use it where possible. The caching version can use much higher limit or
-/// don't have this cap at all.
-static cl::opt<unsigned>
-    DefaultMaxUsesToExplore("capture-tracking-max-uses-to-explore", cl::Hidden,
-                            cl::desc("Maximal number of uses to explore."),
-                            cl::init(100));
+UseCaptureKind llvm::DetermineUseCaptureKind(
+    const Use &U,
+    function_ref<bool(Value *, const DataLayout &)> IsDereferenceableOrNull) {
+  Instruction *I = dyn_cast<Instruction>(U.getUser());
 
-unsigned llvm::getDefaultMaxUsesToExploreForCaptureTracking() {
-  return DefaultMaxUsesToExplore;
-}
+  // TODO: Investigate non-instruction uses.
+  if (!I)
+    return UseCaptureKind::MAY_CAPTURE;
 
-CaptureTracker::~CaptureTracker() = default;
+  switch (I->getOpcode()) {
+  case Instruction::Call:
+  case Instruction::Invoke: {
+    auto *Call = cast<CallBase>(I);
+    // Not captured if the callee is readonly, doesn't return a copy through
+    // its return value and doesn't unwind (a readonly function can leak bits
+    // by throwing an exception or not depending on the input value).
+    if (Call->onlyReadsMemory() && Call->doesNotThrow() &&
+        Call->getType()->isVoidTy())
+      return UseCaptureKind::NO_CAPTURE;
 
-bool CaptureTracker::shouldExplore(const Use *U) { return true; }
+    // The pointer is not captured if returned pointer is not captured.
+    // NOTE: CaptureTracking users should not assume that only functions
+    // marked with nocapture do not capture. This means that places like
+    // getUnderlyingObject in ValueTracking or DecomposeGEPExpression
+    // in BasicAA also need to know about this property.
+    if (isIntrinsicReturningPointerAliasingArgumentWithoutCapturing(Call, true))
+      return UseCaptureKind::PASSTHROUGH;
 
-bool CaptureTracker::isDereferenceableOrNull(Value *O, const DataLayout &DL) {
-  // We want comparisons to null pointers to not be considered capturing,
-  // but need to guard against cases like gep(p, -ptrtoint(p2)) == null,
-  // which are equivalent to p == p2 and would capture the pointer.
-  //
-  // A dereferenceable pointer is a case where this is known to be safe,
-  // because the pointer resulting from such a construction would not be
-  // dereferenceable.
-  //
-  // It is not sufficient to check for inbounds GEP here, because GEP with
-  // zero offset is always inbounds.
-  bool CanBeNull, CanBeFreed;
-  return O->getPointerDereferenceableBytes(DL, CanBeNull, CanBeFreed);
-}
+    // Volatile operations effectively capture the memory location that they
+    // load and store to.
+    if (auto *MI = dyn_cast<MemIntrinsic>(Call))
+      if (MI->isVolatile())
+        return UseCaptureKind::MAY_CAPTURE;
 
-namespace {
-struct SimpleCaptureTracker : public CaptureTracker {
-  explicit SimpleCaptureTracker(bool ReturnCaptures)
-      : ReturnCaptures(ReturnCaptures) {}
+    // Calling a function pointer does not in itself cause the pointer to
+    // be captured.  This is a subtle point considering that (for example)
+    // the callee might return its own address.  It is analogous to saying
+    // that loading a value from a pointer does not cause the pointer to be
+    // captured, even though the loaded value might be the pointer itself
+    // (think of self-referential objects).
+    if (Call->isCallee(&U))
+      return UseCaptureKind::NO_CAPTURE;
 
-  void tooManyUses() override {
-    LLVM_DEBUG(dbgs() << "Captured due to too many uses\n");
-    Captured = true;
+    // Not captured if only passed via 'nocapture' arguments.
+    if (Call->isDataOperand(&U) &&
+        !Call->doesNotCapture(Call->getDataOperandNo(&U))) {
+      // The parameter is not marked 'nocapture' - captured.
+      return UseCaptureKind::MAY_CAPTURE;
+    }
+    return UseCaptureKind::NO_CAPTURE;
   }
-
-  bool captured(const Use *U) override {
-    if (isa<ReturnInst>(U->getUser()) && !ReturnCaptures)
-      return false;
-
-    LLVM_DEBUG(dbgs() << "Captured by: " << *U->getUser() << "\n");
-
-    Captured = true;
-    return true;
+  case Instruction::Load:
+    // Volatile loads make the address observable.
+    if (cast<LoadInst>(I)->isVolatile())
+      return UseCaptureKind::MAY_CAPTURE;
+    return UseCaptureKind::NO_CAPTURE;
+  case Instruction::VAArg:
+    // "va-arg" from a pointer does not cause it to be captured.
+    return UseCaptureKind::NO_CAPTURE;
+  case Instruction::Store:
+    // Stored the pointer - conservatively assume it may be captured.
+    // Volatile stores make the address observable.
+    if (U.getOperandNo() == 0 || cast<StoreInst>(I)->isVolatile())
+      return UseCaptureKind::MAY_CAPTURE;
+    return UseCaptureKind::NO_CAPTURE;
+  case Instruction::AtomicRMW: {
+    // atomicrmw conceptually includes both a load and store from
+    // the same location.
+    // As with a store, the location being accessed is not captured,
+    // but the value being stored is.
+    // Volatile stores make the address observable.
+    auto *ARMWI = cast<AtomicRMWInst>(I);
+    if (U.getOperandNo() == 1 || ARMWI->isVolatile())
+      return UseCaptureKind::MAY_CAPTURE;
+    return UseCaptureKind::NO_CAPTURE;
   }
-
-  bool ReturnCaptures;
-
-  bool Captured = false;
-};
-
-/// Only find pointer captures which happen before the given instruction. Uses
-/// the dominator tree to determine whether one instruction is before another.
-/// Only support the case where the Value is defined in the same basic block
-/// as the given instruction and the use.
-struct CapturesBefore : public CaptureTracker {
-
-  CapturesBefore(bool ReturnCaptures, const Instruction *I,
-                 const DominatorTree *DT, bool IncludeI, const LoopInfo *LI)
-      : BeforeHere(I), DT(DT), ReturnCaptures(ReturnCaptures),
-        IncludeI(IncludeI), LI(LI) {}
-
-  void tooManyUses() override { Captured = true; }
-
-  bool isSafeToPrune(Instruction *I) {
-    if (BeforeHere == I)
-      return !IncludeI;
-
-    // We explore this usage only if the usage can reach "BeforeHere".
-    // If use is not reachable from entry, there is no need to explore.
-    if (!DT->isReachableFromEntry(I->getParent()))
-      return true;
-
-    // Check whether there is a path from I to BeforeHere.
-    return !isPotentiallyReachable(I, BeforeHere, nullptr, DT, LI);
-  }
-
-  bool captured(const Use *U) override {
-    Instruction *I = cast<Instruction>(U->getUser());
-    if (isa<ReturnInst>(I) && !ReturnCaptures)
-      return false;
-
-    // Check isSafeToPrune() here rather than in shouldExplore() to avoid
-    // an expensive reachability query for every instruction we look at.
-    // Instead we only do one for actual capturing candidates.
-    if (isSafeToPrune(I))
-      return false;
-
-    Captured = true;
-    return true;
-  }
+  case Instruction::AtomicCmpXchg: {
+    // cmpxchg conceptually includes both a load and store from
+    // the same location.
+    // As with a store, the location being accessed is not captured,
+    // but the value being stored is.
+    // Volatile stores make the address observable.
+    auto *ACXI = cast<AtomicCmpXchgInst>(I);
