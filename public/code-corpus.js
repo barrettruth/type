@@ -5046,6 +5046,14280 @@ export const codeSnippets = [
   },
   {
     "language": "cpp",
+    "name": "cpp/libstdcxx_hashtable_erase.cpp",
+    "code": "    auto\n    _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,\n               _Hash, _RangeHash, _Unused, _RehashPolicy, _Traits>::\n    _M_erase(size_type __bkt, __node_base_ptr __prev_n, __node_ptr __n)\n    -> iterator\n    {\n      if (__prev_n == _M_buckets[__bkt])\n        _M_remove_bucket_begin(__bkt, __n->_M_next(),\n          __n->_M_nxt ? _M_bucket_index(*__n->_M_next()) : 0);\n      else if (__n->_M_nxt)\n        {\n          size_type __next_bkt = _M_bucket_index(*__n->_M_next());\n          if (__next_bkt != __bkt)\n            _M_buckets[__next_bkt] = __prev_n;\n        }\n\n      __prev_n->_M_nxt = __n->_M_nxt;\n      iterator __result(__n->_M_next());\n      this->_M_deallocate_node(__n);\n      --_M_element_count;\n\n      return __result;\n    }\n\n#pragma GCC diagnostic push\n#pragma GCC diagnostic ignored \"-Wc++17-extensions\" // if constexpr\n  template<typename _Key, typename _Value, typename _Alloc,\n           typename _ExtractKey, typename _Equal,\n           typename _Hash, typename _RangeHash, typename _Unused,\n           typename _RehashPolicy, typename _Traits>\n    auto\n    _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,\n               _Hash, _RangeHash, _Unused, _RehashPolicy, _Traits>::\n    erase(const key_type& __k)\n    -> size_type\n    {\n      auto __loc = _M_locate(__k);\n      if (!__loc)\n        return 0;\n\n      __node_base_ptr __prev_n = __loc._M_before;\n      __node_ptr __n = __loc._M_node();\n      auto __bkt = __loc._M_bucket_index;\n      if (__bkt == size_type(-1))\n        __bkt = _M_bucket_index(*__n);\n\n      if constexpr (__unique_keys::value)\n        {\n          _M_erase(__bkt, __prev_n, __n);\n          return 1;\n        }\n      else\n        {\n          // _GLIBCXX_RESOLVE_LIB_DEFECTS\n          // 526. Is it undefined if a function in the standard changes\n          // in parameters?\n          // We use one loop to find all matching nodes and another to\n          // deallocate them so that the key stays valid during the first loop.\n          // It might be invalidated indirectly when destroying nodes.\n          __node_ptr __n_last = __n->_M_next();\n          while (__n_last && this->_M_node_equals(*__n, *__n_last))\n            __n_last = __n_last->_M_next();\n\n          std::size_t __n_last_bkt\n            = __n_last ? _M_bucket_index(*__n_last) : __bkt;\n\n          // Deallocate nodes.\n          size_type __result = 0;\n          do\n            {\n              __node_ptr __p = __n->_M_next();\n              this->_M_deallocate_node(__n);\n              __n = __p;\n              ++__result;\n            }\n          while (__n != __n_last);\n\n          _M_element_count -= __result;\n          if (__prev_n == _M_buckets[__bkt])\n            _M_remove_bucket_begin(__bkt, __n_last, __n_last_bkt);\n          else if (__n_last_bkt != __bkt)\n            _M_buckets[__n_last_bkt] = __prev_n;\n          __prev_n->_M_nxt = __n_last;\n          return __result;\n        }\n    }\n#pragma GCC diagnostic pop",
+    "spans": [
+      {
+        "start": 4,
+        "end": 8,
+        "className": "syntax-type"
+      },
+      {
+        "start": 13,
+        "end": 23,
+        "className": "syntax-type"
+      },
+      {
+        "start": 23,
+        "end": 24,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 24,
+        "end": 28,
+        "className": "syntax-type"
+      },
+      {
+        "start": 30,
+        "end": 36,
+        "className": "syntax-type"
+      },
+      {
+        "start": 38,
+        "end": 44,
+        "className": "syntax-type"
+      },
+      {
+        "start": 46,
+        "end": 57,
+        "className": "syntax-type"
+      },
+      {
+        "start": 59,
+        "end": 65,
+        "className": "syntax-type"
+      },
+      {
+        "start": 82,
+        "end": 87,
+        "className": "syntax-type"
+      },
+      {
+        "start": 89,
+        "end": 99,
+        "className": "syntax-type"
+      },
+      {
+        "start": 101,
+        "end": 108,
+        "className": "syntax-type"
+      },
+      {
+        "start": 110,
+        "end": 123,
+        "className": "syntax-type"
+      },
+      {
+        "start": 125,
+        "end": 132,
+        "className": "syntax-type"
+      },
+      {
+        "start": 132,
+        "end": 133,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 140,
+        "end": 148,
+        "className": "syntax-function"
+      },
+      {
+        "start": 149,
+        "end": 158,
+        "className": "syntax-type"
+      },
+      {
+        "start": 159,
+        "end": 164,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 166,
+        "end": 181,
+        "className": "syntax-type"
+      },
+      {
+        "start": 182,
+        "end": 190,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 192,
+        "end": 202,
+        "className": "syntax-type"
+      },
+      {
+        "start": 203,
+        "end": 206,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 212,
+        "end": 214,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 215,
+        "end": 223,
+        "className": "syntax-type"
+      },
+      {
+        "start": 236,
+        "end": 238,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 240,
+        "end": 248,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 249,
+        "end": 251,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 252,
+        "end": 262,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 263,
+        "end": 268,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 279,
+        "end": 301,
+        "className": "syntax-function"
+      },
+      {
+        "start": 302,
+        "end": 307,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 309,
+        "end": 312,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 312,
+        "end": 314,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 314,
+        "end": 321,
+        "className": "syntax-function"
+      },
+      {
+        "start": 335,
+        "end": 338,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 338,
+        "end": 340,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 340,
+        "end": 346,
+        "className": "syntax-property"
+      },
+      {
+        "start": 349,
+        "end": 364,
+        "className": "syntax-function"
+      },
+      {
+        "start": 365,
+        "end": 366,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 366,
+        "end": 369,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 369,
+        "end": 371,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 371,
+        "end": 378,
+        "className": "syntax-function"
+      },
+      {
+        "start": 384,
+        "end": 385,
+        "className": "syntax-number"
+      },
+      {
+        "start": 394,
+        "end": 398,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 399,
+        "end": 401,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 403,
+        "end": 406,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 406,
+        "end": 408,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 408,
+        "end": 414,
+        "className": "syntax-property"
+      },
+      {
+        "start": 436,
+        "end": 445,
+        "className": "syntax-type"
+      },
+      {
+        "start": 446,
+        "end": 456,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 457,
+        "end": 458,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 459,
+        "end": 474,
+        "className": "syntax-function"
+      },
+      {
+        "start": 475,
+        "end": 476,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 476,
+        "end": 479,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 479,
+        "end": 481,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 481,
+        "end": 488,
+        "className": "syntax-function"
+      },
+      {
+        "start": 503,
+        "end": 505,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 507,
+        "end": 517,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 518,
+        "end": 520,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 521,
+        "end": 526,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 540,
+        "end": 550,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 551,
+        "end": 561,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 563,
+        "end": 564,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 565,
+        "end": 573,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 592,
+        "end": 600,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 600,
+        "end": 602,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 602,
+        "end": 608,
+        "className": "syntax-property"
+      },
+      {
+        "start": 609,
+        "end": 610,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 611,
+        "end": 614,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 614,
+        "end": 616,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 616,
+        "end": 622,
+        "className": "syntax-property"
+      },
+      {
+        "start": 630,
+        "end": 638,
+        "className": "syntax-type"
+      },
+      {
+        "start": 639,
+        "end": 647,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 648,
+        "end": 651,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 651,
+        "end": 653,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 653,
+        "end": 660,
+        "className": "syntax-function"
+      },
+      {
+        "start": 671,
+        "end": 675,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 675,
+        "end": 677,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 677,
+        "end": 695,
+        "className": "syntax-function"
+      },
+      {
+        "start": 696,
+        "end": 699,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 708,
+        "end": 710,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 710,
+        "end": 726,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 735,
+        "end": 741,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 742,
+        "end": 750,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 759,
+        "end": 766,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 787,
+        "end": 794,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 857,
+        "end": 865,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 865,
+        "end": 866,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 866,
+        "end": 874,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 875,
+        "end": 879,
+        "className": "syntax-type"
+      },
+      {
+        "start": 881,
+        "end": 889,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 890,
+        "end": 896,
+        "className": "syntax-type"
+      },
+      {
+        "start": 898,
+        "end": 906,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 907,
+        "end": 913,
+        "className": "syntax-type"
+      },
+      {
+        "start": 926,
+        "end": 934,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 935,
+        "end": 946,
+        "className": "syntax-type"
+      },
+      {
+        "start": 948,
+        "end": 956,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 957,
+        "end": 963,
+        "className": "syntax-type"
+      },
+      {
+        "start": 976,
+        "end": 984,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 985,
+        "end": 990,
+        "className": "syntax-type"
+      },
+      {
+        "start": 992,
+        "end": 1000,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1001,
+        "end": 1011,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1013,
+        "end": 1021,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1022,
+        "end": 1029,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1042,
+        "end": 1050,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1051,
+        "end": 1064,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1066,
+        "end": 1074,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1075,
+        "end": 1082,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1082,
+        "end": 1083,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1088,
+        "end": 1092,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1097,
+        "end": 1107,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1107,
+        "end": 1108,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1108,
+        "end": 1112,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1114,
+        "end": 1120,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1122,
+        "end": 1128,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1130,
+        "end": 1141,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1143,
+        "end": 1149,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1166,
+        "end": 1171,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1173,
+        "end": 1183,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1185,
+        "end": 1192,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1194,
+        "end": 1207,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1209,
+        "end": 1216,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1216,
+        "end": 1217,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1224,
+        "end": 1229,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1230,
+        "end": 1235,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1236,
+        "end": 1244,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1244,
+        "end": 1245,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1246,
+        "end": 1249,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1255,
+        "end": 1257,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1258,
+        "end": 1267,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1280,
+        "end": 1284,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1285,
+        "end": 1290,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1291,
+        "end": 1292,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1293,
+        "end": 1302,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1303,
+        "end": 1306,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1315,
+        "end": 1317,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1320,
+        "end": 1325,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1335,
+        "end": 1341,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1342,
+        "end": 1343,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1352,
+        "end": 1367,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1368,
+        "end": 1376,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1377,
+        "end": 1378,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1379,
+        "end": 1384,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1385,
+        "end": 1394,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1402,
+        "end": 1412,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1413,
+        "end": 1416,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1417,
+        "end": 1418,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1419,
+        "end": 1424,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1425,
+        "end": 1432,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1442,
+        "end": 1446,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1447,
+        "end": 1452,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1453,
+        "end": 1454,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1455,
+        "end": 1460,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1461,
+        "end": 1476,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1484,
+        "end": 1486,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1488,
+        "end": 1493,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1494,
+        "end": 1496,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1497,
+        "end": 1506,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1507,
+        "end": 1509,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1520,
+        "end": 1525,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1526,
+        "end": 1527,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1528,
+        "end": 1543,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1544,
+        "end": 1545,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1545,
+        "end": 1548,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1558,
+        "end": 1560,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1561,
+        "end": 1570,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1587,
+        "end": 1592,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1614,
+        "end": 1622,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1623,
+        "end": 1628,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1630,
+        "end": 1638,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1640,
+        "end": 1643,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1656,
+        "end": 1662,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1663,
+        "end": 1664,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1682,
+        "end": 1686,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1707,
+        "end": 1738,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1749,
+        "end": 1810,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1821,
+        "end": 1838,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1849,
+        "end": 1909,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1920,
+        "end": 1989,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2000,
+        "end": 2060,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2071,
+        "end": 2081,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2082,
+        "end": 2090,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2091,
+        "end": 2092,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2093,
+        "end": 2096,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2096,
+        "end": 2098,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2098,
+        "end": 2105,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2119,
+        "end": 2124,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2126,
+        "end": 2134,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2135,
+        "end": 2137,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2138,
+        "end": 2142,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2142,
+        "end": 2144,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2144,
+        "end": 2158,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2159,
+        "end": 2160,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2160,
+        "end": 2163,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2165,
+        "end": 2166,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2166,
+        "end": 2174,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2189,
+        "end": 2197,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2198,
+        "end": 2199,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2200,
+        "end": 2208,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2208,
+        "end": 2210,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2210,
+        "end": 2217,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2237,
+        "end": 2243,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2244,
+        "end": 2256,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2269,
+        "end": 2270,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2271,
+        "end": 2279,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2282,
+        "end": 2297,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2298,
+        "end": 2299,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2299,
+        "end": 2307,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2311,
+        "end": 2316,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2329,
+        "end": 2349,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2360,
+        "end": 2369,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2370,
+        "end": 2378,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2379,
+        "end": 2380,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2381,
+        "end": 2382,
+        "className": "syntax-number"
+      },
+      {
+        "start": 2394,
+        "end": 2396,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2425,
+        "end": 2435,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2436,
+        "end": 2439,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2440,
+        "end": 2441,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2442,
+        "end": 2445,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2445,
+        "end": 2447,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2447,
+        "end": 2454,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2472,
+        "end": 2476,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2476,
+        "end": 2478,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2478,
+        "end": 2496,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2497,
+        "end": 2500,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2517,
+        "end": 2520,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2521,
+        "end": 2522,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2523,
+        "end": 2526,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2542,
+        "end": 2544,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2544,
+        "end": 2552,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2578,
+        "end": 2583,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2585,
+        "end": 2588,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2589,
+        "end": 2591,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2592,
+        "end": 2600,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2614,
+        "end": 2630,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2631,
+        "end": 2633,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2634,
+        "end": 2642,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2654,
+        "end": 2656,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2658,
+        "end": 2666,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2667,
+        "end": 2669,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2670,
+        "end": 2680,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2681,
+        "end": 2686,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2701,
+        "end": 2723,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2724,
+        "end": 2729,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2731,
+        "end": 2739,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2741,
+        "end": 2753,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2766,
+        "end": 2770,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2771,
+        "end": 2773,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2775,
+        "end": 2787,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2788,
+        "end": 2790,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2791,
+        "end": 2796,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2810,
+        "end": 2820,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2821,
+        "end": 2833,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2835,
+        "end": 2836,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2837,
+        "end": 2845,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2857,
+        "end": 2865,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2865,
+        "end": 2867,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2867,
+        "end": 2873,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2874,
+        "end": 2875,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2876,
+        "end": 2884,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2896,
+        "end": 2902,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2903,
+        "end": 2911,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2929,
+        "end": 2936,
+        "className": "syntax-keyword"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_hashtable_find.cpp",
+    "code": "    auto\n    _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,\n               _Hash, _RangeHash, _Unused, _RehashPolicy, _Traits>::\n    find(const key_type& __k)\n    -> iterator\n    { return iterator(_M_locate(__k)); }\n\n  template<typename _Key, typename _Value, typename _Alloc,\n           typename _ExtractKey, typename _Equal,\n           typename _Hash, typename _RangeHash, typename _Unused,\n           typename _RehashPolicy, typename _Traits>\n    auto\n    _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,\n               _Hash, _RangeHash, _Unused, _RehashPolicy, _Traits>::\n    find(const key_type& __k) const\n    -> const_iterator\n    { return const_iterator(_M_locate(__k)); }\n\n#if __cplusplus > 201703L\n  template<typename _Key, typename _Value, typename _Alloc,\n           typename _ExtractKey, typename _Equal,\n           typename _Hash, typename _RangeHash, typename _Unused,\n           typename _RehashPolicy, typename _Traits>\n    template<typename _Kt, typename, typename>\n      auto\n      _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,\n                 _Hash, _RangeHash, _Unused, _RehashPolicy, _Traits>::\n      _M_find_tr(const _Kt& __k)\n      -> iterator\n      {\n        if (size() <= __small_size_threshold())\n          {\n            for (auto __n = _M_begin(); __n; __n = __n->_M_next())\n              if (this->_M_key_equals_tr(__k, *__n))\n                return iterator(__n);\n            return end();\n          }\n\n        __hash_code __code = this->_M_hash_code_tr(__k);\n        std::size_t __bkt = _M_bucket_index(__code);\n        return iterator(_M_find_node_tr(__bkt, __k, __code));\n      }\n\n  template<typename _Key, typename _Value, typename _Alloc,\n           typename _ExtractKey, typename _Equal,\n           typename _Hash, typename _RangeHash, typename _Unused,\n           typename _RehashPolicy, typename _Traits>\n    template<typename _Kt, typename, typename>\n      auto\n      _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,\n                 _Hash, _RangeHash, _Unused, _RehashPolicy, _Traits>::\n      _M_find_tr(const _Kt& __k) const\n      -> const_iterator\n      {\n        if (size() <= __small_size_threshold())\n          {\n            for (auto __n = _M_begin(); __n; __n = __n->_M_next())\n              if (this->_M_key_equals_tr(__k, *__n))\n                return const_iterator(__n);\n            return end();\n          }\n\n        __hash_code __code = this->_M_hash_code_tr(__k);\n        std::size_t __bkt = _M_bucket_index(__code);\n        return const_iterator(_M_find_node_tr(__bkt, __k, __code));\n      }\n#endif\n\n  template<typename _Key, typename _Value, typename _Alloc,\n           typename _ExtractKey, typename _Equal,\n           typename _Hash, typename _RangeHash, typename _Unused,\n           typename _RehashPolicy, typename _Traits>\n    auto\n    _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,\n               _Hash, _RangeHash, _Unused, _RehashPolicy, _Traits>::\n    count(const key_type& __k) const\n    -> size_type\n    {\n      auto __it = find(__k);\n      if (!__it._M_cur)\n        return 0;\n\n      if (__unique_keys::value)\n        return 1;",
+    "spans": [
+      {
+        "start": 4,
+        "end": 8,
+        "className": "syntax-type"
+      },
+      {
+        "start": 13,
+        "end": 23,
+        "className": "syntax-type"
+      },
+      {
+        "start": 23,
+        "end": 24,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 24,
+        "end": 28,
+        "className": "syntax-type"
+      },
+      {
+        "start": 30,
+        "end": 36,
+        "className": "syntax-type"
+      },
+      {
+        "start": 38,
+        "end": 44,
+        "className": "syntax-type"
+      },
+      {
+        "start": 46,
+        "end": 57,
+        "className": "syntax-type"
+      },
+      {
+        "start": 59,
+        "end": 65,
+        "className": "syntax-type"
+      },
+      {
+        "start": 82,
+        "end": 87,
+        "className": "syntax-type"
+      },
+      {
+        "start": 89,
+        "end": 99,
+        "className": "syntax-type"
+      },
+      {
+        "start": 101,
+        "end": 108,
+        "className": "syntax-type"
+      },
+      {
+        "start": 110,
+        "end": 123,
+        "className": "syntax-type"
+      },
+      {
+        "start": 125,
+        "end": 132,
+        "className": "syntax-type"
+      },
+      {
+        "start": 132,
+        "end": 133,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 140,
+        "end": 144,
+        "className": "syntax-function"
+      },
+      {
+        "start": 145,
+        "end": 150,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 151,
+        "end": 159,
+        "className": "syntax-type"
+      },
+      {
+        "start": 159,
+        "end": 160,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 161,
+        "end": 164,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 170,
+        "end": 172,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 173,
+        "end": 181,
+        "className": "syntax-type"
+      },
+      {
+        "start": 188,
+        "end": 194,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 195,
+        "end": 203,
+        "className": "syntax-function"
+      },
+      {
+        "start": 204,
+        "end": 213,
+        "className": "syntax-function"
+      },
+      {
+        "start": 214,
+        "end": 217,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 226,
+        "end": 234,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 234,
+        "end": 235,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 235,
+        "end": 243,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 244,
+        "end": 248,
+        "className": "syntax-type"
+      },
+      {
+        "start": 250,
+        "end": 258,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 259,
+        "end": 265,
+        "className": "syntax-type"
+      },
+      {
+        "start": 267,
+        "end": 275,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 276,
+        "end": 282,
+        "className": "syntax-type"
+      },
+      {
+        "start": 295,
+        "end": 303,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 304,
+        "end": 315,
+        "className": "syntax-type"
+      },
+      {
+        "start": 317,
+        "end": 325,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 326,
+        "end": 332,
+        "className": "syntax-type"
+      },
+      {
+        "start": 345,
+        "end": 353,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 354,
+        "end": 359,
+        "className": "syntax-type"
+      },
+      {
+        "start": 361,
+        "end": 369,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 370,
+        "end": 380,
+        "className": "syntax-type"
+      },
+      {
+        "start": 382,
+        "end": 390,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 391,
+        "end": 398,
+        "className": "syntax-type"
+      },
+      {
+        "start": 411,
+        "end": 419,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 420,
+        "end": 433,
+        "className": "syntax-type"
+      },
+      {
+        "start": 435,
+        "end": 443,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 444,
+        "end": 451,
+        "className": "syntax-type"
+      },
+      {
+        "start": 451,
+        "end": 452,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 457,
+        "end": 461,
+        "className": "syntax-type"
+      },
+      {
+        "start": 466,
+        "end": 476,
+        "className": "syntax-type"
+      },
+      {
+        "start": 476,
+        "end": 477,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 477,
+        "end": 481,
+        "className": "syntax-type"
+      },
+      {
+        "start": 483,
+        "end": 489,
+        "className": "syntax-type"
+      },
+      {
+        "start": 491,
+        "end": 497,
+        "className": "syntax-type"
+      },
+      {
+        "start": 499,
+        "end": 510,
+        "className": "syntax-type"
+      },
+      {
+        "start": 512,
+        "end": 518,
+        "className": "syntax-type"
+      },
+      {
+        "start": 535,
+        "end": 540,
+        "className": "syntax-type"
+      },
+      {
+        "start": 542,
+        "end": 552,
+        "className": "syntax-type"
+      },
+      {
+        "start": 554,
+        "end": 561,
+        "className": "syntax-type"
+      },
+      {
+        "start": 563,
+        "end": 576,
+        "className": "syntax-type"
+      },
+      {
+        "start": 578,
+        "end": 585,
+        "className": "syntax-type"
+      },
+      {
+        "start": 585,
+        "end": 586,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 593,
+        "end": 597,
+        "className": "syntax-function"
+      },
+      {
+        "start": 598,
+        "end": 603,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 604,
+        "end": 612,
+        "className": "syntax-type"
+      },
+      {
+        "start": 612,
+        "end": 613,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 614,
+        "end": 617,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 619,
+        "end": 624,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 629,
+        "end": 631,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 632,
+        "end": 646,
+        "className": "syntax-type"
+      },
+      {
+        "start": 653,
+        "end": 659,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 660,
+        "end": 674,
+        "className": "syntax-function"
+      },
+      {
+        "start": 675,
+        "end": 684,
+        "className": "syntax-function"
+      },
+      {
+        "start": 685,
+        "end": 688,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 695,
+        "end": 698,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 699,
+        "end": 710,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 711,
+        "end": 712,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 713,
+        "end": 720,
+        "className": "syntax-number"
+      },
+      {
+        "start": 723,
+        "end": 731,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 731,
+        "end": 732,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 732,
+        "end": 740,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 741,
+        "end": 745,
+        "className": "syntax-type"
+      },
+      {
+        "start": 747,
+        "end": 755,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 756,
+        "end": 762,
+        "className": "syntax-type"
+      },
+      {
+        "start": 764,
+        "end": 772,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 773,
+        "end": 779,
+        "className": "syntax-type"
+      },
+      {
+        "start": 792,
+        "end": 800,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 801,
+        "end": 812,
+        "className": "syntax-type"
+      },
+      {
+        "start": 814,
+        "end": 822,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 823,
+        "end": 829,
+        "className": "syntax-type"
+      },
+      {
+        "start": 842,
+        "end": 850,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 851,
+        "end": 856,
+        "className": "syntax-type"
+      },
+      {
+        "start": 858,
+        "end": 866,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 867,
+        "end": 877,
+        "className": "syntax-type"
+      },
+      {
+        "start": 879,
+        "end": 887,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 888,
+        "end": 895,
+        "className": "syntax-type"
+      },
+      {
+        "start": 908,
+        "end": 916,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 917,
+        "end": 930,
+        "className": "syntax-type"
+      },
+      {
+        "start": 932,
+        "end": 940,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 941,
+        "end": 948,
+        "className": "syntax-type"
+      },
+      {
+        "start": 948,
+        "end": 949,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 954,
+        "end": 962,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 962,
+        "end": 963,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 963,
+        "end": 971,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 972,
+        "end": 975,
+        "className": "syntax-type"
+      },
+      {
+        "start": 977,
+        "end": 985,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 987,
+        "end": 995,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 995,
+        "end": 996,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1003,
+        "end": 1007,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1014,
+        "end": 1024,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1024,
+        "end": 1025,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1025,
+        "end": 1029,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1031,
+        "end": 1037,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1039,
+        "end": 1045,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1047,
+        "end": 1058,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1060,
+        "end": 1066,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1085,
+        "end": 1090,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1092,
+        "end": 1102,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1104,
+        "end": 1111,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1113,
+        "end": 1126,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1128,
+        "end": 1135,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1135,
+        "end": 1136,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1145,
+        "end": 1155,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1156,
+        "end": 1161,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1162,
+        "end": 1165,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1165,
+        "end": 1166,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1167,
+        "end": 1170,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1178,
+        "end": 1180,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1181,
+        "end": 1189,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1206,
+        "end": 1208,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1210,
+        "end": 1214,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1220,
+        "end": 1242,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1270,
+        "end": 1273,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1275,
+        "end": 1279,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1280,
+        "end": 1283,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1284,
+        "end": 1285,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1286,
+        "end": 1294,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1298,
+        "end": 1301,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1303,
+        "end": 1306,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1307,
+        "end": 1308,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1309,
+        "end": 1312,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1312,
+        "end": 1314,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1314,
+        "end": 1321,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1339,
+        "end": 1341,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1343,
+        "end": 1347,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1347,
+        "end": 1349,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1349,
+        "end": 1365,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1366,
+        "end": 1369,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1371,
+        "end": 1372,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1372,
+        "end": 1375,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1394,
+        "end": 1400,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1401,
+        "end": 1409,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1410,
+        "end": 1413,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1428,
+        "end": 1434,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1435,
+        "end": 1438,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1463,
+        "end": 1474,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1475,
+        "end": 1481,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1482,
+        "end": 1483,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1484,
+        "end": 1488,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1488,
+        "end": 1490,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1490,
+        "end": 1505,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1506,
+        "end": 1509,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1525,
+        "end": 1531,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1532,
+        "end": 1537,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1538,
+        "end": 1539,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1540,
+        "end": 1555,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1556,
+        "end": 1562,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1573,
+        "end": 1579,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1580,
+        "end": 1588,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1589,
+        "end": 1604,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1605,
+        "end": 1610,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1612,
+        "end": 1615,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1617,
+        "end": 1623,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1638,
+        "end": 1646,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1646,
+        "end": 1647,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1647,
+        "end": 1655,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1656,
+        "end": 1660,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1662,
+        "end": 1670,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1671,
+        "end": 1677,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1679,
+        "end": 1687,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1688,
+        "end": 1694,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1707,
+        "end": 1715,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1716,
+        "end": 1727,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1729,
+        "end": 1737,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1738,
+        "end": 1744,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1757,
+        "end": 1765,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1766,
+        "end": 1771,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1773,
+        "end": 1781,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1782,
+        "end": 1792,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1794,
+        "end": 1802,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1803,
+        "end": 1810,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1823,
+        "end": 1831,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1832,
+        "end": 1845,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1847,
+        "end": 1855,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1856,
+        "end": 1863,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1863,
+        "end": 1864,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1869,
+        "end": 1877,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1877,
+        "end": 1878,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1878,
+        "end": 1886,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1887,
+        "end": 1890,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1892,
+        "end": 1900,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1902,
+        "end": 1910,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1910,
+        "end": 1911,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1918,
+        "end": 1922,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1929,
+        "end": 1939,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1939,
+        "end": 1940,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1940,
+        "end": 1944,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1946,
+        "end": 1952,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1954,
+        "end": 1960,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1962,
+        "end": 1973,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1975,
+        "end": 1981,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2000,
+        "end": 2005,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2007,
+        "end": 2017,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2019,
+        "end": 2026,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2028,
+        "end": 2041,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2043,
+        "end": 2050,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2050,
+        "end": 2051,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2060,
+        "end": 2070,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2071,
+        "end": 2076,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2077,
+        "end": 2080,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2080,
+        "end": 2081,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2082,
+        "end": 2085,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2087,
+        "end": 2092,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2099,
+        "end": 2101,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2102,
+        "end": 2116,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2133,
+        "end": 2135,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2137,
+        "end": 2141,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2147,
+        "end": 2169,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2197,
+        "end": 2200,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2202,
+        "end": 2206,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2207,
+        "end": 2210,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2211,
+        "end": 2212,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2213,
+        "end": 2221,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2225,
+        "end": 2228,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2230,
+        "end": 2233,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2234,
+        "end": 2235,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2236,
+        "end": 2239,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2239,
+        "end": 2241,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2241,
+        "end": 2248,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2266,
+        "end": 2268,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2270,
+        "end": 2274,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2274,
+        "end": 2276,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2276,
+        "end": 2292,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2293,
+        "end": 2296,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2298,
+        "end": 2299,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2299,
+        "end": 2302,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2321,
+        "end": 2327,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2328,
+        "end": 2342,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2343,
+        "end": 2346,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2361,
+        "end": 2367,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2368,
+        "end": 2371,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2396,
+        "end": 2407,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2408,
+        "end": 2414,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2415,
+        "end": 2416,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2417,
+        "end": 2421,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2421,
+        "end": 2423,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2423,
+        "end": 2438,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2439,
+        "end": 2442,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2458,
+        "end": 2464,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2465,
+        "end": 2470,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2471,
+        "end": 2472,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2473,
+        "end": 2488,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2489,
+        "end": 2495,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2506,
+        "end": 2512,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2513,
+        "end": 2527,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2528,
+        "end": 2543,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2544,
+        "end": 2549,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2551,
+        "end": 2554,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2556,
+        "end": 2562,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2574,
+        "end": 2580,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2584,
+        "end": 2592,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2592,
+        "end": 2593,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2593,
+        "end": 2601,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2602,
+        "end": 2606,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2608,
+        "end": 2616,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2617,
+        "end": 2623,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2625,
+        "end": 2633,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2634,
+        "end": 2640,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2653,
+        "end": 2661,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2662,
+        "end": 2673,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2675,
+        "end": 2683,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2684,
+        "end": 2690,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2703,
+        "end": 2711,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2712,
+        "end": 2717,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2719,
+        "end": 2727,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2728,
+        "end": 2738,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2740,
+        "end": 2748,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2749,
+        "end": 2756,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2769,
+        "end": 2777,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2778,
+        "end": 2791,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2793,
+        "end": 2801,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2802,
+        "end": 2809,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2809,
+        "end": 2810,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2815,
+        "end": 2819,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2824,
+        "end": 2834,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2834,
+        "end": 2835,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2835,
+        "end": 2839,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2841,
+        "end": 2847,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2849,
+        "end": 2855,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2857,
+        "end": 2868,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2870,
+        "end": 2876,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2893,
+        "end": 2898,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2900,
+        "end": 2910,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2912,
+        "end": 2919,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2921,
+        "end": 2934,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2936,
+        "end": 2943,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2943,
+        "end": 2944,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2951,
+        "end": 2956,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2957,
+        "end": 2962,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2963,
+        "end": 2971,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2971,
+        "end": 2972,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2973,
+        "end": 2976,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2978,
+        "end": 2983,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2988,
+        "end": 2990,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2991,
+        "end": 3000,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3013,
+        "end": 3017,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3018,
+        "end": 3022,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3023,
+        "end": 3024,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3025,
+        "end": 3029,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3030,
+        "end": 3033,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3042,
+        "end": 3044,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3047,
+        "end": 3051,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3052,
+        "end": 3058,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3068,
+        "end": 3074,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3075,
+        "end": 3076,
+        "className": "syntax-number"
+      },
+      {
+        "start": 3085,
+        "end": 3087,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3104,
+        "end": 3109,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3119,
+        "end": 3125,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3126,
+        "end": 3127,
+        "className": "syntax-number"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_hashtable_insert.cpp",
+    "code": "    auto\n    _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,\n               _Hash, _RangeHash, _Unused, _RehashPolicy, _Traits>::\n    _M_insert_unique_node(size_type __bkt, __hash_code __code,\n                          __node_ptr __node, size_type __n_elt)\n    -> iterator\n    {\n      __rehash_guard_t __rehash_guard(_M_rehash_policy);\n      std::pair<bool, std::size_t> __do_rehash\n        = _M_rehash_policy._M_need_rehash(_M_bucket_count, _M_element_count,\n                                          __n_elt);\n\n      if (__do_rehash.first)\n        {\n          _M_rehash(__do_rehash.second, true_type{});\n          __bkt = _M_bucket_index(__code);\n        }\n\n      __rehash_guard._M_guarded_obj = nullptr;\n      _M_store_code(*__node, __code);\n\n      // Always insert at the beginning of the bucket.\n      _M_insert_bucket_begin(__bkt, __node);\n      ++_M_element_count;\n      return iterator(__node);\n    }\n\n  template<typename _Key, typename _Value, typename _Alloc,\n           typename _ExtractKey, typename _Equal,\n           typename _Hash, typename _RangeHash, typename _Unused,\n           typename _RehashPolicy, typename _Traits>\n    auto\n    _Hashtable<_Key, _Value, _Alloc, _ExtractKey, _Equal,\n               _Hash, _RangeHash, _Unused, _RehashPolicy, _Traits>::\n    _M_insert_multi_node(__node_ptr __hint,\n                         __hash_code __code, __node_ptr __node)\n    -> iterator\n    {\n      __rehash_guard_t __rehash_guard(_M_rehash_policy);\n      std::pair<bool, std::size_t> __do_rehash\n        = _M_rehash_policy._M_need_rehash(_M_bucket_count, _M_element_count, 1);\n\n      if (__do_rehash.first)\n        _M_rehash(__do_rehash.second, false_type{});\n\n      __rehash_guard._M_guarded_obj = nullptr;\n      _M_store_code(*__node, __code);\n      const key_type& __k = _ExtractKey{}(__node->_M_v());\n      size_type __bkt = _M_bucket_index(__code);\n\n      // Find the node before an equivalent one or use hint if it exists and\n      // if it is equivalent.\n      __node_base_ptr __prev\n        = __builtin_expect(__hint != nullptr, false)\n          && this->_M_equals(__k, __code, *__hint)\n            ? __hint\n            : _M_find_before_node(__bkt, __k, __code);\n\n      if (__prev)\n        {\n          // Insert after the node before the equivalent one.\n          __node->_M_nxt = __prev->_M_nxt;\n          __prev->_M_nxt = __node;\n          if (__builtin_expect(__prev == __hint, false))\n            // hint might be the last bucket node, in this case we need to\n            // update next bucket.\n            if (__node->_M_nxt\n                && !this->_M_equals(__k, __code, *__node->_M_next()))\n              {\n                size_type __next_bkt = _M_bucket_index(*__node->_M_next());\n                if (__next_bkt != __bkt)\n                  _M_buckets[__next_bkt] = __node;\n              }\n        }\n      else\n        // The inserted node has no equivalent in the hashtable. We must\n        // insert the new node at the beginning of the bucket to preserve\n        // equivalent elements' relative positions.\n        _M_insert_bucket_begin(__bkt, __node);\n      ++_M_element_count;",
+    "spans": [
+      {
+        "start": 4,
+        "end": 8,
+        "className": "syntax-type"
+      },
+      {
+        "start": 13,
+        "end": 23,
+        "className": "syntax-type"
+      },
+      {
+        "start": 23,
+        "end": 24,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 24,
+        "end": 28,
+        "className": "syntax-type"
+      },
+      {
+        "start": 30,
+        "end": 36,
+        "className": "syntax-type"
+      },
+      {
+        "start": 38,
+        "end": 44,
+        "className": "syntax-type"
+      },
+      {
+        "start": 46,
+        "end": 57,
+        "className": "syntax-type"
+      },
+      {
+        "start": 59,
+        "end": 65,
+        "className": "syntax-type"
+      },
+      {
+        "start": 82,
+        "end": 87,
+        "className": "syntax-type"
+      },
+      {
+        "start": 89,
+        "end": 99,
+        "className": "syntax-type"
+      },
+      {
+        "start": 101,
+        "end": 108,
+        "className": "syntax-type"
+      },
+      {
+        "start": 110,
+        "end": 123,
+        "className": "syntax-type"
+      },
+      {
+        "start": 125,
+        "end": 132,
+        "className": "syntax-type"
+      },
+      {
+        "start": 132,
+        "end": 133,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 140,
+        "end": 161,
+        "className": "syntax-function"
+      },
+      {
+        "start": 162,
+        "end": 171,
+        "className": "syntax-type"
+      },
+      {
+        "start": 172,
+        "end": 177,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 179,
+        "end": 190,
+        "className": "syntax-type"
+      },
+      {
+        "start": 191,
+        "end": 197,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 225,
+        "end": 235,
+        "className": "syntax-type"
+      },
+      {
+        "start": 236,
+        "end": 242,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 244,
+        "end": 253,
+        "className": "syntax-type"
+      },
+      {
+        "start": 254,
+        "end": 261,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 267,
+        "end": 269,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 270,
+        "end": 278,
+        "className": "syntax-type"
+      },
+      {
+        "start": 291,
+        "end": 307,
+        "className": "syntax-type"
+      },
+      {
+        "start": 308,
+        "end": 322,
+        "className": "syntax-function"
+      },
+      {
+        "start": 323,
+        "end": 339,
+        "className": "syntax-type"
+      },
+      {
+        "start": 353,
+        "end": 357,
+        "className": "syntax-type"
+      },
+      {
+        "start": 357,
+        "end": 358,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 358,
+        "end": 362,
+        "className": "syntax-type"
+      },
+      {
+        "start": 369,
+        "end": 375,
+        "className": "syntax-type"
+      },
+      {
+        "start": 375,
+        "end": 376,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 377,
+        "end": 388,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 397,
+        "end": 398,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 399,
+        "end": 415,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 416,
+        "end": 430,
+        "className": "syntax-function"
+      },
+      {
+        "start": 431,
+        "end": 446,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 448,
+        "end": 464,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 508,
+        "end": 515,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 525,
+        "end": 527,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 529,
+        "end": 540,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 541,
+        "end": 546,
+        "className": "syntax-property"
+      },
+      {
+        "start": 568,
+        "end": 577,
+        "className": "syntax-function"
+      },
+      {
+        "start": 578,
+        "end": 589,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 590,
+        "end": 596,
+        "className": "syntax-property"
+      },
+      {
+        "start": 598,
+        "end": 607,
+        "className": "syntax-type"
+      },
+      {
+        "start": 622,
+        "end": 627,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 628,
+        "end": 629,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 630,
+        "end": 645,
+        "className": "syntax-function"
+      },
+      {
+        "start": 646,
+        "end": 652,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 672,
+        "end": 686,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 687,
+        "end": 701,
+        "className": "syntax-property"
+      },
+      {
+        "start": 702,
+        "end": 703,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 704,
+        "end": 711,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 719,
+        "end": 732,
+        "className": "syntax-function"
+      },
+      {
+        "start": 733,
+        "end": 734,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 734,
+        "end": 740,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 742,
+        "end": 748,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 758,
+        "end": 806,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 813,
+        "end": 835,
+        "className": "syntax-function"
+      },
+      {
+        "start": 836,
+        "end": 841,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 843,
+        "end": 849,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 858,
+        "end": 860,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 860,
+        "end": 876,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 884,
+        "end": 890,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 891,
+        "end": 899,
+        "className": "syntax-function"
+      },
+      {
+        "start": 900,
+        "end": 906,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 918,
+        "end": 926,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 926,
+        "end": 927,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 927,
+        "end": 935,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 936,
+        "end": 940,
+        "className": "syntax-type"
+      },
+      {
+        "start": 942,
+        "end": 950,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 951,
+        "end": 957,
+        "className": "syntax-type"
+      },
+      {
+        "start": 959,
+        "end": 967,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 968,
+        "end": 974,
+        "className": "syntax-type"
+      },
+      {
+        "start": 987,
+        "end": 995,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 996,
+        "end": 1007,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1009,
+        "end": 1017,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1018,
+        "end": 1024,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1037,
+        "end": 1045,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1046,
+        "end": 1051,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1053,
+        "end": 1061,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1062,
+        "end": 1072,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1074,
+        "end": 1082,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1083,
+        "end": 1090,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1103,
+        "end": 1111,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1112,
+        "end": 1125,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1127,
+        "end": 1135,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1136,
+        "end": 1143,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1143,
+        "end": 1144,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1149,
+        "end": 1153,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1158,
+        "end": 1168,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1168,
+        "end": 1169,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1169,
+        "end": 1173,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1175,
+        "end": 1181,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1183,
+        "end": 1189,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1191,
+        "end": 1202,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1204,
+        "end": 1210,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1227,
+        "end": 1232,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1234,
+        "end": 1244,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1246,
+        "end": 1253,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1255,
+        "end": 1268,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1270,
+        "end": 1277,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1277,
+        "end": 1278,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1285,
+        "end": 1305,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1306,
+        "end": 1316,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1317,
+        "end": 1323,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1350,
+        "end": 1361,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1362,
+        "end": 1368,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1370,
+        "end": 1380,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1381,
+        "end": 1387,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1393,
+        "end": 1395,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1396,
+        "end": 1404,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1417,
+        "end": 1433,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1434,
+        "end": 1448,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1449,
+        "end": 1465,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1479,
+        "end": 1483,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1483,
+        "end": 1484,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1484,
+        "end": 1488,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1495,
+        "end": 1501,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1501,
+        "end": 1502,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1503,
+        "end": 1514,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1523,
+        "end": 1524,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1525,
+        "end": 1541,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1542,
+        "end": 1556,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1557,
+        "end": 1572,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1574,
+        "end": 1590,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1592,
+        "end": 1593,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1603,
+        "end": 1605,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1607,
+        "end": 1618,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1619,
+        "end": 1624,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1634,
+        "end": 1643,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1644,
+        "end": 1655,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1656,
+        "end": 1662,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1664,
+        "end": 1674,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1686,
+        "end": 1700,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1701,
+        "end": 1715,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1716,
+        "end": 1717,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1718,
+        "end": 1725,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1733,
+        "end": 1746,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1747,
+        "end": 1748,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1748,
+        "end": 1754,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1756,
+        "end": 1762,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1771,
+        "end": 1776,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1777,
+        "end": 1785,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1785,
+        "end": 1786,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1787,
+        "end": 1790,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1791,
+        "end": 1792,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1793,
+        "end": 1804,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1807,
+        "end": 1813,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1813,
+        "end": 1815,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1815,
+        "end": 1819,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1830,
+        "end": 1839,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1840,
+        "end": 1845,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1846,
+        "end": 1847,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1848,
+        "end": 1863,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1864,
+        "end": 1870,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1880,
+        "end": 1950,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1957,
+        "end": 1980,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1987,
+        "end": 2002,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2003,
+        "end": 2009,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2018,
+        "end": 2019,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2020,
+        "end": 2036,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2037,
+        "end": 2043,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2044,
+        "end": 2046,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2047,
+        "end": 2054,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 2073,
+        "end": 2075,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2076,
+        "end": 2080,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2080,
+        "end": 2082,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2082,
+        "end": 2091,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2092,
+        "end": 2095,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2097,
+        "end": 2103,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2105,
+        "end": 2106,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2106,
+        "end": 2112,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2128,
+        "end": 2134,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2149,
+        "end": 2168,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2169,
+        "end": 2174,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2176,
+        "end": 2179,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2181,
+        "end": 2187,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2197,
+        "end": 2199,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2201,
+        "end": 2207,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2229,
+        "end": 2280,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2291,
+        "end": 2297,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2297,
+        "end": 2299,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2299,
+        "end": 2305,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2306,
+        "end": 2307,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2308,
+        "end": 2314,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2314,
+        "end": 2316,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2316,
+        "end": 2322,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2334,
+        "end": 2340,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2340,
+        "end": 2342,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2342,
+        "end": 2348,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2349,
+        "end": 2350,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2351,
+        "end": 2357,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2369,
+        "end": 2371,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2373,
+        "end": 2389,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2390,
+        "end": 2396,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2397,
+        "end": 2399,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2400,
+        "end": 2406,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2428,
+        "end": 2490,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2503,
+        "end": 2525,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2538,
+        "end": 2540,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2542,
+        "end": 2548,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2548,
+        "end": 2550,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2550,
+        "end": 2556,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2573,
+        "end": 2575,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2577,
+        "end": 2581,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2581,
+        "end": 2583,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2583,
+        "end": 2592,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2593,
+        "end": 2596,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2598,
+        "end": 2604,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2606,
+        "end": 2607,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2607,
+        "end": 2613,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2613,
+        "end": 2615,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2615,
+        "end": 2622,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2659,
+        "end": 2668,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2669,
+        "end": 2679,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2680,
+        "end": 2681,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2682,
+        "end": 2697,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2698,
+        "end": 2699,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2699,
+        "end": 2705,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2705,
+        "end": 2707,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2707,
+        "end": 2714,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2735,
+        "end": 2737,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2739,
+        "end": 2749,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2750,
+        "end": 2752,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2753,
+        "end": 2758,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2778,
+        "end": 2788,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2789,
+        "end": 2799,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2801,
+        "end": 2802,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2803,
+        "end": 2809,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2843,
+        "end": 2847,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2856,
+        "end": 2920,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2929,
+        "end": 2994,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 3003,
+        "end": 3046,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 3055,
+        "end": 3077,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3078,
+        "end": 3083,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3085,
+        "end": 3091,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3100,
+        "end": 3102,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3102,
+        "end": 3118,
+        "className": "syntax-variable"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_heap_adjust_pop.cpp",
+    "code": "  template<typename _RandomAccessIterator, typename _Distance,\n           typename _Tp, typename _Compare>\n    _GLIBCXX20_CONSTEXPR\n    void\n    __adjust_heap(_RandomAccessIterator __first, _Distance __holeIndex,\n                  _Distance __len, _Tp __value, _Compare __comp)\n    {\n      const _Distance __topIndex = __holeIndex;\n      _Distance __secondChild = __holeIndex;\n      while (__secondChild < (__len - 1) / 2)\n        {\n          __secondChild = 2 * (__secondChild + 1);\n          if (__comp(__first + __secondChild,\n                     __first + (__secondChild - 1)))\n            __secondChild--;\n          *(__first + __holeIndex) = _GLIBCXX_MOVE(*(__first + __secondChild));\n          __holeIndex = __secondChild;\n        }\n      if ((__len & 1) == 0 && __secondChild == (__len - 2) / 2)\n        {\n          __secondChild = 2 * (__secondChild + 1);\n          *(__first + __holeIndex) = _GLIBCXX_MOVE(*(__first\n                                                     + (__secondChild - 1)));\n          __holeIndex = __secondChild - 1;\n        }\n      __decltype(__gnu_cxx::__ops::__iter_comp_val(_GLIBCXX_MOVE(__comp)))\n        __cmp(_GLIBCXX_MOVE(__comp));\n      std::__push_heap(__first, __holeIndex, __topIndex,\n                       _GLIBCXX_MOVE(__value), __cmp);\n    }\n\n  template<typename _RandomAccessIterator, typename _Compare>\n    _GLIBCXX20_CONSTEXPR\n    inline void\n    __pop_heap(_RandomAccessIterator __first, _RandomAccessIterator __last,\n               _RandomAccessIterator __result, _Compare& __comp)\n    {\n      typedef typename iterator_traits<_RandomAccessIterator>::value_type\n        _ValueType;\n      typedef typename iterator_traits<_RandomAccessIterator>::difference_type\n        _DistanceType;\n\n      _ValueType __value = _GLIBCXX_MOVE(*__result);\n      *__result = _GLIBCXX_MOVE(*__first);\n      std::__adjust_heap(__first, _DistanceType(0),\n                         _DistanceType(__last - __first),\n                         _GLIBCXX_MOVE(__value), __comp);\n    }",
+    "spans": [
+      {
+        "start": 2,
+        "end": 10,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 10,
+        "end": 11,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 11,
+        "end": 19,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 20,
+        "end": 41,
+        "className": "syntax-type"
+      },
+      {
+        "start": 43,
+        "end": 51,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 52,
+        "end": 61,
+        "className": "syntax-type"
+      },
+      {
+        "start": 74,
+        "end": 82,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 83,
+        "end": 86,
+        "className": "syntax-type"
+      },
+      {
+        "start": 88,
+        "end": 96,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 97,
+        "end": 105,
+        "className": "syntax-type"
+      },
+      {
+        "start": 105,
+        "end": 106,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 111,
+        "end": 131,
+        "className": "syntax-type"
+      },
+      {
+        "start": 136,
+        "end": 140,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 145,
+        "end": 158,
+        "className": "syntax-function"
+      },
+      {
+        "start": 159,
+        "end": 180,
+        "className": "syntax-type"
+      },
+      {
+        "start": 181,
+        "end": 188,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 190,
+        "end": 199,
+        "className": "syntax-type"
+      },
+      {
+        "start": 200,
+        "end": 211,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 231,
+        "end": 240,
+        "className": "syntax-type"
+      },
+      {
+        "start": 241,
+        "end": 246,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 248,
+        "end": 251,
+        "className": "syntax-type"
+      },
+      {
+        "start": 252,
+        "end": 259,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 261,
+        "end": 269,
+        "className": "syntax-type"
+      },
+      {
+        "start": 270,
+        "end": 276,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 290,
+        "end": 295,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 296,
+        "end": 305,
+        "className": "syntax-type"
+      },
+      {
+        "start": 306,
+        "end": 316,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 317,
+        "end": 318,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 319,
+        "end": 330,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 338,
+        "end": 347,
+        "className": "syntax-type"
+      },
+      {
+        "start": 348,
+        "end": 361,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 362,
+        "end": 363,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 364,
+        "end": 375,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 383,
+        "end": 388,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 390,
+        "end": 403,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 404,
+        "end": 405,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 407,
+        "end": 412,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 413,
+        "end": 414,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 415,
+        "end": 416,
+        "className": "syntax-number"
+      },
+      {
+        "start": 420,
+        "end": 421,
+        "className": "syntax-number"
+      },
+      {
+        "start": 443,
+        "end": 456,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 457,
+        "end": 458,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 459,
+        "end": 460,
+        "className": "syntax-number"
+      },
+      {
+        "start": 461,
+        "end": 462,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 464,
+        "end": 477,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 478,
+        "end": 479,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 480,
+        "end": 481,
+        "className": "syntax-number"
+      },
+      {
+        "start": 494,
+        "end": 496,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 498,
+        "end": 504,
+        "className": "syntax-function"
+      },
+      {
+        "start": 505,
+        "end": 512,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 513,
+        "end": 514,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 515,
+        "end": 528,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 551,
+        "end": 558,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 559,
+        "end": 560,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 562,
+        "end": 575,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 576,
+        "end": 577,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 578,
+        "end": 579,
+        "className": "syntax-number"
+      },
+      {
+        "start": 595,
+        "end": 608,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 608,
+        "end": 610,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 622,
+        "end": 623,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 624,
+        "end": 631,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 632,
+        "end": 633,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 634,
+        "end": 645,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 647,
+        "end": 648,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 649,
+        "end": 662,
+        "className": "syntax-function"
+      },
+      {
+        "start": 663,
+        "end": 664,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 665,
+        "end": 672,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 673,
+        "end": 674,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 675,
+        "end": 688,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 702,
+        "end": 713,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 714,
+        "end": 715,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 716,
+        "end": 729,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 747,
+        "end": 749,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 752,
+        "end": 757,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 758,
+        "end": 759,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 760,
+        "end": 761,
+        "className": "syntax-number"
+      },
+      {
+        "start": 763,
+        "end": 765,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 766,
+        "end": 767,
+        "className": "syntax-number"
+      },
+      {
+        "start": 768,
+        "end": 770,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 771,
+        "end": 784,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 785,
+        "end": 787,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 789,
+        "end": 794,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 795,
+        "end": 796,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 797,
+        "end": 798,
+        "className": "syntax-number"
+      },
+      {
+        "start": 802,
+        "end": 803,
+        "className": "syntax-number"
+      },
+      {
+        "start": 825,
+        "end": 838,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 839,
+        "end": 840,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 841,
+        "end": 842,
+        "className": "syntax-number"
+      },
+      {
+        "start": 843,
+        "end": 844,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 846,
+        "end": 859,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 860,
+        "end": 861,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 862,
+        "end": 863,
+        "className": "syntax-number"
+      },
+      {
+        "start": 876,
+        "end": 877,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 878,
+        "end": 885,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 886,
+        "end": 887,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 888,
+        "end": 899,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 901,
+        "end": 902,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 903,
+        "end": 916,
+        "className": "syntax-function"
+      },
+      {
+        "start": 917,
+        "end": 918,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 919,
+        "end": 926,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 980,
+        "end": 981,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 983,
+        "end": 996,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 997,
+        "end": 998,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 999,
+        "end": 1000,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1015,
+        "end": 1026,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1027,
+        "end": 1028,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1029,
+        "end": 1042,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1043,
+        "end": 1044,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1045,
+        "end": 1046,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1064,
+        "end": 1074,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1093,
+        "end": 1108,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1109,
+        "end": 1122,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1123,
+        "end": 1129,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1141,
+        "end": 1146,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1147,
+        "end": 1160,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1161,
+        "end": 1167,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1182,
+        "end": 1193,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1194,
+        "end": 1201,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1203,
+        "end": 1214,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1216,
+        "end": 1226,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1251,
+        "end": 1264,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1265,
+        "end": 1272,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1275,
+        "end": 1280,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1292,
+        "end": 1300,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1300,
+        "end": 1301,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1301,
+        "end": 1309,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1310,
+        "end": 1331,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1333,
+        "end": 1341,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1342,
+        "end": 1350,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1350,
+        "end": 1351,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1356,
+        "end": 1376,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1381,
+        "end": 1387,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1388,
+        "end": 1392,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1397,
+        "end": 1407,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1408,
+        "end": 1429,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1430,
+        "end": 1437,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1439,
+        "end": 1460,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1461,
+        "end": 1467,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1484,
+        "end": 1505,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1506,
+        "end": 1514,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1516,
+        "end": 1524,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1524,
+        "end": 1525,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1526,
+        "end": 1532,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1546,
+        "end": 1553,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1554,
+        "end": 1562,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1563,
+        "end": 1578,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1578,
+        "end": 1579,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1579,
+        "end": 1600,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1600,
+        "end": 1601,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1603,
+        "end": 1613,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1622,
+        "end": 1632,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1640,
+        "end": 1647,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1648,
+        "end": 1656,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1657,
+        "end": 1672,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1672,
+        "end": 1673,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1673,
+        "end": 1694,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1694,
+        "end": 1695,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1697,
+        "end": 1712,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1721,
+        "end": 1734,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1743,
+        "end": 1753,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1754,
+        "end": 1761,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1762,
+        "end": 1763,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1764,
+        "end": 1777,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1778,
+        "end": 1779,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1779,
+        "end": 1787,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1796,
+        "end": 1797,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1797,
+        "end": 1805,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1806,
+        "end": 1807,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1808,
+        "end": 1821,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1822,
+        "end": 1823,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1823,
+        "end": 1830,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1844,
+        "end": 1857,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1858,
+        "end": 1865,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1867,
+        "end": 1880,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1881,
+        "end": 1882,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1910,
+        "end": 1923,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1924,
+        "end": 1930,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1931,
+        "end": 1932,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1933,
+        "end": 1940,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1968,
+        "end": 1981,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1982,
+        "end": 1989,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1992,
+        "end": 1998,
+        "className": "syntax-variable"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_heap_make.cpp",
+    "code": "  template<typename _RandomAccessIterator, typename _Compare>\n    _GLIBCXX20_CONSTEXPR\n    void\n    __make_heap(_RandomAccessIterator __first, _RandomAccessIterator __last,\n                _Compare& __comp)\n    {\n      typedef typename iterator_traits<_RandomAccessIterator>::value_type\n          _ValueType;\n      typedef typename iterator_traits<_RandomAccessIterator>::difference_type\n          _DistanceType;\n\n      if (__last - __first < 2)\n        return;\n\n      const _DistanceType __len = __last - __first;\n      _DistanceType __parent = (__len - 2) / 2;\n      while (true)\n        {\n          _ValueType __value = _GLIBCXX_MOVE(*(__first + __parent));\n          std::__adjust_heap(__first, __parent, __len, _GLIBCXX_MOVE(__value),\n                             __comp);\n          if (__parent == 0)\n            return;\n          __parent--;\n        }\n    }",
+    "spans": [
+      {
+        "start": 2,
+        "end": 10,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 10,
+        "end": 11,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 11,
+        "end": 19,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 20,
+        "end": 41,
+        "className": "syntax-type"
+      },
+      {
+        "start": 43,
+        "end": 51,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 52,
+        "end": 60,
+        "className": "syntax-type"
+      },
+      {
+        "start": 60,
+        "end": 61,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 66,
+        "end": 86,
+        "className": "syntax-type"
+      },
+      {
+        "start": 91,
+        "end": 95,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 100,
+        "end": 111,
+        "className": "syntax-function"
+      },
+      {
+        "start": 112,
+        "end": 133,
+        "className": "syntax-type"
+      },
+      {
+        "start": 134,
+        "end": 141,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 143,
+        "end": 164,
+        "className": "syntax-type"
+      },
+      {
+        "start": 165,
+        "end": 171,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 189,
+        "end": 197,
+        "className": "syntax-type"
+      },
+      {
+        "start": 197,
+        "end": 198,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 199,
+        "end": 205,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 219,
+        "end": 226,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 227,
+        "end": 235,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 236,
+        "end": 251,
+        "className": "syntax-type"
+      },
+      {
+        "start": 251,
+        "end": 252,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 252,
+        "end": 273,
+        "className": "syntax-type"
+      },
+      {
+        "start": 273,
+        "end": 274,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 276,
+        "end": 286,
+        "className": "syntax-type"
+      },
+      {
+        "start": 297,
+        "end": 307,
+        "className": "syntax-type"
+      },
+      {
+        "start": 315,
+        "end": 322,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 323,
+        "end": 331,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 332,
+        "end": 347,
+        "className": "syntax-type"
+      },
+      {
+        "start": 347,
+        "end": 348,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 348,
+        "end": 369,
+        "className": "syntax-type"
+      },
+      {
+        "start": 369,
+        "end": 370,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 372,
+        "end": 387,
+        "className": "syntax-type"
+      },
+      {
+        "start": 398,
+        "end": 411,
+        "className": "syntax-type"
+      },
+      {
+        "start": 420,
+        "end": 422,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 424,
+        "end": 430,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 431,
+        "end": 432,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 433,
+        "end": 440,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 441,
+        "end": 442,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 443,
+        "end": 444,
+        "className": "syntax-number"
+      },
+      {
+        "start": 454,
+        "end": 460,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 469,
+        "end": 474,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 475,
+        "end": 488,
+        "className": "syntax-type"
+      },
+      {
+        "start": 489,
+        "end": 494,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 495,
+        "end": 496,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 497,
+        "end": 503,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 504,
+        "end": 505,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 506,
+        "end": 513,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 521,
+        "end": 534,
+        "className": "syntax-type"
+      },
+      {
+        "start": 535,
+        "end": 543,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 544,
+        "end": 545,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 547,
+        "end": 552,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 553,
+        "end": 554,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 555,
+        "end": 556,
+        "className": "syntax-number"
+      },
+      {
+        "start": 560,
+        "end": 561,
+        "className": "syntax-number"
+      },
+      {
+        "start": 569,
+        "end": 574,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 602,
+        "end": 612,
+        "className": "syntax-type"
+      },
+      {
+        "start": 613,
+        "end": 620,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 621,
+        "end": 622,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 623,
+        "end": 636,
+        "className": "syntax-function"
+      },
+      {
+        "start": 637,
+        "end": 638,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 639,
+        "end": 646,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 647,
+        "end": 648,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 649,
+        "end": 657,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 676,
+        "end": 689,
+        "className": "syntax-function"
+      },
+      {
+        "start": 690,
+        "end": 697,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 699,
+        "end": 707,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 709,
+        "end": 714,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 716,
+        "end": 729,
+        "className": "syntax-function"
+      },
+      {
+        "start": 730,
+        "end": 737,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 769,
+        "end": 775,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 788,
+        "end": 790,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 792,
+        "end": 800,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 801,
+        "end": 803,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 804,
+        "end": 805,
+        "className": "syntax-number"
+      },
+      {
+        "start": 819,
+        "end": 825,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 837,
+        "end": 845,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 845,
+        "end": 847,
+        "className": "syntax-operator"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_tree_bounds.cpp",
+    "code": "           typename _Compare, typename _Alloc>\n    void\n    _Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>::\n    _M_erase(_Node_ptr __x)\n    {\n      // Erase without rebalancing.\n      while (__x)\n        {\n          _M_erase(_S_right(__x));\n          _Node_ptr __y = _S_left(__x);\n          _M_drop_node(__x);\n          __x = __y;\n        }\n    }\n\n  template<typename _Key, typename _Val, typename _KeyOfValue,\n           typename _Compare, typename _Alloc>\n    typename _Rb_tree<_Key, _Val, _KeyOfValue,\n                      _Compare, _Alloc>::_Base_ptr\n    _Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>::\n    _M_lower_bound(_Base_ptr __x, _Base_ptr __y,\n                   const _Key& __k) const\n    {\n      while (__x)\n        if (!_M_impl._M_key_compare(_S_key(__x), __k))\n          __y = __x, __x = _S_left(__x);\n        else\n          __x = _S_right(__x);\n      return __y;\n    }\n\n  template<typename _Key, typename _Val, typename _KeyOfValue,\n           typename _Compare, typename _Alloc>\n    typename _Rb_tree<_Key, _Val, _KeyOfValue,\n                      _Compare, _Alloc>::_Base_ptr\n    _Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>::\n    _M_upper_bound(_Base_ptr __x, _Base_ptr __y,\n                   const _Key& __k) const\n    {\n      while (__x)\n        if (_M_impl._M_key_compare(__k, _S_key(__x)))\n          __y = __x, __x = _S_left(__x);\n        else\n          __x = _S_right(__x);\n      return __y;\n    }\n\n  template<typename _Key, typename _Val, typename _KeyOfValue,\n           typename _Compare, typename _Alloc>\n    pair<typename _Rb_tree<_Key, _Val, _KeyOfValue,\n                           _Compare, _Alloc>::iterator,\n         typename _Rb_tree<_Key, _Val, _KeyOfValue,\n                           _Compare, _Alloc>::iterator>\n    _Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>::\n    equal_range(const _Key& __k)\n    {\n      typedef pair<iterator, iterator> _Ret;\n\n      _Base_ptr __x = _M_begin();\n      _Base_ptr __y = _M_end();\n      while (__x)\n        {\n          if (_M_impl._M_key_compare(_S_key(__x), __k))\n            __x = _S_right(__x);\n          else if (_M_impl._M_key_compare(__k, _S_key(__x)))\n            __y = __x, __x = _S_left(__x);\n          else\n            {\n              _Base_ptr __xu(__x);\n              _Base_ptr __yu(__y);\n              __y = __x, __x = _S_left(__x);\n              __xu = _S_right(__xu);\n              return _Ret(iterator(_M_lower_bound(__x, __y, __k)),\n                          iterator(_M_upper_bound(__xu, __yu, __k)));\n            }\n        }\n      return _Ret(iterator(__y), iterator(__y));\n    }\n\n  template<typename _Key, typename _Val, typename _KeyOfValue,\n           typename _Compare, typename _Alloc>\n    pair<typename _Rb_tree<_Key, _Val, _KeyOfValue,\n                           _Compare, _Alloc>::const_iterator,\n         typename _Rb_tree<_Key, _Val, _KeyOfValue,\n                           _Compare, _Alloc>::const_iterator>\n    _Rb_tree<_Key, _Val, _KeyOfValue, _Compare, _Alloc>::\n    equal_range(const _Key& __k) const\n    {\n      typedef pair<const_iterator, const_iterator> _Ret;\n\n      _Base_ptr __x = _M_begin();\n      _Base_ptr __y = _M_end();\n      while (__x)\n        {\n          if (_M_impl._M_key_compare(_S_key(__x), __k))\n            __x = _S_right(__x);\n          else if (_M_impl._M_key_compare(__k, _S_key(__x)))\n            __y = __x, __x = _S_left(__x);\n          else\n            {\n              _Base_ptr __xu(__x);\n              _Base_ptr __yu(__y);\n              __y = __x, __x = _S_left(__x);\n              __xu = _S_right(__xu);\n              return _Ret(const_iterator(_M_lower_bound(__x, __y, __k)),\n                          const_iterator(_M_upper_bound(__xu, __yu, __k)));\n            }\n        }\n      return _Ret(const_iterator(__y), const_iterator(__y));",
+    "spans": [
+      {
+        "start": 11,
+        "end": 19,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 20,
+        "end": 28,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 30,
+        "end": 38,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 39,
+        "end": 45,
+        "className": "syntax-type"
+      },
+      {
+        "start": 45,
+        "end": 46,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 51,
+        "end": 55,
+        "className": "syntax-type"
+      },
+      {
+        "start": 60,
+        "end": 68,
+        "className": "syntax-type"
+      },
+      {
+        "start": 68,
+        "end": 69,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 69,
+        "end": 73,
+        "className": "syntax-type"
+      },
+      {
+        "start": 75,
+        "end": 79,
+        "className": "syntax-type"
+      },
+      {
+        "start": 81,
+        "end": 92,
+        "className": "syntax-type"
+      },
+      {
+        "start": 94,
+        "end": 102,
+        "className": "syntax-type"
+      },
+      {
+        "start": 104,
+        "end": 110,
+        "className": "syntax-type"
+      },
+      {
+        "start": 110,
+        "end": 111,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 118,
+        "end": 126,
+        "className": "syntax-function"
+      },
+      {
+        "start": 127,
+        "end": 136,
+        "className": "syntax-type"
+      },
+      {
+        "start": 137,
+        "end": 140,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 154,
+        "end": 183,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 190,
+        "end": 195,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 197,
+        "end": 200,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 222,
+        "end": 230,
+        "className": "syntax-function"
+      },
+      {
+        "start": 231,
+        "end": 239,
+        "className": "syntax-function"
+      },
+      {
+        "start": 240,
+        "end": 243,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 257,
+        "end": 266,
+        "className": "syntax-type"
+      },
+      {
+        "start": 267,
+        "end": 270,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 271,
+        "end": 272,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 273,
+        "end": 280,
+        "className": "syntax-function"
+      },
+      {
+        "start": 281,
+        "end": 284,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 297,
+        "end": 309,
+        "className": "syntax-function"
+      },
+      {
+        "start": 310,
+        "end": 313,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 326,
+        "end": 329,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 330,
+        "end": 331,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 332,
+        "end": 335,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 356,
+        "end": 364,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 364,
+        "end": 365,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 365,
+        "end": 373,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 374,
+        "end": 378,
+        "className": "syntax-type"
+      },
+      {
+        "start": 380,
+        "end": 388,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 389,
+        "end": 393,
+        "className": "syntax-type"
+      },
+      {
+        "start": 395,
+        "end": 403,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 404,
+        "end": 415,
+        "className": "syntax-type"
+      },
+      {
+        "start": 428,
+        "end": 436,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 437,
+        "end": 445,
+        "className": "syntax-type"
+      },
+      {
+        "start": 447,
+        "end": 455,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 456,
+        "end": 462,
+        "className": "syntax-type"
+      },
+      {
+        "start": 462,
+        "end": 463,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 468,
+        "end": 476,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 477,
+        "end": 485,
+        "className": "syntax-type"
+      },
+      {
+        "start": 485,
+        "end": 486,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 486,
+        "end": 490,
+        "className": "syntax-type"
+      },
+      {
+        "start": 492,
+        "end": 496,
+        "className": "syntax-type"
+      },
+      {
+        "start": 498,
+        "end": 509,
+        "className": "syntax-type"
+      },
+      {
+        "start": 533,
+        "end": 541,
+        "className": "syntax-type"
+      },
+      {
+        "start": 543,
+        "end": 549,
+        "className": "syntax-type"
+      },
+      {
+        "start": 549,
+        "end": 550,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 552,
+        "end": 561,
+        "className": "syntax-type"
+      },
+      {
+        "start": 566,
+        "end": 574,
+        "className": "syntax-type"
+      },
+      {
+        "start": 574,
+        "end": 575,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 575,
+        "end": 579,
+        "className": "syntax-type"
+      },
+      {
+        "start": 581,
+        "end": 585,
+        "className": "syntax-type"
+      },
+      {
+        "start": 587,
+        "end": 598,
+        "className": "syntax-type"
+      },
+      {
+        "start": 600,
+        "end": 608,
+        "className": "syntax-type"
+      },
+      {
+        "start": 610,
+        "end": 616,
+        "className": "syntax-type"
+      },
+      {
+        "start": 616,
+        "end": 617,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 624,
+        "end": 638,
+        "className": "syntax-function"
+      },
+      {
+        "start": 639,
+        "end": 648,
+        "className": "syntax-type"
+      },
+      {
+        "start": 649,
+        "end": 652,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 654,
+        "end": 663,
+        "className": "syntax-type"
+      },
+      {
+        "start": 664,
+        "end": 667,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 688,
+        "end": 693,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 694,
+        "end": 698,
+        "className": "syntax-type"
+      },
+      {
+        "start": 698,
+        "end": 699,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 700,
+        "end": 703,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 705,
+        "end": 710,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 723,
+        "end": 728,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 730,
+        "end": 733,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 743,
+        "end": 745,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 748,
+        "end": 755,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 756,
+        "end": 770,
+        "className": "syntax-function"
+      },
+      {
+        "start": 771,
+        "end": 777,
+        "className": "syntax-function"
+      },
+      {
+        "start": 778,
+        "end": 781,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 784,
+        "end": 787,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 800,
+        "end": 803,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 804,
+        "end": 805,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 806,
+        "end": 809,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 811,
+        "end": 814,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 815,
+        "end": 816,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 817,
+        "end": 824,
+        "className": "syntax-function"
+      },
+      {
+        "start": 825,
+        "end": 828,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 839,
+        "end": 843,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 854,
+        "end": 857,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 858,
+        "end": 859,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 860,
+        "end": 868,
+        "className": "syntax-function"
+      },
+      {
+        "start": 869,
+        "end": 872,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 881,
+        "end": 887,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 888,
+        "end": 891,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 902,
+        "end": 910,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 910,
+        "end": 911,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 911,
+        "end": 919,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 920,
+        "end": 924,
+        "className": "syntax-type"
+      },
+      {
+        "start": 926,
+        "end": 934,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 935,
+        "end": 939,
+        "className": "syntax-type"
+      },
+      {
+        "start": 941,
+        "end": 949,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 950,
+        "end": 961,
+        "className": "syntax-type"
+      },
+      {
+        "start": 974,
+        "end": 982,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 983,
+        "end": 991,
+        "className": "syntax-type"
+      },
+      {
+        "start": 993,
+        "end": 1001,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1002,
+        "end": 1008,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1008,
+        "end": 1009,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1014,
+        "end": 1022,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1023,
+        "end": 1031,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1031,
+        "end": 1032,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1032,
+        "end": 1036,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1038,
+        "end": 1042,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1044,
+        "end": 1055,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1079,
+        "end": 1087,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1089,
+        "end": 1095,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1095,
+        "end": 1096,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1098,
+        "end": 1107,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1112,
+        "end": 1120,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1120,
+        "end": 1121,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1121,
+        "end": 1125,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1127,
+        "end": 1131,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1133,
+        "end": 1144,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1146,
+        "end": 1154,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1156,
+        "end": 1162,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1162,
+        "end": 1163,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1170,
+        "end": 1184,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1185,
+        "end": 1194,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1195,
+        "end": 1198,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1200,
+        "end": 1209,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1210,
+        "end": 1213,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1234,
+        "end": 1239,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1240,
+        "end": 1244,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1244,
+        "end": 1245,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1246,
+        "end": 1249,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1251,
+        "end": 1256,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1269,
+        "end": 1274,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1276,
+        "end": 1279,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1289,
+        "end": 1291,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1293,
+        "end": 1300,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1301,
+        "end": 1315,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1316,
+        "end": 1319,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1321,
+        "end": 1327,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1328,
+        "end": 1331,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1345,
+        "end": 1348,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1349,
+        "end": 1350,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1351,
+        "end": 1354,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1356,
+        "end": 1359,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1360,
+        "end": 1361,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1362,
+        "end": 1369,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1370,
+        "end": 1373,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1384,
+        "end": 1388,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1399,
+        "end": 1402,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1403,
+        "end": 1404,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1405,
+        "end": 1413,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1414,
+        "end": 1417,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1426,
+        "end": 1432,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1433,
+        "end": 1436,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1447,
+        "end": 1455,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1455,
+        "end": 1456,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1456,
+        "end": 1464,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1465,
+        "end": 1469,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1471,
+        "end": 1479,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1480,
+        "end": 1484,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1486,
+        "end": 1494,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1495,
+        "end": 1506,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1519,
+        "end": 1527,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1528,
+        "end": 1536,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1538,
+        "end": 1546,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1547,
+        "end": 1553,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1553,
+        "end": 1554,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1559,
+        "end": 1563,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1563,
+        "end": 1564,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1564,
+        "end": 1572,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1573,
+        "end": 1581,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1581,
+        "end": 1582,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1582,
+        "end": 1586,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1588,
+        "end": 1592,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1594,
+        "end": 1605,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1634,
+        "end": 1642,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1644,
+        "end": 1650,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1650,
+        "end": 1651,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1653,
+        "end": 1661,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1672,
+        "end": 1680,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1681,
+        "end": 1689,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1689,
+        "end": 1690,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1690,
+        "end": 1694,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1696,
+        "end": 1700,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1702,
+        "end": 1713,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1742,
+        "end": 1750,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1752,
+        "end": 1758,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1758,
+        "end": 1759,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1761,
+        "end": 1769,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1769,
+        "end": 1770,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1775,
+        "end": 1783,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1783,
+        "end": 1784,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1784,
+        "end": 1788,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1790,
+        "end": 1794,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1796,
+        "end": 1807,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1809,
+        "end": 1817,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1819,
+        "end": 1825,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1825,
+        "end": 1826,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1833,
+        "end": 1844,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1845,
+        "end": 1850,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1851,
+        "end": 1855,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1855,
+        "end": 1856,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1857,
+        "end": 1860,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1874,
+        "end": 1881,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1882,
+        "end": 1886,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1886,
+        "end": 1887,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1887,
+        "end": 1895,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1897,
+        "end": 1905,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1905,
+        "end": 1906,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1907,
+        "end": 1911,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1920,
+        "end": 1929,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1930,
+        "end": 1933,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1934,
+        "end": 1935,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1936,
+        "end": 1944,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1954,
+        "end": 1963,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1964,
+        "end": 1967,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1968,
+        "end": 1969,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1970,
+        "end": 1976,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1986,
+        "end": 1991,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1993,
+        "end": 1996,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2018,
+        "end": 2020,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2022,
+        "end": 2029,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2030,
+        "end": 2044,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2045,
+        "end": 2051,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2052,
+        "end": 2055,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2058,
+        "end": 2061,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2076,
+        "end": 2079,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2080,
+        "end": 2081,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2082,
+        "end": 2090,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2091,
+        "end": 2094,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2107,
+        "end": 2111,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2112,
+        "end": 2114,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2116,
+        "end": 2123,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2124,
+        "end": 2138,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2139,
+        "end": 2142,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2144,
+        "end": 2150,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2151,
+        "end": 2154,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2170,
+        "end": 2173,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2174,
+        "end": 2175,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2176,
+        "end": 2179,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2181,
+        "end": 2184,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2185,
+        "end": 2186,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2187,
+        "end": 2194,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2195,
+        "end": 2198,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2211,
+        "end": 2215,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2244,
+        "end": 2253,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2254,
+        "end": 2258,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2259,
+        "end": 2262,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2279,
+        "end": 2288,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2289,
+        "end": 2293,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2294,
+        "end": 2297,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2314,
+        "end": 2317,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2318,
+        "end": 2319,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2320,
+        "end": 2323,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2325,
+        "end": 2328,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2329,
+        "end": 2330,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2331,
+        "end": 2338,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2339,
+        "end": 2342,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2359,
+        "end": 2363,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2364,
+        "end": 2365,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2366,
+        "end": 2374,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2375,
+        "end": 2379,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2396,
+        "end": 2402,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2403,
+        "end": 2407,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2408,
+        "end": 2416,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2417,
+        "end": 2431,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2432,
+        "end": 2435,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2437,
+        "end": 2440,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2442,
+        "end": 2445,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2475,
+        "end": 2483,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2484,
+        "end": 2498,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2499,
+        "end": 2503,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2505,
+        "end": 2509,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2511,
+        "end": 2514,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2549,
+        "end": 2555,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2556,
+        "end": 2560,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2561,
+        "end": 2569,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2570,
+        "end": 2573,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2576,
+        "end": 2584,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2585,
+        "end": 2588,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2601,
+        "end": 2609,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2609,
+        "end": 2610,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2610,
+        "end": 2618,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2619,
+        "end": 2623,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2625,
+        "end": 2633,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2634,
+        "end": 2638,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2640,
+        "end": 2648,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2649,
+        "end": 2660,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2673,
+        "end": 2681,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2682,
+        "end": 2690,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2692,
+        "end": 2700,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2701,
+        "end": 2707,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2707,
+        "end": 2708,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2713,
+        "end": 2717,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2717,
+        "end": 2718,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2718,
+        "end": 2726,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2727,
+        "end": 2735,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2735,
+        "end": 2736,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2736,
+        "end": 2740,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2742,
+        "end": 2746,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2748,
+        "end": 2759,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2788,
+        "end": 2796,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2798,
+        "end": 2804,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2804,
+        "end": 2805,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2807,
+        "end": 2821,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2832,
+        "end": 2840,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2841,
+        "end": 2849,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2849,
+        "end": 2850,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2850,
+        "end": 2854,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2856,
+        "end": 2860,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2862,
+        "end": 2873,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2902,
+        "end": 2910,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2912,
+        "end": 2918,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2918,
+        "end": 2919,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2921,
+        "end": 2935,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2935,
+        "end": 2936,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2941,
+        "end": 2949,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2949,
+        "end": 2950,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2950,
+        "end": 2954,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2956,
+        "end": 2960,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2962,
+        "end": 2973,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2975,
+        "end": 2983,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2985,
+        "end": 2991,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2991,
+        "end": 2992,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2999,
+        "end": 3010,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3011,
+        "end": 3016,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3017,
+        "end": 3021,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3021,
+        "end": 3022,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3023,
+        "end": 3026,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3028,
+        "end": 3033,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3046,
+        "end": 3053,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3054,
+        "end": 3058,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3058,
+        "end": 3059,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3059,
+        "end": 3073,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3075,
+        "end": 3089,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3089,
+        "end": 3090,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3091,
+        "end": 3095,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3104,
+        "end": 3113,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3114,
+        "end": 3117,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3118,
+        "end": 3119,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3120,
+        "end": 3128,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3138,
+        "end": 3147,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3148,
+        "end": 3151,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3152,
+        "end": 3153,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3154,
+        "end": 3160,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3170,
+        "end": 3175,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3177,
+        "end": 3180,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3202,
+        "end": 3204,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3206,
+        "end": 3213,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3214,
+        "end": 3228,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3229,
+        "end": 3235,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3236,
+        "end": 3239,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3242,
+        "end": 3245,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3260,
+        "end": 3263,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3264,
+        "end": 3265,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3266,
+        "end": 3274,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3275,
+        "end": 3278,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3291,
+        "end": 3295,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3296,
+        "end": 3298,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3300,
+        "end": 3307,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3308,
+        "end": 3322,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3323,
+        "end": 3326,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3328,
+        "end": 3334,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3335,
+        "end": 3338,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3354,
+        "end": 3357,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3358,
+        "end": 3359,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3360,
+        "end": 3363,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3365,
+        "end": 3368,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3369,
+        "end": 3370,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3371,
+        "end": 3378,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3379,
+        "end": 3382,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3395,
+        "end": 3399,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3428,
+        "end": 3437,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3438,
+        "end": 3442,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3443,
+        "end": 3446,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3463,
+        "end": 3472,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3473,
+        "end": 3477,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3478,
+        "end": 3481,
+        "className": "syntax-type"
+      },
+      {
+        "start": 3498,
+        "end": 3501,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3502,
+        "end": 3503,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3504,
+        "end": 3507,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3509,
+        "end": 3512,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3513,
+        "end": 3514,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3515,
+        "end": 3522,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3523,
+        "end": 3526,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3543,
+        "end": 3547,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3548,
+        "end": 3549,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3550,
+        "end": 3558,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3559,
+        "end": 3563,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3580,
+        "end": 3586,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3587,
+        "end": 3591,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3592,
+        "end": 3606,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3607,
+        "end": 3621,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3622,
+        "end": 3625,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3627,
+        "end": 3630,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3632,
+        "end": 3635,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3665,
+        "end": 3679,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3680,
+        "end": 3694,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3695,
+        "end": 3699,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3701,
+        "end": 3705,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3707,
+        "end": 3710,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3745,
+        "end": 3751,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3752,
+        "end": 3756,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3757,
+        "end": 3771,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3772,
+        "end": 3775,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3778,
+        "end": 3792,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3793,
+        "end": 3796,
+        "className": "syntax-variable"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_uninitialized_copy.cpp",
+    "code": "#if __cplusplus >= 201103L\n      using _Dest = decltype(std::__niter_base(__result));\n      using _Src = decltype(std::__niter_base(__first));\n      using _ValT = typename iterator_traits<_ForwardIterator>::value_type;\n\n#if __glibcxx_raw_memory_algorithms >= 202411L // >= C++26\n      if consteval {\n        return std::__do_uninit_copy(__first, __last, __result);\n      }\n#endif\n      if constexpr (!__is_trivially_constructible(_ValT, decltype(*__first)))\n        return std::__do_uninit_copy(__first, __last, __result);\n      else if constexpr (__memcpyable<_Dest, _Src>::__value)\n        {\n          ptrdiff_t __n = __last - __first;\n          if (__n > 0) [[__likely__]]\n            {\n              using _ValT = typename remove_pointer<_Src>::type;\n              __builtin_memcpy(std::__niter_base(__result),\n                               std::__niter_base(__first),\n                               __n * sizeof(_ValT));\n              __result += __n;\n            }\n          return __result;\n        }\n#if __cpp_lib_concepts\n      else if constexpr (contiguous_iterator<_ForwardIterator>\n                           && contiguous_iterator<_InputIterator>)\n        {\n          using _DestPtr = decltype(std::to_address(__result));\n          using _SrcPtr = decltype(std::to_address(__first));\n          if constexpr (__memcpyable<_DestPtr, _SrcPtr>::__value)\n            {\n              if (auto __n = __last - __first; __n > 0) [[likely]]\n                {\n                  void* __dest = std::to_address(__result);\n                  const void* __src = std::to_address(__first);\n                  size_t __nbytes = __n * sizeof(remove_pointer_t<_DestPtr>);\n                  __builtin_memcpy(__dest, __src, __nbytes);\n                  __result += __n;\n                }\n              return __result;\n            }\n          else\n            return std::__do_uninit_copy(__first, __last, __result);\n        }\n#endif\n      else\n        return std::__do_uninit_copy(__first, __last, __result);\n#else // C++98\n      typedef typename iterator_traits<_InputIterator>::value_type\n        _ValueType1;\n      typedef typename iterator_traits<_ForwardIterator>::value_type\n        _ValueType2;\n\n      const bool __can_memcpy\n        = __memcpyable<_ValueType1*, _ValueType2*>::__value\n            && __is_trivially_constructible(_ValueType2, __decltype(*__first));\n\n      return __uninitialized_copy<__can_memcpy>::\n               __uninit_copy(__first, __last, __result);\n#endif\n    }",
+    "spans": [
+      {
+        "start": 0,
+        "end": 3,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 4,
+        "end": 15,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 19,
+        "end": 26,
+        "className": "syntax-number"
+      },
+      {
+        "start": 33,
+        "end": 38,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 39,
+        "end": 44,
+        "className": "syntax-type"
+      },
+      {
+        "start": 45,
+        "end": 46,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 61,
+        "end": 73,
+        "className": "syntax-function"
+      },
+      {
+        "start": 74,
+        "end": 82,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 92,
+        "end": 97,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 98,
+        "end": 102,
+        "className": "syntax-type"
+      },
+      {
+        "start": 103,
+        "end": 104,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 119,
+        "end": 131,
+        "className": "syntax-function"
+      },
+      {
+        "start": 132,
+        "end": 139,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 149,
+        "end": 154,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 155,
+        "end": 160,
+        "className": "syntax-type"
+      },
+      {
+        "start": 161,
+        "end": 162,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 163,
+        "end": 171,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 172,
+        "end": 187,
+        "className": "syntax-type"
+      },
+      {
+        "start": 187,
+        "end": 188,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 188,
+        "end": 204,
+        "className": "syntax-type"
+      },
+      {
+        "start": 204,
+        "end": 205,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 207,
+        "end": 217,
+        "className": "syntax-type"
+      },
+      {
+        "start": 220,
+        "end": 223,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 224,
+        "end": 255,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 259,
+        "end": 266,
+        "className": "syntax-number"
+      },
+      {
+        "start": 267,
+        "end": 278,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 285,
+        "end": 287,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 288,
+        "end": 297,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 308,
+        "end": 314,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 320,
+        "end": 336,
+        "className": "syntax-function"
+      },
+      {
+        "start": 337,
+        "end": 344,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 346,
+        "end": 352,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 354,
+        "end": 362,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 373,
+        "end": 379,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 386,
+        "end": 388,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 389,
+        "end": 398,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 401,
+        "end": 429,
+        "className": "syntax-function"
+      },
+      {
+        "start": 430,
+        "end": 435,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 446,
+        "end": 447,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 447,
+        "end": 454,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 466,
+        "end": 472,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 478,
+        "end": 494,
+        "className": "syntax-function"
+      },
+      {
+        "start": 495,
+        "end": 502,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 504,
+        "end": 510,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 512,
+        "end": 520,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 529,
+        "end": 533,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 534,
+        "end": 536,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 537,
+        "end": 546,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 548,
+        "end": 560,
+        "className": "syntax-type"
+      },
+      {
+        "start": 560,
+        "end": 561,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 561,
+        "end": 566,
+        "className": "syntax-type"
+      },
+      {
+        "start": 568,
+        "end": 572,
+        "className": "syntax-type"
+      },
+      {
+        "start": 572,
+        "end": 573,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 575,
+        "end": 582,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 604,
+        "end": 613,
+        "className": "syntax-type"
+      },
+      {
+        "start": 614,
+        "end": 617,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 618,
+        "end": 619,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 620,
+        "end": 626,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 627,
+        "end": 628,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 629,
+        "end": 636,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 648,
+        "end": 650,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 652,
+        "end": 655,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 656,
+        "end": 657,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 658,
+        "end": 659,
+        "className": "syntax-number"
+      },
+      {
+        "start": 663,
+        "end": 673,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 704,
+        "end": 709,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 710,
+        "end": 715,
+        "className": "syntax-type"
+      },
+      {
+        "start": 716,
+        "end": 717,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 718,
+        "end": 726,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 727,
+        "end": 741,
+        "className": "syntax-type"
+      },
+      {
+        "start": 741,
+        "end": 742,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 742,
+        "end": 746,
+        "className": "syntax-type"
+      },
+      {
+        "start": 746,
+        "end": 747,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 749,
+        "end": 753,
+        "className": "syntax-type"
+      },
+      {
+        "start": 769,
+        "end": 785,
+        "className": "syntax-function"
+      },
+      {
+        "start": 791,
+        "end": 803,
+        "className": "syntax-function"
+      },
+      {
+        "start": 804,
+        "end": 812,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 851,
+        "end": 863,
+        "className": "syntax-function"
+      },
+      {
+        "start": 864,
+        "end": 871,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 905,
+        "end": 908,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 909,
+        "end": 910,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 911,
+        "end": 917,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 918,
+        "end": 923,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 941,
+        "end": 949,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 950,
+        "end": 952,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 953,
+        "end": 956,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 982,
+        "end": 988,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 989,
+        "end": 997,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1009,
+        "end": 1012,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1013,
+        "end": 1031,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1038,
+        "end": 1042,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1043,
+        "end": 1045,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1046,
+        "end": 1055,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1057,
+        "end": 1076,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1076,
+        "end": 1077,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1077,
+        "end": 1093,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1093,
+        "end": 1094,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1122,
+        "end": 1124,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1125,
+        "end": 1144,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1144,
+        "end": 1145,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1145,
+        "end": 1159,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1159,
+        "end": 1160,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1182,
+        "end": 1187,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1188,
+        "end": 1196,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1197,
+        "end": 1198,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1213,
+        "end": 1223,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1224,
+        "end": 1232,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1246,
+        "end": 1251,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1252,
+        "end": 1259,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1260,
+        "end": 1261,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1276,
+        "end": 1286,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1287,
+        "end": 1294,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1308,
+        "end": 1310,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1311,
+        "end": 1320,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1322,
+        "end": 1334,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1334,
+        "end": 1335,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1335,
+        "end": 1343,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1345,
+        "end": 1352,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1352,
+        "end": 1353,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1355,
+        "end": 1362,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1392,
+        "end": 1394,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1396,
+        "end": 1400,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1401,
+        "end": 1404,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1405,
+        "end": 1406,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1407,
+        "end": 1413,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1414,
+        "end": 1415,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1416,
+        "end": 1423,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1425,
+        "end": 1428,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1429,
+        "end": 1430,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1431,
+        "end": 1432,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1436,
+        "end": 1442,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1481,
+        "end": 1485,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1485,
+        "end": 1486,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1487,
+        "end": 1493,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1494,
+        "end": 1495,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1501,
+        "end": 1511,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1512,
+        "end": 1520,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1541,
+        "end": 1546,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1547,
+        "end": 1551,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1551,
+        "end": 1552,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1553,
+        "end": 1558,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1559,
+        "end": 1560,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1566,
+        "end": 1576,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1577,
+        "end": 1584,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1605,
+        "end": 1611,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1612,
+        "end": 1620,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1621,
+        "end": 1622,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1623,
+        "end": 1626,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1627,
+        "end": 1628,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1629,
+        "end": 1635,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1636,
+        "end": 1652,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1652,
+        "end": 1653,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1653,
+        "end": 1661,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1661,
+        "end": 1662,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1683,
+        "end": 1699,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1700,
+        "end": 1706,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1708,
+        "end": 1713,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1715,
+        "end": 1723,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1744,
+        "end": 1752,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1753,
+        "end": 1755,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1756,
+        "end": 1759,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1793,
+        "end": 1799,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1800,
+        "end": 1808,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1834,
+        "end": 1838,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1851,
+        "end": 1857,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1863,
+        "end": 1879,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1880,
+        "end": 1887,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1889,
+        "end": 1895,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1897,
+        "end": 1905,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1918,
+        "end": 1924,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1931,
+        "end": 1935,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1951,
+        "end": 1954,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1956,
+        "end": 1972,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1973,
+        "end": 1980,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1982,
+        "end": 1988,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1990,
+        "end": 1998,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2001,
+        "end": 2006,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2007,
+        "end": 2015,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2022,
+        "end": 2029,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2030,
+        "end": 2038,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2039,
+        "end": 2054,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2054,
+        "end": 2055,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2055,
+        "end": 2069,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2069,
+        "end": 2070,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2072,
+        "end": 2082,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2091,
+        "end": 2102,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2110,
+        "end": 2117,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2118,
+        "end": 2126,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2127,
+        "end": 2142,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2142,
+        "end": 2143,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2143,
+        "end": 2159,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2159,
+        "end": 2160,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2162,
+        "end": 2172,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2181,
+        "end": 2192,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2201,
+        "end": 2206,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2207,
+        "end": 2211,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2212,
+        "end": 2224,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2233,
+        "end": 2234,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2235,
+        "end": 2247,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2247,
+        "end": 2248,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2248,
+        "end": 2259,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2259,
+        "end": 2260,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2262,
+        "end": 2273,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2273,
+        "end": 2275,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2277,
+        "end": 2284,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2297,
+        "end": 2299,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2300,
+        "end": 2328,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2329,
+        "end": 2340,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2342,
+        "end": 2352,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2353,
+        "end": 2354,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2354,
+        "end": 2361,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2372,
+        "end": 2378,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2379,
+        "end": 2399,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2399,
+        "end": 2400,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2400,
+        "end": 2412,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2412,
+        "end": 2413,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2431,
+        "end": 2444,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2445,
+        "end": 2452,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2454,
+        "end": 2460,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2462,
+        "end": 2470,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2473,
+        "end": 2479,
+        "className": "syntax-keyword"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_uninitialized_dispatch.cpp",
+    "code": "    struct __uninitialized_copy\n    {\n      template<typename _InputIterator, typename _ForwardIterator>\n        static _ForwardIterator\n        __uninit_copy(_InputIterator __first, _InputIterator __last,\n                      _ForwardIterator __result)\n        { return std::__do_uninit_copy(__first, __last, __result); }\n    };\n\n  template<>\n    struct __uninitialized_copy<true>\n    {\n      // Overload for generic iterators.\n      template<typename _InputIterator, typename _ForwardIterator>\n        static _ForwardIterator\n        __uninit_copy(_InputIterator __first, _InputIterator __last,\n                      _ForwardIterator __result)\n        {\n          if (__unwrappable_niter<_InputIterator>::__value\n                && __unwrappable_niter<_ForwardIterator>::__value)\n            {\n              __uninit_copy(std::__niter_base(__first),\n                            std::__niter_base(__last),\n                            std::__niter_base(__result));\n              std::advance(__result, std::distance(__first, __last));\n              return __result;\n            }\n          else\n            return std::__do_uninit_copy(__first, __last, __result);\n        }\n\n      // Overload for pointers.\n      template<typename _Tp, typename _Up>\n        static _Up*\n        __uninit_copy(_Tp* __first, _Tp* __last, _Up* __result)\n        {\n          // Ensure that we don't successfully memcpy in cases that should be\n          // ill-formed because is_constructible<_Up, _Tp&> is false.\n          typedef __typeof__(static_cast<_Up>(*__first)) __check\n            __attribute__((__unused__));\n\n          const ptrdiff_t __n = __last - __first;\n          if (__builtin_expect(__n > 0, true))\n            {\n              __builtin_memcpy(__result, __first, __n * sizeof(_Tp));\n              __result += __n;\n            }\n          return __result;\n        }\n    };",
+    "spans": [
+      {
+        "start": 4,
+        "end": 10,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 11,
+        "end": 31,
+        "className": "syntax-type"
+      },
+      {
+        "start": 44,
+        "end": 52,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 52,
+        "end": 53,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 53,
+        "end": 61,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 62,
+        "end": 76,
+        "className": "syntax-type"
+      },
+      {
+        "start": 78,
+        "end": 86,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 87,
+        "end": 103,
+        "className": "syntax-type"
+      },
+      {
+        "start": 103,
+        "end": 104,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 113,
+        "end": 119,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 120,
+        "end": 136,
+        "className": "syntax-type"
+      },
+      {
+        "start": 145,
+        "end": 158,
+        "className": "syntax-function"
+      },
+      {
+        "start": 159,
+        "end": 173,
+        "className": "syntax-type"
+      },
+      {
+        "start": 174,
+        "end": 181,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 183,
+        "end": 197,
+        "className": "syntax-type"
+      },
+      {
+        "start": 198,
+        "end": 204,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 228,
+        "end": 244,
+        "className": "syntax-type"
+      },
+      {
+        "start": 245,
+        "end": 253,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 265,
+        "end": 271,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 277,
+        "end": 293,
+        "className": "syntax-function"
+      },
+      {
+        "start": 294,
+        "end": 301,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 303,
+        "end": 309,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 311,
+        "end": 319,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 334,
+        "end": 342,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 342,
+        "end": 344,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 349,
+        "end": 355,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 356,
+        "end": 376,
+        "className": "syntax-type"
+      },
+      {
+        "start": 376,
+        "end": 377,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 381,
+        "end": 382,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 395,
+        "end": 429,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 436,
+        "end": 444,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 444,
+        "end": 445,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 445,
+        "end": 453,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 454,
+        "end": 468,
+        "className": "syntax-type"
+      },
+      {
+        "start": 470,
+        "end": 478,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 479,
+        "end": 495,
+        "className": "syntax-type"
+      },
+      {
+        "start": 495,
+        "end": 496,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 505,
+        "end": 511,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 512,
+        "end": 528,
+        "className": "syntax-type"
+      },
+      {
+        "start": 537,
+        "end": 550,
+        "className": "syntax-function"
+      },
+      {
+        "start": 551,
+        "end": 565,
+        "className": "syntax-type"
+      },
+      {
+        "start": 566,
+        "end": 573,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 575,
+        "end": 589,
+        "className": "syntax-type"
+      },
+      {
+        "start": 590,
+        "end": 596,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 620,
+        "end": 636,
+        "className": "syntax-type"
+      },
+      {
+        "start": 637,
+        "end": 645,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 667,
+        "end": 669,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 671,
+        "end": 690,
+        "className": "syntax-type"
+      },
+      {
+        "start": 690,
+        "end": 691,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 691,
+        "end": 705,
+        "className": "syntax-type"
+      },
+      {
+        "start": 705,
+        "end": 706,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 708,
+        "end": 715,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 732,
+        "end": 734,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 735,
+        "end": 754,
+        "className": "syntax-type"
+      },
+      {
+        "start": 754,
+        "end": 755,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 755,
+        "end": 771,
+        "className": "syntax-type"
+      },
+      {
+        "start": 771,
+        "end": 772,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 774,
+        "end": 781,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 811,
+        "end": 824,
+        "className": "syntax-function"
+      },
+      {
+        "start": 830,
+        "end": 842,
+        "className": "syntax-function"
+      },
+      {
+        "start": 843,
+        "end": 850,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 886,
+        "end": 898,
+        "className": "syntax-function"
+      },
+      {
+        "start": 899,
+        "end": 905,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 941,
+        "end": 953,
+        "className": "syntax-function"
+      },
+      {
+        "start": 954,
+        "end": 962,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 985,
+        "end": 992,
+        "className": "syntax-function"
+      },
+      {
+        "start": 993,
+        "end": 1001,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1008,
+        "end": 1016,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1017,
+        "end": 1024,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1026,
+        "end": 1032,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1050,
+        "end": 1056,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1057,
+        "end": 1065,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1091,
+        "end": 1095,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1108,
+        "end": 1114,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1120,
+        "end": 1136,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1137,
+        "end": 1144,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1146,
+        "end": 1152,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1154,
+        "end": 1162,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1182,
+        "end": 1207,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1214,
+        "end": 1222,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1222,
+        "end": 1223,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1223,
+        "end": 1231,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1232,
+        "end": 1235,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1237,
+        "end": 1245,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1246,
+        "end": 1249,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1249,
+        "end": 1250,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1259,
+        "end": 1265,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1266,
+        "end": 1269,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1269,
+        "end": 1270,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1279,
+        "end": 1292,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1293,
+        "end": 1296,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1296,
+        "end": 1297,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1298,
+        "end": 1305,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1307,
+        "end": 1310,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1310,
+        "end": 1311,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1312,
+        "end": 1318,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1320,
+        "end": 1323,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1323,
+        "end": 1324,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1325,
+        "end": 1333,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1355,
+        "end": 1422,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1433,
+        "end": 1492,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1503,
+        "end": 1510,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1511,
+        "end": 1521,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1522,
+        "end": 1533,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1533,
+        "end": 1534,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1534,
+        "end": 1537,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1537,
+        "end": 1538,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1539,
+        "end": 1540,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1540,
+        "end": 1547,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1550,
+        "end": 1557,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1585,
+        "end": 1595,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1610,
+        "end": 1615,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1616,
+        "end": 1625,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1626,
+        "end": 1629,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1630,
+        "end": 1631,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1632,
+        "end": 1638,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1639,
+        "end": 1640,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1641,
+        "end": 1648,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1660,
+        "end": 1662,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1664,
+        "end": 1680,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1681,
+        "end": 1684,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1685,
+        "end": 1686,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1687,
+        "end": 1688,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1725,
+        "end": 1741,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1742,
+        "end": 1750,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1752,
+        "end": 1759,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1761,
+        "end": 1764,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1765,
+        "end": 1766,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1767,
+        "end": 1773,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1774,
+        "end": 1777,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1795,
+        "end": 1803,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1804,
+        "end": 1806,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1807,
+        "end": 1810,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1836,
+        "end": 1842,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1843,
+        "end": 1851,
+        "className": "syntax-variable"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_vector_assign_aux.cpp",
+    "code": "  template<typename _Tp, typename _Alloc>\n    _GLIBCXX20_CONSTEXPR\n    void\n    vector<_Tp, _Alloc>::\n    _M_fill_assign(size_t __n, const value_type& __val)\n    {\n      const size_type __sz = size();\n      if (__n > capacity())\n        {\n          if (__n <= __sz)\n            __builtin_unreachable();\n          vector __tmp(__n, __val, _M_get_Tp_allocator());\n          __tmp._M_impl._M_swap_data(this->_M_impl);\n        }\n      else if (__n > __sz)\n        {\n          std::fill(begin(), end(), __val);\n          const size_type __add = __n - __sz;\n          _GLIBCXX_ASAN_ANNOTATE_GROW(__add);\n          this->_M_impl._M_finish =\n            std::__uninitialized_fill_n_a(this->_M_impl._M_finish,\n                                          __add, __val, _M_get_Tp_allocator());\n          _GLIBCXX_ASAN_ANNOTATE_GREW(__add);\n        }\n      else\n        _M_erase_at_end(std::fill_n(this->_M_impl._M_start, __n, __val));\n    }\n\n  template<typename _Tp, typename _Alloc>\n    template<typename _InputIterator>\n      _GLIBCXX20_CONSTEXPR\n      void\n      vector<_Tp, _Alloc>::\n      _M_assign_aux(_InputIterator __first, _InputIterator __last,\n                    std::input_iterator_tag)\n      {\n        pointer __cur(this->_M_impl._M_start);\n        for (; __first != __last && __cur != this->_M_impl._M_finish;\n             ++__cur, (void)++__first)\n          *__cur = *__first;\n        if (__first == __last)\n          _M_erase_at_end(__cur);\n        else\n          _M_range_insert(end(), __first, __last,\n                          std::__iterator_category(__first));\n      }\n\n  template<typename _Tp, typename _Alloc>\n    template<typename _ForwardIterator>\n      _GLIBCXX20_CONSTEXPR\n      void\n      vector<_Tp, _Alloc>::\n      _M_assign_aux(_ForwardIterator __first, _ForwardIterator __last,\n                    std::forward_iterator_tag)\n      {\n        const size_type __sz = size();\n        const size_type __len = std::distance(__first, __last);\n\n        if (__len > capacity())\n          {\n            if (__len <= __sz)\n              __builtin_unreachable();\n\n            _S_check_init_len(__len, _M_get_Tp_allocator());\n            pointer __tmp(_M_allocate_and_copy(__len, __first, __last));\n            std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,\n                          _M_get_Tp_allocator());\n            _GLIBCXX_ASAN_ANNOTATE_REINIT;\n            _M_deallocate(this->_M_impl._M_start,\n                          this->_M_impl._M_end_of_storage\n                          - this->_M_impl._M_start);\n            this->_M_impl._M_start = __tmp;\n            this->_M_impl._M_finish = this->_M_impl._M_start + __len;\n            this->_M_impl._M_end_of_storage = this->_M_impl._M_finish;\n          }\n        else if (__sz >= __len)\n          _M_erase_at_end(std::copy(__first, __last, this->_M_impl._M_start));\n        else",
+    "spans": [
+      {
+        "start": 2,
+        "end": 10,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 10,
+        "end": 11,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 11,
+        "end": 19,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 20,
+        "end": 23,
+        "className": "syntax-type"
+      },
+      {
+        "start": 25,
+        "end": 33,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 34,
+        "end": 40,
+        "className": "syntax-type"
+      },
+      {
+        "start": 40,
+        "end": 41,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 46,
+        "end": 66,
+        "className": "syntax-type"
+      },
+      {
+        "start": 71,
+        "end": 75,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 80,
+        "end": 86,
+        "className": "syntax-type"
+      },
+      {
+        "start": 86,
+        "end": 87,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 87,
+        "end": 90,
+        "className": "syntax-type"
+      },
+      {
+        "start": 92,
+        "end": 98,
+        "className": "syntax-type"
+      },
+      {
+        "start": 98,
+        "end": 99,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 106,
+        "end": 120,
+        "className": "syntax-function"
+      },
+      {
+        "start": 121,
+        "end": 127,
+        "className": "syntax-type"
+      },
+      {
+        "start": 128,
+        "end": 131,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 133,
+        "end": 138,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 139,
+        "end": 149,
+        "className": "syntax-type"
+      },
+      {
+        "start": 149,
+        "end": 150,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 151,
+        "end": 156,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 170,
+        "end": 175,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 176,
+        "end": 185,
+        "className": "syntax-type"
+      },
+      {
+        "start": 186,
+        "end": 190,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 191,
+        "end": 192,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 193,
+        "end": 197,
+        "className": "syntax-function"
+      },
+      {
+        "start": 207,
+        "end": 209,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 211,
+        "end": 214,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 215,
+        "end": 216,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 217,
+        "end": 225,
+        "className": "syntax-function"
+      },
+      {
+        "start": 249,
+        "end": 251,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 253,
+        "end": 256,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 260,
+        "end": 264,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 278,
+        "end": 299,
+        "className": "syntax-function"
+      },
+      {
+        "start": 313,
+        "end": 319,
+        "className": "syntax-type"
+      },
+      {
+        "start": 320,
+        "end": 325,
+        "className": "syntax-function"
+      },
+      {
+        "start": 326,
+        "end": 329,
+        "className": "syntax-type"
+      },
+      {
+        "start": 331,
+        "end": 336,
+        "className": "syntax-type"
+      },
+      {
+        "start": 338,
+        "end": 357,
+        "className": "syntax-type"
+      },
+      {
+        "start": 372,
+        "end": 377,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 378,
+        "end": 385,
+        "className": "syntax-property"
+      },
+      {
+        "start": 386,
+        "end": 398,
+        "className": "syntax-function"
+      },
+      {
+        "start": 399,
+        "end": 403,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 403,
+        "end": 405,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 405,
+        "end": 412,
+        "className": "syntax-property"
+      },
+      {
+        "start": 431,
+        "end": 435,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 436,
+        "end": 438,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 440,
+        "end": 443,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 444,
+        "end": 445,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 446,
+        "end": 450,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 477,
+        "end": 481,
+        "className": "syntax-function"
+      },
+      {
+        "start": 482,
+        "end": 487,
+        "className": "syntax-function"
+      },
+      {
+        "start": 491,
+        "end": 494,
+        "className": "syntax-function"
+      },
+      {
+        "start": 498,
+        "end": 503,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 516,
+        "end": 521,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 522,
+        "end": 531,
+        "className": "syntax-type"
+      },
+      {
+        "start": 532,
+        "end": 537,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 538,
+        "end": 539,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 540,
+        "end": 543,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 544,
+        "end": 545,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 546,
+        "end": 550,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 562,
+        "end": 589,
+        "className": "syntax-function"
+      },
+      {
+        "start": 590,
+        "end": 595,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 608,
+        "end": 612,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 612,
+        "end": 614,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 614,
+        "end": 621,
+        "className": "syntax-property"
+      },
+      {
+        "start": 622,
+        "end": 631,
+        "className": "syntax-property"
+      },
+      {
+        "start": 632,
+        "end": 633,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 651,
+        "end": 675,
+        "className": "syntax-function"
+      },
+      {
+        "start": 676,
+        "end": 680,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 680,
+        "end": 682,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 682,
+        "end": 689,
+        "className": "syntax-property"
+      },
+      {
+        "start": 690,
+        "end": 699,
+        "className": "syntax-property"
+      },
+      {
+        "start": 743,
+        "end": 748,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 750,
+        "end": 755,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 757,
+        "end": 776,
+        "className": "syntax-function"
+      },
+      {
+        "start": 791,
+        "end": 818,
+        "className": "syntax-function"
+      },
+      {
+        "start": 819,
+        "end": 824,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 843,
+        "end": 847,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 856,
+        "end": 871,
+        "className": "syntax-function"
+      },
+      {
+        "start": 877,
+        "end": 883,
+        "className": "syntax-function"
+      },
+      {
+        "start": 884,
+        "end": 888,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 888,
+        "end": 890,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 890,
+        "end": 897,
+        "className": "syntax-property"
+      },
+      {
+        "start": 898,
+        "end": 906,
+        "className": "syntax-property"
+      },
+      {
+        "start": 908,
+        "end": 911,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 913,
+        "end": 918,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 931,
+        "end": 939,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 939,
+        "end": 940,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 940,
+        "end": 948,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 949,
+        "end": 952,
+        "className": "syntax-type"
+      },
+      {
+        "start": 954,
+        "end": 962,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 963,
+        "end": 969,
+        "className": "syntax-type"
+      },
+      {
+        "start": 969,
+        "end": 970,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 975,
+        "end": 983,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 983,
+        "end": 984,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 984,
+        "end": 992,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 993,
+        "end": 1007,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1007,
+        "end": 1008,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1015,
+        "end": 1035,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1042,
+        "end": 1046,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1053,
+        "end": 1059,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1059,
+        "end": 1060,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1060,
+        "end": 1063,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1065,
+        "end": 1071,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1071,
+        "end": 1072,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1081,
+        "end": 1094,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1095,
+        "end": 1109,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1110,
+        "end": 1117,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1119,
+        "end": 1133,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1134,
+        "end": 1140,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1167,
+        "end": 1185,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1203,
+        "end": 1210,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1211,
+        "end": 1216,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1217,
+        "end": 1221,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1221,
+        "end": 1223,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1223,
+        "end": 1230,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1231,
+        "end": 1239,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1250,
+        "end": 1253,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1257,
+        "end": 1264,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1265,
+        "end": 1267,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1268,
+        "end": 1274,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1275,
+        "end": 1277,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1278,
+        "end": 1283,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1284,
+        "end": 1286,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1287,
+        "end": 1291,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1291,
+        "end": 1293,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1293,
+        "end": 1300,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1301,
+        "end": 1310,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1325,
+        "end": 1327,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1327,
+        "end": 1332,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1335,
+        "end": 1339,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1340,
+        "end": 1342,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1342,
+        "end": 1349,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1361,
+        "end": 1362,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1362,
+        "end": 1367,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1368,
+        "end": 1369,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1370,
+        "end": 1371,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1371,
+        "end": 1378,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1388,
+        "end": 1390,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1392,
+        "end": 1399,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1400,
+        "end": 1402,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1403,
+        "end": 1409,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1421,
+        "end": 1436,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1437,
+        "end": 1442,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1453,
+        "end": 1457,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1468,
+        "end": 1483,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1484,
+        "end": 1487,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1491,
+        "end": 1498,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1500,
+        "end": 1506,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1539,
+        "end": 1558,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1559,
+        "end": 1566,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1581,
+        "end": 1589,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1589,
+        "end": 1590,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1590,
+        "end": 1598,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1599,
+        "end": 1602,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1604,
+        "end": 1612,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1613,
+        "end": 1619,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1619,
+        "end": 1620,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1625,
+        "end": 1633,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1633,
+        "end": 1634,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1634,
+        "end": 1642,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1643,
+        "end": 1659,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1659,
+        "end": 1660,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1667,
+        "end": 1687,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1694,
+        "end": 1698,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1705,
+        "end": 1711,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1711,
+        "end": 1712,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1712,
+        "end": 1715,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1717,
+        "end": 1723,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1723,
+        "end": 1724,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1733,
+        "end": 1746,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1747,
+        "end": 1763,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1764,
+        "end": 1771,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1773,
+        "end": 1789,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1790,
+        "end": 1796,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1823,
+        "end": 1843,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1861,
+        "end": 1866,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1867,
+        "end": 1876,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1877,
+        "end": 1881,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1882,
+        "end": 1883,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1884,
+        "end": 1888,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1900,
+        "end": 1905,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1906,
+        "end": 1915,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1916,
+        "end": 1921,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1922,
+        "end": 1923,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1929,
+        "end": 1937,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1938,
+        "end": 1945,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1947,
+        "end": 1953,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1965,
+        "end": 1967,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1969,
+        "end": 1974,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1975,
+        "end": 1976,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1977,
+        "end": 1985,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2013,
+        "end": 2015,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2017,
+        "end": 2022,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2026,
+        "end": 2030,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2046,
+        "end": 2067,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2084,
+        "end": 2101,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2102,
+        "end": 2107,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2109,
+        "end": 2128,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2145,
+        "end": 2152,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2153,
+        "end": 2158,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2159,
+        "end": 2179,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2180,
+        "end": 2185,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2187,
+        "end": 2194,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2196,
+        "end": 2202,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2223,
+        "end": 2231,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2232,
+        "end": 2236,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2236,
+        "end": 2238,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2238,
+        "end": 2245,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2246,
+        "end": 2254,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2256,
+        "end": 2260,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2260,
+        "end": 2262,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2262,
+        "end": 2269,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2270,
+        "end": 2279,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2307,
+        "end": 2326,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2343,
+        "end": 2372,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2386,
+        "end": 2399,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2400,
+        "end": 2404,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2404,
+        "end": 2406,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2406,
+        "end": 2413,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2414,
+        "end": 2422,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2450,
+        "end": 2454,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2454,
+        "end": 2456,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2456,
+        "end": 2463,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2464,
+        "end": 2481,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2508,
+        "end": 2509,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2510,
+        "end": 2514,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2514,
+        "end": 2516,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2516,
+        "end": 2523,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2524,
+        "end": 2532,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2547,
+        "end": 2551,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2551,
+        "end": 2553,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2553,
+        "end": 2560,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2561,
+        "end": 2569,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2570,
+        "end": 2571,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2572,
+        "end": 2577,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2591,
+        "end": 2595,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2595,
+        "end": 2597,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2597,
+        "end": 2604,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2605,
+        "end": 2614,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2615,
+        "end": 2616,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2617,
+        "end": 2621,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2621,
+        "end": 2623,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2623,
+        "end": 2630,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2631,
+        "end": 2639,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2640,
+        "end": 2641,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2642,
+        "end": 2647,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2661,
+        "end": 2665,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2665,
+        "end": 2667,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2667,
+        "end": 2674,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2675,
+        "end": 2692,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2693,
+        "end": 2694,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2695,
+        "end": 2699,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2699,
+        "end": 2701,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2701,
+        "end": 2708,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2709,
+        "end": 2718,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2740,
+        "end": 2744,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2745,
+        "end": 2747,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2749,
+        "end": 2753,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2757,
+        "end": 2762,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2774,
+        "end": 2789,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2795,
+        "end": 2799,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2800,
+        "end": 2807,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2809,
+        "end": 2815,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2817,
+        "end": 2821,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2821,
+        "end": 2823,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2823,
+        "end": 2830,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2831,
+        "end": 2839,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2851,
+        "end": 2855,
+        "className": "syntax-keyword"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_vector_erase_assign.cpp",
+    "code": "    _GLIBCXX20_CONSTEXPR\n    typename vector<_Tp, _Alloc>::iterator\n    vector<_Tp, _Alloc>::\n    _M_erase(iterator __position)\n    {\n      if (__position + 1 != end())\n        _GLIBCXX_MOVE3(__position + 1, end(), __position);\n      --this->_M_impl._M_finish;\n      _Alloc_traits::destroy(this->_M_impl, this->_M_impl._M_finish);\n      _GLIBCXX_ASAN_ANNOTATE_SHRINK(1);\n      return __position;\n    }\n\n  template<typename _Tp, typename _Alloc>\n    _GLIBCXX20_CONSTEXPR\n    typename vector<_Tp, _Alloc>::iterator\n    vector<_Tp, _Alloc>::\n    _M_erase(iterator __first, iterator __last)\n    {\n      if (__first != __last)\n        {\n          if (__last != end())\n            _GLIBCXX_MOVE3(__last, end(), __first);\n          _M_erase_at_end(__first.base() + (end() - __last));\n        }\n      return __first;\n    }\n\n  template<typename _Tp, typename _Alloc>\n    _GLIBCXX20_CONSTEXPR\n    vector<_Tp, _Alloc>&\n    vector<_Tp, _Alloc>::\n    operator=(const vector<_Tp, _Alloc>& __x)\n    {\n      if (std::__addressof(__x) != this)\n        {\n          _GLIBCXX_ASAN_ANNOTATE_REINIT;\n#if __cplusplus >= 201103L\n          if (_Alloc_traits::_S_propagate_on_copy_assign())\n            {\n              if (!_Alloc_traits::_S_always_equal()\n                  && _M_get_Tp_allocator() != __x._M_get_Tp_allocator())\n                {\n                  // replacement allocator cannot free existing storage\n                  this->clear();\n                  _M_deallocate(this->_M_impl._M_start,\n                                this->_M_impl._M_end_of_storage\n                                - this->_M_impl._M_start);\n                  this->_M_impl._M_start = nullptr;\n                  this->_M_impl._M_finish = nullptr;\n                  this->_M_impl._M_end_of_storage = nullptr;\n                }\n              std::__alloc_on_copy(_M_get_Tp_allocator(),\n                                   __x._M_get_Tp_allocator());\n            }\n#endif\n          const size_type __xlen = __x.size();\n          if (__xlen > capacity())\n            {\n              pointer __tmp = _M_allocate_and_copy(__xlen, __x.begin(),\n                                                   __x.end());\n              std::_Destroy(this->_M_impl._M_start, this->_M_impl._M_finish,\n                            _M_get_Tp_allocator());\n              _M_deallocate(this->_M_impl._M_start,\n                            this->_M_impl._M_end_of_storage\n                            - this->_M_impl._M_start);\n              this->_M_impl._M_start = __tmp;\n              this->_M_impl._M_end_of_storage = this->_M_impl._M_start + __xlen;\n            }\n          else if (size() >= __xlen)\n            {\n              std::_Destroy(std::copy(__x.begin(), __x.end(), begin()),\n                            end(), _M_get_Tp_allocator());\n            }\n          else\n            {\n              std::copy(__x._M_impl._M_start, __x._M_impl._M_start + size(),\n                        this->_M_impl._M_start);\n              std::__uninitialized_copy_a(__x._M_impl._M_start + size(),\n                                          __x._M_impl._M_finish,\n                                          this->_M_impl._M_finish,\n                                          _M_get_Tp_allocator());\n            }\n          this->_M_impl._M_finish = this->_M_impl._M_start + __xlen;\n        }\n      return *this;\n    }",
+    "spans": [
+      {
+        "start": 4,
+        "end": 24,
+        "className": "syntax-type"
+      },
+      {
+        "start": 29,
+        "end": 37,
+        "className": "syntax-type"
+      },
+      {
+        "start": 38,
+        "end": 44,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 44,
+        "end": 45,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 45,
+        "end": 48,
+        "className": "syntax-type"
+      },
+      {
+        "start": 50,
+        "end": 56,
+        "className": "syntax-type"
+      },
+      {
+        "start": 56,
+        "end": 57,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 59,
+        "end": 67,
+        "className": "syntax-type"
+      },
+      {
+        "start": 72,
+        "end": 78,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 78,
+        "end": 79,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 79,
+        "end": 82,
+        "className": "syntax-type"
+      },
+      {
+        "start": 84,
+        "end": 90,
+        "className": "syntax-type"
+      },
+      {
+        "start": 90,
+        "end": 91,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 98,
+        "end": 106,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 107,
+        "end": 115,
+        "className": "syntax-type"
+      },
+      {
+        "start": 116,
+        "end": 126,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 140,
+        "end": 142,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 144,
+        "end": 154,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 155,
+        "end": 156,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 157,
+        "end": 158,
+        "className": "syntax-number"
+      },
+      {
+        "start": 159,
+        "end": 161,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 162,
+        "end": 165,
+        "className": "syntax-function"
+      },
+      {
+        "start": 177,
+        "end": 191,
+        "className": "syntax-function"
+      },
+      {
+        "start": 192,
+        "end": 202,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 203,
+        "end": 204,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 205,
+        "end": 206,
+        "className": "syntax-number"
+      },
+      {
+        "start": 208,
+        "end": 211,
+        "className": "syntax-function"
+      },
+      {
+        "start": 215,
+        "end": 225,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 234,
+        "end": 236,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 236,
+        "end": 240,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 240,
+        "end": 242,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 242,
+        "end": 249,
+        "className": "syntax-property"
+      },
+      {
+        "start": 250,
+        "end": 259,
+        "className": "syntax-property"
+      },
+      {
+        "start": 282,
+        "end": 289,
+        "className": "syntax-function"
+      },
+      {
+        "start": 290,
+        "end": 294,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 294,
+        "end": 296,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 296,
+        "end": 303,
+        "className": "syntax-property"
+      },
+      {
+        "start": 305,
+        "end": 309,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 309,
+        "end": 311,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 311,
+        "end": 318,
+        "className": "syntax-property"
+      },
+      {
+        "start": 319,
+        "end": 328,
+        "className": "syntax-property"
+      },
+      {
+        "start": 337,
+        "end": 366,
+        "className": "syntax-function"
+      },
+      {
+        "start": 367,
+        "end": 368,
+        "className": "syntax-number"
+      },
+      {
+        "start": 377,
+        "end": 383,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 384,
+        "end": 394,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 405,
+        "end": 413,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 413,
+        "end": 414,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 414,
+        "end": 422,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 423,
+        "end": 426,
+        "className": "syntax-type"
+      },
+      {
+        "start": 428,
+        "end": 436,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 437,
+        "end": 443,
+        "className": "syntax-type"
+      },
+      {
+        "start": 443,
+        "end": 444,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 449,
+        "end": 469,
+        "className": "syntax-type"
+      },
+      {
+        "start": 474,
+        "end": 482,
+        "className": "syntax-type"
+      },
+      {
+        "start": 483,
+        "end": 489,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 489,
+        "end": 490,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 490,
+        "end": 493,
+        "className": "syntax-type"
+      },
+      {
+        "start": 495,
+        "end": 501,
+        "className": "syntax-type"
+      },
+      {
+        "start": 501,
+        "end": 502,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 504,
+        "end": 512,
+        "className": "syntax-type"
+      },
+      {
+        "start": 517,
+        "end": 523,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 523,
+        "end": 524,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 524,
+        "end": 527,
+        "className": "syntax-type"
+      },
+      {
+        "start": 529,
+        "end": 535,
+        "className": "syntax-type"
+      },
+      {
+        "start": 535,
+        "end": 536,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 543,
+        "end": 551,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 552,
+        "end": 560,
+        "className": "syntax-type"
+      },
+      {
+        "start": 561,
+        "end": 568,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 570,
+        "end": 578,
+        "className": "syntax-type"
+      },
+      {
+        "start": 579,
+        "end": 585,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 599,
+        "end": 601,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 603,
+        "end": 610,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 611,
+        "end": 613,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 614,
+        "end": 620,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 642,
+        "end": 644,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 646,
+        "end": 652,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 653,
+        "end": 655,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 656,
+        "end": 659,
+        "className": "syntax-function"
+      },
+      {
+        "start": 675,
+        "end": 689,
+        "className": "syntax-function"
+      },
+      {
+        "start": 690,
+        "end": 696,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 698,
+        "end": 701,
+        "className": "syntax-function"
+      },
+      {
+        "start": 705,
+        "end": 712,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 725,
+        "end": 740,
+        "className": "syntax-function"
+      },
+      {
+        "start": 741,
+        "end": 748,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 749,
+        "end": 753,
+        "className": "syntax-function"
+      },
+      {
+        "start": 756,
+        "end": 757,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 759,
+        "end": 762,
+        "className": "syntax-function"
+      },
+      {
+        "start": 765,
+        "end": 766,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 767,
+        "end": 773,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 793,
+        "end": 799,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 800,
+        "end": 807,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 818,
+        "end": 826,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 826,
+        "end": 827,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 827,
+        "end": 835,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 836,
+        "end": 839,
+        "className": "syntax-type"
+      },
+      {
+        "start": 841,
+        "end": 849,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 850,
+        "end": 856,
+        "className": "syntax-type"
+      },
+      {
+        "start": 856,
+        "end": 857,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 862,
+        "end": 882,
+        "className": "syntax-type"
+      },
+      {
+        "start": 887,
+        "end": 893,
+        "className": "syntax-type"
+      },
+      {
+        "start": 893,
+        "end": 894,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 894,
+        "end": 897,
+        "className": "syntax-type"
+      },
+      {
+        "start": 899,
+        "end": 905,
+        "className": "syntax-type"
+      },
+      {
+        "start": 905,
+        "end": 907,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 912,
+        "end": 918,
+        "className": "syntax-type"
+      },
+      {
+        "start": 918,
+        "end": 919,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 919,
+        "end": 922,
+        "className": "syntax-type"
+      },
+      {
+        "start": 924,
+        "end": 930,
+        "className": "syntax-type"
+      },
+      {
+        "start": 930,
+        "end": 931,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 946,
+        "end": 947,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 948,
+        "end": 953,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 954,
+        "end": 960,
+        "className": "syntax-type"
+      },
+      {
+        "start": 960,
+        "end": 961,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 961,
+        "end": 964,
+        "className": "syntax-type"
+      },
+      {
+        "start": 966,
+        "end": 972,
+        "className": "syntax-type"
+      },
+      {
+        "start": 972,
+        "end": 974,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 975,
+        "end": 978,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 992,
+        "end": 994,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1001,
+        "end": 1012,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1013,
+        "end": 1016,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1018,
+        "end": 1020,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1021,
+        "end": 1025,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1047,
+        "end": 1076,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1078,
+        "end": 1081,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1082,
+        "end": 1093,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1097,
+        "end": 1104,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1115,
+        "end": 1117,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1134,
+        "end": 1161,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1193,
+        "end": 1195,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1213,
+        "end": 1228,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1249,
+        "end": 1251,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1252,
+        "end": 1271,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1274,
+        "end": 1276,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1277,
+        "end": 1280,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1281,
+        "end": 1300,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1340,
+        "end": 1393,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1412,
+        "end": 1416,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1416,
+        "end": 1418,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1418,
+        "end": 1423,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1445,
+        "end": 1458,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1459,
+        "end": 1463,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1463,
+        "end": 1465,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1465,
+        "end": 1472,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1473,
+        "end": 1481,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1515,
+        "end": 1519,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1519,
+        "end": 1521,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1521,
+        "end": 1528,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1529,
+        "end": 1546,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1579,
+        "end": 1580,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1581,
+        "end": 1585,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1585,
+        "end": 1587,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1587,
+        "end": 1594,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1595,
+        "end": 1603,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1624,
+        "end": 1628,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1628,
+        "end": 1630,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1630,
+        "end": 1637,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1638,
+        "end": 1646,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1647,
+        "end": 1648,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1649,
+        "end": 1656,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1676,
+        "end": 1680,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1680,
+        "end": 1682,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1682,
+        "end": 1689,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1690,
+        "end": 1699,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1700,
+        "end": 1701,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1702,
+        "end": 1709,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1729,
+        "end": 1733,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1733,
+        "end": 1735,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1735,
+        "end": 1742,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1743,
+        "end": 1760,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1761,
+        "end": 1762,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1763,
+        "end": 1770,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1809,
+        "end": 1824,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1825,
+        "end": 1844,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1883,
+        "end": 1886,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1887,
+        "end": 1906,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1925,
+        "end": 1931,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1942,
+        "end": 1947,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1948,
+        "end": 1957,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1958,
+        "end": 1964,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1965,
+        "end": 1966,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1967,
+        "end": 1970,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1971,
+        "end": 1975,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1989,
+        "end": 1991,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1993,
+        "end": 1999,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2000,
+        "end": 2001,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2002,
+        "end": 2010,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2042,
+        "end": 2049,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2050,
+        "end": 2055,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2056,
+        "end": 2057,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2058,
+        "end": 2078,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2079,
+        "end": 2085,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2087,
+        "end": 2090,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2091,
+        "end": 2096,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2151,
+        "end": 2154,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2155,
+        "end": 2158,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2182,
+        "end": 2190,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2191,
+        "end": 2195,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2195,
+        "end": 2197,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2197,
+        "end": 2204,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2205,
+        "end": 2213,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2215,
+        "end": 2219,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2219,
+        "end": 2221,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2221,
+        "end": 2228,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2229,
+        "end": 2238,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2268,
+        "end": 2287,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2306,
+        "end": 2319,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2320,
+        "end": 2324,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2324,
+        "end": 2326,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2326,
+        "end": 2333,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2334,
+        "end": 2342,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2372,
+        "end": 2376,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2376,
+        "end": 2378,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2378,
+        "end": 2385,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2386,
+        "end": 2403,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2432,
+        "end": 2433,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2434,
+        "end": 2438,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2438,
+        "end": 2440,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2440,
+        "end": 2447,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2448,
+        "end": 2456,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2473,
+        "end": 2477,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2477,
+        "end": 2479,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2479,
+        "end": 2486,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2487,
+        "end": 2495,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2496,
+        "end": 2497,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2498,
+        "end": 2503,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2519,
+        "end": 2523,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2523,
+        "end": 2525,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2525,
+        "end": 2532,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2533,
+        "end": 2550,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2551,
+        "end": 2552,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2553,
+        "end": 2557,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2557,
+        "end": 2559,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2559,
+        "end": 2566,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2567,
+        "end": 2575,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2576,
+        "end": 2577,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2578,
+        "end": 2584,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2610,
+        "end": 2614,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2615,
+        "end": 2617,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2619,
+        "end": 2623,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2629,
+        "end": 2635,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2670,
+        "end": 2678,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2684,
+        "end": 2688,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2689,
+        "end": 2692,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2693,
+        "end": 2698,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2702,
+        "end": 2705,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2706,
+        "end": 2709,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2713,
+        "end": 2718,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2751,
+        "end": 2754,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2758,
+        "end": 2777,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2806,
+        "end": 2810,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2844,
+        "end": 2848,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2849,
+        "end": 2852,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2853,
+        "end": 2860,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2861,
+        "end": 2869,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2871,
+        "end": 2874,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2875,
+        "end": 2882,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2883,
+        "end": 2891,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2892,
+        "end": 2893,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2894,
+        "end": 2898,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2926,
+        "end": 2930,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2930,
+        "end": 2932,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2932,
+        "end": 2939,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2940,
+        "end": 2948,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2970,
+        "end": 2992,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2993,
+        "end": 2996,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2997,
+        "end": 3004,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3005,
+        "end": 3013,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3014,
+        "end": 3015,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3016,
+        "end": 3020,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3066,
+        "end": 3069,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3070,
+        "end": 3077,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3078,
+        "end": 3087,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3131,
+        "end": 3135,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3135,
+        "end": 3137,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3137,
+        "end": 3144,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3145,
+        "end": 3154,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3198,
+        "end": 3217,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3246,
+        "end": 3250,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3250,
+        "end": 3252,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3252,
+        "end": 3259,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3260,
+        "end": 3269,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3270,
+        "end": 3271,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3272,
+        "end": 3276,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3276,
+        "end": 3278,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3278,
+        "end": 3285,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3286,
+        "end": 3294,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3295,
+        "end": 3296,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3297,
+        "end": 3303,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3321,
+        "end": 3327,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 3328,
+        "end": 3329,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3329,
+        "end": 3333,
+        "className": "syntax-variable"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_vector_fill_insert.cpp",
+    "code": "    _M_fill_insert(iterator __position, size_type __n, const value_type& __x)\n    {\n      if (__n != 0)\n        {\n          if (size_type(this->_M_impl._M_end_of_storage\n                        - this->_M_impl._M_finish) >= __n)\n            {\n#if __cplusplus < 201103L\n              value_type __x_copy = __x;\n#else\n              _Temporary_value __tmp(this, __x);\n              value_type& __x_copy = __tmp._M_val();\n#endif\n              const size_type __elems_after = end() - __position;\n              pointer __old_finish(this->_M_impl._M_finish);\n              if (__elems_after > __n)\n                {\n                  _GLIBCXX_ASAN_ANNOTATE_GROW(__n);\n                  std::__uninitialized_move_a(__old_finish - __n,\n                                              __old_finish,\n                                              __old_finish,\n                                              _M_get_Tp_allocator());\n                  this->_M_impl._M_finish += __n;\n                  _GLIBCXX_ASAN_ANNOTATE_GREW(__n);\n                  _GLIBCXX_MOVE_BACKWARD3(__position.base(),\n                                          __old_finish - __n, __old_finish);\n                  std::fill(__position.base(), __position.base() + __n,\n                            __x_copy);\n                }\n              else\n                {\n                  _GLIBCXX_ASAN_ANNOTATE_GROW(__n);\n                  this->_M_impl._M_finish =\n                    std::__uninitialized_fill_n_a(__old_finish,\n                                                  __n - __elems_after,\n                                                  __x_copy,\n                                                  _M_get_Tp_allocator());\n                  _GLIBCXX_ASAN_ANNOTATE_GREW(__n - __elems_after);\n                  std::__uninitialized_move_a(__position.base(), __old_finish,\n                                              this->_M_impl._M_finish,\n                                              _M_get_Tp_allocator());\n                  this->_M_impl._M_finish += __elems_after;\n                  _GLIBCXX_ASAN_ANNOTATE_GREW(__elems_after);\n                  std::fill(__position.base(), __old_finish, __x_copy);\n                }\n            }\n          else\n            {\n              // Make local copies of these members because the compiler thinks\n              // the allocator can alter them if 'this' is globally reachable.\n              pointer __old_start = this->_M_impl._M_start;\n              pointer __old_finish = this->_M_impl._M_finish;\n              const pointer __pos = __position.base();\n\n              const size_type __len =\n                _M_check_len(__n, \"vector::_M_fill_insert\");\n              const size_type __elems_before = __pos - __old_start;\n              pointer __new_start(this->_M_allocate(__len));\n              pointer __new_finish(__new_start);\n              __try\n                {\n                  // See _M_realloc_insert above.\n                  std::__uninitialized_fill_n_a(__new_start + __elems_before,\n                                                __n, __x,\n                                                _M_get_Tp_allocator());\n                  __new_finish = pointer();\n\n                  __new_finish\n                    = std::__uninitialized_move_if_noexcept_a\n                    (__old_start, __pos, __new_start, _M_get_Tp_allocator());\n\n                  __new_finish += __n;\n\n                  __new_finish\n                    = std::__uninitialized_move_if_noexcept_a\n                    (__pos, __old_finish, __new_finish, _M_get_Tp_allocator());\n                }",
+    "spans": [
+      {
+        "start": 4,
+        "end": 18,
+        "className": "syntax-function"
+      },
+      {
+        "start": 19,
+        "end": 27,
+        "className": "syntax-type"
+      },
+      {
+        "start": 28,
+        "end": 38,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 40,
+        "end": 49,
+        "className": "syntax-type"
+      },
+      {
+        "start": 50,
+        "end": 53,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 55,
+        "end": 60,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 61,
+        "end": 71,
+        "className": "syntax-type"
+      },
+      {
+        "start": 71,
+        "end": 72,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 73,
+        "end": 76,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 90,
+        "end": 92,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 94,
+        "end": 97,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 98,
+        "end": 100,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 101,
+        "end": 102,
+        "className": "syntax-number"
+      },
+      {
+        "start": 124,
+        "end": 126,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 128,
+        "end": 137,
+        "className": "syntax-function"
+      },
+      {
+        "start": 138,
+        "end": 142,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 142,
+        "end": 144,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 144,
+        "end": 151,
+        "className": "syntax-property"
+      },
+      {
+        "start": 152,
+        "end": 169,
+        "className": "syntax-property"
+      },
+      {
+        "start": 194,
+        "end": 195,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 196,
+        "end": 200,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 200,
+        "end": 202,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 202,
+        "end": 209,
+        "className": "syntax-property"
+      },
+      {
+        "start": 210,
+        "end": 219,
+        "className": "syntax-property"
+      },
+      {
+        "start": 224,
+        "end": 227,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 243,
+        "end": 246,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 247,
+        "end": 258,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 259,
+        "end": 260,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 261,
+        "end": 268,
+        "className": "syntax-number"
+      },
+      {
+        "start": 283,
+        "end": 293,
+        "className": "syntax-type"
+      },
+      {
+        "start": 294,
+        "end": 302,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 303,
+        "end": 304,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 305,
+        "end": 308,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 310,
+        "end": 315,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 330,
+        "end": 346,
+        "className": "syntax-type"
+      },
+      {
+        "start": 347,
+        "end": 352,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 353,
+        "end": 357,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 359,
+        "end": 362,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 379,
+        "end": 389,
+        "className": "syntax-type"
+      },
+      {
+        "start": 389,
+        "end": 390,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 391,
+        "end": 399,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 400,
+        "end": 401,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 402,
+        "end": 407,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 408,
+        "end": 414,
+        "className": "syntax-function"
+      },
+      {
+        "start": 418,
+        "end": 424,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 439,
+        "end": 444,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 445,
+        "end": 454,
+        "className": "syntax-type"
+      },
+      {
+        "start": 455,
+        "end": 468,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 469,
+        "end": 470,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 471,
+        "end": 474,
+        "className": "syntax-function"
+      },
+      {
+        "start": 477,
+        "end": 478,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 479,
+        "end": 489,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 505,
+        "end": 512,
+        "className": "syntax-type"
+      },
+      {
+        "start": 513,
+        "end": 525,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 526,
+        "end": 530,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 530,
+        "end": 532,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 532,
+        "end": 539,
+        "className": "syntax-property"
+      },
+      {
+        "start": 540,
+        "end": 549,
+        "className": "syntax-property"
+      },
+      {
+        "start": 566,
+        "end": 568,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 570,
+        "end": 583,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 584,
+        "end": 585,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 586,
+        "end": 589,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 627,
+        "end": 654,
+        "className": "syntax-function"
+      },
+      {
+        "start": 655,
+        "end": 658,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 684,
+        "end": 706,
+        "className": "syntax-function"
+      },
+      {
+        "start": 707,
+        "end": 719,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 720,
+        "end": 721,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 722,
+        "end": 725,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 773,
+        "end": 785,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 833,
+        "end": 845,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 893,
+        "end": 912,
+        "className": "syntax-function"
+      },
+      {
+        "start": 935,
+        "end": 939,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 939,
+        "end": 941,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 941,
+        "end": 948,
+        "className": "syntax-property"
+      },
+      {
+        "start": 949,
+        "end": 958,
+        "className": "syntax-property"
+      },
+      {
+        "start": 959,
+        "end": 961,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 962,
+        "end": 965,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 985,
+        "end": 1012,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1013,
+        "end": 1016,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1037,
+        "end": 1060,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1061,
+        "end": 1071,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1072,
+        "end": 1076,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1122,
+        "end": 1134,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1135,
+        "end": 1136,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1137,
+        "end": 1140,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1142,
+        "end": 1154,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1180,
+        "end": 1184,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1185,
+        "end": 1195,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1196,
+        "end": 1200,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1204,
+        "end": 1214,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1215,
+        "end": 1219,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1222,
+        "end": 1223,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1224,
+        "end": 1227,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1257,
+        "end": 1265,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1300,
+        "end": 1304,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1341,
+        "end": 1368,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1369,
+        "end": 1372,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1393,
+        "end": 1397,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1397,
+        "end": 1399,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1399,
+        "end": 1406,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1407,
+        "end": 1416,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1417,
+        "end": 1418,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1444,
+        "end": 1468,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1469,
+        "end": 1481,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1533,
+        "end": 1536,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1537,
+        "end": 1538,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1539,
+        "end": 1552,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1604,
+        "end": 1612,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1664,
+        "end": 1683,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1706,
+        "end": 1733,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1734,
+        "end": 1737,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1738,
+        "end": 1739,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1740,
+        "end": 1753,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1779,
+        "end": 1801,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1802,
+        "end": 1812,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1813,
+        "end": 1817,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1821,
+        "end": 1833,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1881,
+        "end": 1885,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1885,
+        "end": 1887,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1887,
+        "end": 1894,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1895,
+        "end": 1904,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1952,
+        "end": 1971,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1994,
+        "end": 1998,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1998,
+        "end": 2000,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2000,
+        "end": 2007,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2008,
+        "end": 2017,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2018,
+        "end": 2020,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2021,
+        "end": 2034,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2054,
+        "end": 2081,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2082,
+        "end": 2095,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2121,
+        "end": 2125,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2126,
+        "end": 2136,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2137,
+        "end": 2141,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2145,
+        "end": 2157,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2159,
+        "end": 2167,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2212,
+        "end": 2216,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2245,
+        "end": 2310,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2325,
+        "end": 2389,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2404,
+        "end": 2411,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2412,
+        "end": 2423,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2424,
+        "end": 2425,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2426,
+        "end": 2430,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2430,
+        "end": 2432,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2432,
+        "end": 2439,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2440,
+        "end": 2448,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2464,
+        "end": 2471,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2472,
+        "end": 2484,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2485,
+        "end": 2486,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2487,
+        "end": 2491,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2491,
+        "end": 2493,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2493,
+        "end": 2500,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2501,
+        "end": 2510,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2526,
+        "end": 2531,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2532,
+        "end": 2539,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2540,
+        "end": 2545,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2546,
+        "end": 2547,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2548,
+        "end": 2558,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2559,
+        "end": 2563,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2582,
+        "end": 2587,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2588,
+        "end": 2597,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2598,
+        "end": 2603,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2604,
+        "end": 2605,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2622,
+        "end": 2634,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2635,
+        "end": 2638,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2640,
+        "end": 2664,
+        "className": "syntax-string"
+      },
+      {
+        "start": 2681,
+        "end": 2686,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2687,
+        "end": 2696,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2697,
+        "end": 2711,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2712,
+        "end": 2713,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2714,
+        "end": 2719,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2720,
+        "end": 2721,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2722,
+        "end": 2733,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2749,
+        "end": 2756,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2757,
+        "end": 2768,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2769,
+        "end": 2773,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2773,
+        "end": 2775,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2775,
+        "end": 2786,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2787,
+        "end": 2792,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2810,
+        "end": 2817,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2818,
+        "end": 2830,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2831,
+        "end": 2842,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2901,
+        "end": 2932,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2956,
+        "end": 2980,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2981,
+        "end": 2992,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2993,
+        "end": 2994,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2995,
+        "end": 3009,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3059,
+        "end": 3062,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3064,
+        "end": 3067,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3117,
+        "end": 3136,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3159,
+        "end": 3171,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3172,
+        "end": 3173,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3174,
+        "end": 3181,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3204,
+        "end": 3216,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3237,
+        "end": 3238,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3244,
+        "end": 3278,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3300,
+        "end": 3311,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3313,
+        "end": 3318,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3320,
+        "end": 3331,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3333,
+        "end": 3352,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3376,
+        "end": 3388,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3389,
+        "end": 3391,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3392,
+        "end": 3395,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3416,
+        "end": 3428,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3449,
+        "end": 3450,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3456,
+        "end": 3490,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3512,
+        "end": 3517,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3519,
+        "end": 3531,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3533,
+        "end": 3545,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3547,
+        "end": 3566,
+        "className": "syntax-function"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
+    "name": "cpp/libstdcxx_vector_realloc_insert.cpp",
+    "code": "      _M_realloc_insert(iterator __position, _Args&&... __args)\n#else\n  template<typename _Tp, typename _Alloc>\n    void\n    vector<_Tp, _Alloc>::\n    _M_realloc_insert(iterator __position, const _Tp& __x)\n#endif\n    {\n      const size_type __len = _M_check_len(1u, \"vector::_M_realloc_insert\");\n      if (__len <= 0)\n        __builtin_unreachable ();\n      pointer __old_start = this->_M_impl._M_start;\n      pointer __old_finish = this->_M_impl._M_finish;\n      const size_type __elems_before = __position - begin();\n      pointer __new_start(this->_M_allocate(__len));\n      pointer __new_finish(__new_start);\n\n      {\n        _Guard_alloc __guard(__new_start, __len, *this);\n\n        // The order of the three operations is dictated by the C++11\n        // case, where the moves could alter a new element belonging\n        // to the existing vector.  This is an issue only for callers\n        // taking the element by lvalue ref (see last bullet of C++11\n        // [res.on.arguments]).\n\n        // If this throws, the existing elements are unchanged.\n#if __cplusplus >= 201103L\n        _Alloc_traits::construct(this->_M_impl,\n                                 std::__to_address(__new_start + __elems_before),\n                                 std::forward<_Args>(__args)...);\n#else\n        _Alloc_traits::construct(this->_M_impl,\n                                 __new_start + __elems_before,\n                                 __x);\n#endif\n\n#if __cplusplus >= 201103L\n        if _GLIBCXX17_CONSTEXPR (_S_use_relocate())\n          {\n            // Relocation cannot throw.\n            __new_finish = _S_relocate(__old_start, __position.base(),\n                                       __new_start, _M_get_Tp_allocator());\n            ++__new_finish;\n            __new_finish = _S_relocate(__position.base(), __old_finish,\n                                       __new_finish, _M_get_Tp_allocator());\n          }\n        else\n#endif\n          {\n            // RAII type to destroy initialized elements.\n            struct _Guard_elts\n            {\n              pointer _M_first, _M_last;  // Elements to destroy\n              _Tp_alloc_type& _M_alloc;\n\n              _GLIBCXX20_CONSTEXPR\n              _Guard_elts(pointer __elt, _Tp_alloc_type& __a)\n              : _M_first(__elt), _M_last(__elt + 1), _M_alloc(__a)\n              { }\n\n              _GLIBCXX20_CONSTEXPR\n              ~_Guard_elts()\n              { std::_Destroy(_M_first, _M_last, _M_alloc); }\n\n            private:\n              _Guard_elts(const _Guard_elts&);\n            };\n\n            // Guard the new element so it will be destroyed if anything throws.\n            _Guard_elts __guard_elts(__new_start + __elems_before, _M_impl);\n\n            __new_finish = std::__uninitialized_move_if_noexcept_a(\n                             __old_start, __position.base(),\n                             __new_start, _M_get_Tp_allocator());\n\n            ++__new_finish;\n            // Guard everything before the new element too.\n            __guard_elts._M_first = __new_start;\n\n            __new_finish = std::__uninitialized_move_if_noexcept_a(\n                              __position.base(), __old_finish,\n                              __new_finish, _M_get_Tp_allocator());\n\n            // New storage has been fully initialized, destroy the old elements.\n            __guard_elts._M_first = __old_start;\n            __guard_elts._M_last = __old_finish;\n          }",
+    "spans": [
+      {
+        "start": 6,
+        "end": 23,
+        "className": "syntax-function"
+      },
+      {
+        "start": 24,
+        "end": 32,
+        "className": "syntax-type"
+      },
+      {
+        "start": 33,
+        "end": 43,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 45,
+        "end": 50,
+        "className": "syntax-type"
+      },
+      {
+        "start": 50,
+        "end": 52,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 56,
+        "end": 62,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 64,
+        "end": 69,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 72,
+        "end": 80,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 80,
+        "end": 81,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 81,
+        "end": 89,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 90,
+        "end": 93,
+        "className": "syntax-type"
+      },
+      {
+        "start": 95,
+        "end": 103,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 104,
+        "end": 110,
+        "className": "syntax-type"
+      },
+      {
+        "start": 110,
+        "end": 111,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 116,
+        "end": 120,
+        "className": "syntax-type"
+      },
+      {
+        "start": 125,
+        "end": 131,
+        "className": "syntax-type"
+      },
+      {
+        "start": 131,
+        "end": 132,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 132,
+        "end": 135,
+        "className": "syntax-type"
+      },
+      {
+        "start": 137,
+        "end": 143,
+        "className": "syntax-type"
+      },
+      {
+        "start": 143,
+        "end": 144,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 151,
+        "end": 168,
+        "className": "syntax-function"
+      },
+      {
+        "start": 169,
+        "end": 177,
+        "className": "syntax-type"
+      },
+      {
+        "start": 178,
+        "end": 188,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 190,
+        "end": 195,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 196,
+        "end": 199,
+        "className": "syntax-type"
+      },
+      {
+        "start": 199,
+        "end": 200,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 201,
+        "end": 204,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 206,
+        "end": 212,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 225,
+        "end": 230,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 231,
+        "end": 240,
+        "className": "syntax-type"
+      },
+      {
+        "start": 241,
+        "end": 246,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 247,
+        "end": 248,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 249,
+        "end": 261,
+        "className": "syntax-function"
+      },
+      {
+        "start": 262,
+        "end": 264,
+        "className": "syntax-number"
+      },
+      {
+        "start": 266,
+        "end": 293,
+        "className": "syntax-string"
+      },
+      {
+        "start": 302,
+        "end": 304,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 306,
+        "end": 311,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 315,
+        "end": 316,
+        "className": "syntax-number"
+      },
+      {
+        "start": 326,
+        "end": 347,
+        "className": "syntax-function"
+      },
+      {
+        "start": 358,
+        "end": 365,
+        "className": "syntax-type"
+      },
+      {
+        "start": 366,
+        "end": 377,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 378,
+        "end": 379,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 380,
+        "end": 384,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 384,
+        "end": 386,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 386,
+        "end": 393,
+        "className": "syntax-property"
+      },
+      {
+        "start": 394,
+        "end": 402,
+        "className": "syntax-property"
+      },
+      {
+        "start": 410,
+        "end": 417,
+        "className": "syntax-type"
+      },
+      {
+        "start": 418,
+        "end": 430,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 431,
+        "end": 432,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 433,
+        "end": 437,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 437,
+        "end": 439,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 439,
+        "end": 446,
+        "className": "syntax-property"
+      },
+      {
+        "start": 447,
+        "end": 456,
+        "className": "syntax-property"
+      },
+      {
+        "start": 464,
+        "end": 469,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 470,
+        "end": 479,
+        "className": "syntax-type"
+      },
+      {
+        "start": 480,
+        "end": 494,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 495,
+        "end": 496,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 497,
+        "end": 507,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 508,
+        "end": 509,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 510,
+        "end": 515,
+        "className": "syntax-function"
+      },
+      {
+        "start": 525,
+        "end": 532,
+        "className": "syntax-type"
+      },
+      {
+        "start": 533,
+        "end": 544,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 545,
+        "end": 549,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 549,
+        "end": 551,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 551,
+        "end": 562,
+        "className": "syntax-function"
+      },
+      {
+        "start": 563,
+        "end": 568,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 578,
+        "end": 585,
+        "className": "syntax-type"
+      },
+      {
+        "start": 586,
+        "end": 598,
+        "className": "syntax-function"
+      },
+      {
+        "start": 599,
+        "end": 610,
+        "className": "syntax-type"
+      },
+      {
+        "start": 630,
+        "end": 642,
+        "className": "syntax-type"
+      },
+      {
+        "start": 643,
+        "end": 650,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 651,
+        "end": 662,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 664,
+        "end": 669,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 671,
+        "end": 672,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 672,
+        "end": 676,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 688,
+        "end": 749,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 758,
+        "end": 818,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 827,
+        "end": 888,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 897,
+        "end": 958,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 967,
+        "end": 990,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1000,
+        "end": 1055,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1056,
+        "end": 1059,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1060,
+        "end": 1071,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1075,
+        "end": 1082,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1106,
+        "end": 1115,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1116,
+        "end": 1120,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1120,
+        "end": 1122,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1122,
+        "end": 1129,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1169,
+        "end": 1181,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1182,
+        "end": 1193,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1194,
+        "end": 1195,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1196,
+        "end": 1210,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1251,
+        "end": 1258,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1258,
+        "end": 1259,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1259,
+        "end": 1264,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1264,
+        "end": 1265,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1266,
+        "end": 1272,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1279,
+        "end": 1284,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1308,
+        "end": 1317,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1318,
+        "end": 1322,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1322,
+        "end": 1324,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1324,
+        "end": 1331,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1366,
+        "end": 1377,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1378,
+        "end": 1379,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1380,
+        "end": 1394,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1429,
+        "end": 1432,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1435,
+        "end": 1441,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1443,
+        "end": 1446,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1447,
+        "end": 1458,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1462,
+        "end": 1469,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1478,
+        "end": 1480,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1481,
+        "end": 1501,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1503,
+        "end": 1518,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1546,
+        "end": 1573,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1586,
+        "end": 1598,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1599,
+        "end": 1600,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1601,
+        "end": 1612,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1613,
+        "end": 1624,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1626,
+        "end": 1636,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1637,
+        "end": 1641,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1684,
+        "end": 1695,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1697,
+        "end": 1716,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1733,
+        "end": 1735,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1735,
+        "end": 1747,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1761,
+        "end": 1773,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1774,
+        "end": 1775,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1776,
+        "end": 1787,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1788,
+        "end": 1798,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1799,
+        "end": 1803,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1807,
+        "end": 1819,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1860,
+        "end": 1872,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1874,
+        "end": 1893,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1918,
+        "end": 1922,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1923,
+        "end": 1929,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1954,
+        "end": 1999,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2012,
+        "end": 2018,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2019,
+        "end": 2030,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2059,
+        "end": 2066,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2067,
+        "end": 2075,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2077,
+        "end": 2084,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2087,
+        "end": 2109,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2124,
+        "end": 2138,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2138,
+        "end": 2139,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2140,
+        "end": 2148,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2165,
+        "end": 2185,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2200,
+        "end": 2211,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2212,
+        "end": 2219,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2220,
+        "end": 2225,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2227,
+        "end": 2241,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2241,
+        "end": 2242,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2243,
+        "end": 2246,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2264,
+        "end": 2272,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2273,
+        "end": 2278,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2281,
+        "end": 2288,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2289,
+        "end": 2294,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2295,
+        "end": 2296,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2297,
+        "end": 2298,
+        "className": "syntax-number"
+      },
+      {
+        "start": 2301,
+        "end": 2309,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2310,
+        "end": 2313,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2348,
+        "end": 2368,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2384,
+        "end": 2395,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2419,
+        "end": 2427,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2428,
+        "end": 2436,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2438,
+        "end": 2445,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2447,
+        "end": 2455,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2473,
+        "end": 2480,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2496,
+        "end": 2507,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2508,
+        "end": 2513,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2514,
+        "end": 2525,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2525,
+        "end": 2526,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2557,
+        "end": 2625,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2638,
+        "end": 2649,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2650,
+        "end": 2662,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2663,
+        "end": 2674,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2675,
+        "end": 2676,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2677,
+        "end": 2691,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2693,
+        "end": 2700,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2716,
+        "end": 2728,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2729,
+        "end": 2730,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2736,
+        "end": 2770,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2801,
+        "end": 2812,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2814,
+        "end": 2824,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2825,
+        "end": 2829,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2862,
+        "end": 2873,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2875,
+        "end": 2894,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2912,
+        "end": 2914,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2914,
+        "end": 2926,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2940,
+        "end": 2987,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 3000,
+        "end": 3012,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3013,
+        "end": 3021,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3022,
+        "end": 3023,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3024,
+        "end": 3035,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3050,
+        "end": 3062,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3063,
+        "end": 3064,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3070,
+        "end": 3104,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3136,
+        "end": 3146,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3147,
+        "end": 3151,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3155,
+        "end": 3167,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3199,
+        "end": 3211,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3213,
+        "end": 3232,
+        "className": "syntax-function"
+      },
+      {
+        "start": 3250,
+        "end": 3318,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 3331,
+        "end": 3343,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3344,
+        "end": 3352,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3353,
+        "end": 3354,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3355,
+        "end": 3366,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3380,
+        "end": 3392,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 3393,
+        "end": 3400,
+        "className": "syntax-property"
+      },
+      {
+        "start": 3401,
+        "end": 3402,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 3403,
+        "end": 3415,
+        "className": "syntax-variable"
+      }
+    ]
+  },
+  {
+    "language": "cpp",
     "name": "cpp/llvm_capture_tracking.cpp",
     "code": "UseCaptureKind llvm::DetermineUseCaptureKind(\n    const Use &U,\n    function_ref<bool(Value *, const DataLayout &)> IsDereferenceableOrNull) {\n  Instruction *I = dyn_cast<Instruction>(U.getUser());\n\n  // TODO: Investigate non-instruction uses.\n  if (!I)\n    return UseCaptureKind::MAY_CAPTURE;\n\n  switch (I->getOpcode()) {\n  case Instruction::Call:\n  case Instruction::Invoke: {\n    auto *Call = cast<CallBase>(I);\n    // Not captured if the callee is readonly, doesn't return a copy through\n    // its return value and doesn't unwind (a readonly function can leak bits\n    // by throwing an exception or not depending on the input value).\n    if (Call->onlyReadsMemory() && Call->doesNotThrow() &&\n        Call->getType()->isVoidTy())\n      return UseCaptureKind::NO_CAPTURE;\n\n    // The pointer is not captured if returned pointer is not captured.\n    // NOTE: CaptureTracking users should not assume that only functions\n    // marked with nocapture do not capture. This means that places like\n    // getUnderlyingObject in ValueTracking or DecomposeGEPExpression\n    // in BasicAA also need to know about this property.\n    if (isIntrinsicReturningPointerAliasingArgumentWithoutCapturing(Call, true))\n      return UseCaptureKind::PASSTHROUGH;\n\n    // Volatile operations effectively capture the memory location that they\n    // load and store to.\n    if (auto *MI = dyn_cast<MemIntrinsic>(Call))\n      if (MI->isVolatile())\n        return UseCaptureKind::MAY_CAPTURE;\n\n    // Calling a function pointer does not in itself cause the pointer to\n    // be captured.  This is a subtle point considering that (for example)\n    // the callee might return its own address.  It is analogous to saying\n    // that loading a value from a pointer does not cause the pointer to be\n    // captured, even though the loaded value might be the pointer itself\n    // (think of self-referential objects).\n    if (Call->isCallee(&U))\n      return UseCaptureKind::NO_CAPTURE;\n\n    // Not captured if only passed via 'nocapture' arguments.\n    if (Call->isDataOperand(&U) &&\n        !Call->doesNotCapture(Call->getDataOperandNo(&U))) {\n      // The parameter is not marked 'nocapture' - captured.\n      return UseCaptureKind::MAY_CAPTURE;\n    }\n    return UseCaptureKind::NO_CAPTURE;\n  }\n  case Instruction::Load:\n    // Volatile loads make the address observable.\n    if (cast<LoadInst>(I)->isVolatile())\n      return UseCaptureKind::MAY_CAPTURE;\n    return UseCaptureKind::NO_CAPTURE;\n  case Instruction::VAArg:\n    // \"va-arg\" from a pointer does not cause it to be captured.\n    return UseCaptureKind::NO_CAPTURE;\n  case Instruction::Store:\n    // Stored the pointer - conservatively assume it may be captured.\n    // Volatile stores make the address observable.\n    if (U.getOperandNo() == 0 || cast<StoreInst>(I)->isVolatile())\n      return UseCaptureKind::MAY_CAPTURE;\n    return UseCaptureKind::NO_CAPTURE;\n  case Instruction::AtomicRMW: {\n    // atomicrmw conceptually includes both a load and store from\n    // the same location.\n    // As with a store, the location being accessed is not captured,\n    // but the value being stored is.\n    // Volatile stores make the address observable.\n    auto *ARMWI = cast<AtomicRMWInst>(I);\n    if (U.getOperandNo() == 1 || ARMWI->isVolatile())\n      return UseCaptureKind::MAY_CAPTURE;\n    return UseCaptureKind::NO_CAPTURE;\n  }\n  case Instruction::AtomicCmpXchg: {\n    // cmpxchg conceptually includes both a load and store from\n    // the same location.\n    // As with a store, the location being accessed is not captured,\n    // but the value being stored is.\n    // Volatile stores make the address observable.\n    auto *ACXI = cast<AtomicCmpXchgInst>(I);",
     "spans": [
@@ -7729,6 +22003,1003 @@ export const codeSnippets = [
     ]
   },
   {
+    "language": "javascript",
+    "name": "javascript/typescript_lkg_task.js",
+    "code": "export const produceLKG = task({\n    name: \"LKG\",\n    description: \"Makes a new LKG out of the built js files\",\n    dependencies: [local],\n    run: async () => {\n        if (!cmdLineOptions.bundle) {\n            throw new Error(\"LKG cannot be created when --bundle=false\");\n        }\n\n        const expectedFiles = [\n            \"built/local/tsc.js\",\n            \"built/local/_tsc.js\",\n            \"built/local/tsserver.js\",\n            \"built/local/_tsserver.js\",\n            \"built/local/tsserverlibrary.js\",\n            \"built/local/tsserverlibrary.d.ts\",\n            \"built/local/typescript.js\",\n            \"built/local/typescript.d.ts\",\n            \"built/local/typingsInstaller.js\",\n            \"built/local/_typingsInstaller.js\",\n            \"built/local/watchGuard.js\",\n        ].concat(libs().map(lib => lib.target));\n        const missingFiles = expectedFiles\n            .concat(localizationTargets)\n            .filter(f => !fs.existsSync(f));\n        if (missingFiles.length > 0) {\n            throw new Error(\n                \"Cannot replace the LKG unless all built targets are present in directory 'built/local/'. The following files are missing:\\n\"\n                    + missingFiles.join(\"\\n\"),\n            );\n        }\n\n        await exec(process.execPath, [\"scripts/produceLKG.mjs\"]);\n    },\n});\n\nexport const lkg = task({\n    name: \"lkg\",\n    hiddenFromTaskList: true,\n    dependencies: [produceLKG],\n});\n\nexport const cleanBuilt = task({\n    name: \"clean-built\",\n    hiddenFromTaskList: true,\n    run: () => fs.promises.rm(\"built\", { recursive: true, force: true }),\n});\n\nexport const clean = task({\n    name: \"clean\",\n    description: \"Cleans build outputs\",\n    dependencies: [cleanBuilt, cleanDiagnostics],\n});",
+    "spans": [
+      {
+        "start": 0,
+        "end": 6,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 7,
+        "end": 12,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 13,
+        "end": 23,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 24,
+        "end": 25,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 26,
+        "end": 30,
+        "className": "syntax-function"
+      },
+      {
+        "start": 30,
+        "end": 32,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 37,
+        "end": 41,
+        "className": "syntax-property"
+      },
+      {
+        "start": 43,
+        "end": 48,
+        "className": "syntax-string"
+      },
+      {
+        "start": 48,
+        "end": 49,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 54,
+        "end": 65,
+        "className": "syntax-property"
+      },
+      {
+        "start": 67,
+        "end": 110,
+        "className": "syntax-string"
+      },
+      {
+        "start": 110,
+        "end": 111,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 116,
+        "end": 128,
+        "className": "syntax-property"
+      },
+      {
+        "start": 130,
+        "end": 131,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 131,
+        "end": 136,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 136,
+        "end": 138,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 143,
+        "end": 146,
+        "className": "syntax-function"
+      },
+      {
+        "start": 148,
+        "end": 153,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 154,
+        "end": 156,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 157,
+        "end": 159,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 160,
+        "end": 161,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 170,
+        "end": 172,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 173,
+        "end": 174,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 174,
+        "end": 175,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 175,
+        "end": 189,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 189,
+        "end": 190,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 190,
+        "end": 196,
+        "className": "syntax-property"
+      },
+      {
+        "start": 196,
+        "end": 197,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 198,
+        "end": 199,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 212,
+        "end": 217,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 218,
+        "end": 221,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 222,
+        "end": 227,
+        "className": "syntax-type"
+      },
+      {
+        "start": 227,
+        "end": 228,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 228,
+        "end": 271,
+        "className": "syntax-string"
+      },
+      {
+        "start": 271,
+        "end": 273,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 282,
+        "end": 283,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 293,
+        "end": 298,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 299,
+        "end": 312,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 313,
+        "end": 314,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 315,
+        "end": 316,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 329,
+        "end": 349,
+        "className": "syntax-string"
+      },
+      {
+        "start": 349,
+        "end": 350,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 363,
+        "end": 384,
+        "className": "syntax-string"
+      },
+      {
+        "start": 384,
+        "end": 385,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 398,
+        "end": 423,
+        "className": "syntax-string"
+      },
+      {
+        "start": 423,
+        "end": 424,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 437,
+        "end": 463,
+        "className": "syntax-string"
+      },
+      {
+        "start": 463,
+        "end": 464,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 477,
+        "end": 509,
+        "className": "syntax-string"
+      },
+      {
+        "start": 509,
+        "end": 510,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 523,
+        "end": 557,
+        "className": "syntax-string"
+      },
+      {
+        "start": 557,
+        "end": 558,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 571,
+        "end": 598,
+        "className": "syntax-string"
+      },
+      {
+        "start": 598,
+        "end": 599,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 612,
+        "end": 641,
+        "className": "syntax-string"
+      },
+      {
+        "start": 641,
+        "end": 642,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 655,
+        "end": 688,
+        "className": "syntax-string"
+      },
+      {
+        "start": 688,
+        "end": 689,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 702,
+        "end": 736,
+        "className": "syntax-string"
+      },
+      {
+        "start": 736,
+        "end": 737,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 750,
+        "end": 777,
+        "className": "syntax-string"
+      },
+      {
+        "start": 777,
+        "end": 778,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 787,
+        "end": 789,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 789,
+        "end": 795,
+        "className": "syntax-function"
+      },
+      {
+        "start": 795,
+        "end": 796,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 796,
+        "end": 800,
+        "className": "syntax-function"
+      },
+      {
+        "start": 800,
+        "end": 803,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 803,
+        "end": 806,
+        "className": "syntax-function"
+      },
+      {
+        "start": 806,
+        "end": 807,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 807,
+        "end": 810,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 811,
+        "end": 813,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 814,
+        "end": 817,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 817,
+        "end": 818,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 818,
+        "end": 824,
+        "className": "syntax-property"
+      },
+      {
+        "start": 824,
+        "end": 827,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 836,
+        "end": 841,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 842,
+        "end": 854,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 855,
+        "end": 856,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 857,
+        "end": 870,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 883,
+        "end": 884,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 884,
+        "end": 890,
+        "className": "syntax-function"
+      },
+      {
+        "start": 890,
+        "end": 891,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 891,
+        "end": 910,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 910,
+        "end": 911,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 924,
+        "end": 925,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 925,
+        "end": 931,
+        "className": "syntax-function"
+      },
+      {
+        "start": 931,
+        "end": 932,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 932,
+        "end": 933,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 934,
+        "end": 936,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 937,
+        "end": 938,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 938,
+        "end": 940,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 940,
+        "end": 941,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 941,
+        "end": 951,
+        "className": "syntax-function"
+      },
+      {
+        "start": 951,
+        "end": 952,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 952,
+        "end": 953,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 953,
+        "end": 956,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 965,
+        "end": 967,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 968,
+        "end": 969,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 969,
+        "end": 981,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 981,
+        "end": 982,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 982,
+        "end": 988,
+        "className": "syntax-property"
+      },
+      {
+        "start": 989,
+        "end": 990,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 991,
+        "end": 992,
+        "className": "syntax-number"
+      },
+      {
+        "start": 992,
+        "end": 993,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 994,
+        "end": 995,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1008,
+        "end": 1013,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1014,
+        "end": 1017,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1018,
+        "end": 1023,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1023,
+        "end": 1024,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1041,
+        "end": 1166,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1187,
+        "end": 1188,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1189,
+        "end": 1201,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1201,
+        "end": 1202,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1202,
+        "end": 1206,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1206,
+        "end": 1207,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1207,
+        "end": 1211,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1211,
+        "end": 1213,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1226,
+        "end": 1228,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1237,
+        "end": 1238,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1248,
+        "end": 1253,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1254,
+        "end": 1258,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1258,
+        "end": 1259,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1259,
+        "end": 1266,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1266,
+        "end": 1267,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1267,
+        "end": 1275,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1275,
+        "end": 1276,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1277,
+        "end": 1278,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1278,
+        "end": 1302,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1302,
+        "end": 1305,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1310,
+        "end": 1312,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1313,
+        "end": 1316,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1318,
+        "end": 1324,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1325,
+        "end": 1330,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1331,
+        "end": 1334,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1335,
+        "end": 1336,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1337,
+        "end": 1341,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1341,
+        "end": 1343,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1348,
+        "end": 1352,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1354,
+        "end": 1359,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1359,
+        "end": 1360,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1365,
+        "end": 1383,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1385,
+        "end": 1389,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1389,
+        "end": 1390,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1395,
+        "end": 1407,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1409,
+        "end": 1410,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1410,
+        "end": 1420,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1420,
+        "end": 1422,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1423,
+        "end": 1426,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1428,
+        "end": 1434,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1435,
+        "end": 1440,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1441,
+        "end": 1451,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1452,
+        "end": 1453,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1454,
+        "end": 1458,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1458,
+        "end": 1460,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1465,
+        "end": 1469,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1471,
+        "end": 1484,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1484,
+        "end": 1485,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1490,
+        "end": 1508,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1510,
+        "end": 1514,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1514,
+        "end": 1515,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1520,
+        "end": 1523,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1525,
+        "end": 1527,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1528,
+        "end": 1530,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1531,
+        "end": 1533,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1533,
+        "end": 1534,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1534,
+        "end": 1542,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1542,
+        "end": 1543,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1543,
+        "end": 1545,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1545,
+        "end": 1546,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1546,
+        "end": 1553,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1553,
+        "end": 1554,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1555,
+        "end": 1556,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1557,
+        "end": 1566,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1568,
+        "end": 1572,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1572,
+        "end": 1573,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1574,
+        "end": 1579,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1581,
+        "end": 1585,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1586,
+        "end": 1589,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1590,
+        "end": 1593,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1595,
+        "end": 1601,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1602,
+        "end": 1607,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1608,
+        "end": 1613,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1614,
+        "end": 1615,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1616,
+        "end": 1620,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1620,
+        "end": 1622,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1627,
+        "end": 1631,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1633,
+        "end": 1640,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1640,
+        "end": 1641,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1646,
+        "end": 1657,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1659,
+        "end": 1681,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1681,
+        "end": 1682,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1687,
+        "end": 1699,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1701,
+        "end": 1702,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1702,
+        "end": 1712,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1712,
+        "end": 1713,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1714,
+        "end": 1730,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1730,
+        "end": 1732,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1733,
+        "end": 1736,
+        "className": "syntax-punctuation"
+      }
+    ]
+  },
+  {
     "language": "lua",
     "name": "lua/neovim_diagnostic_list.lua",
     "code": "local function set_list(loclist, opts)\n  opts = opts or {}\n  local open = vim.nonnil(opts.open, true)\n  local title = opts.title or 'Diagnostics'\n  local winnr = opts.winnr or 0\n  local bufnr --- @type integer?\n  if loclist then\n    bufnr = api.nvim_win_get_buf(winnr)\n  end\n\n  -- Don't clamp line numbers since the quickfix list can already handle line\n  -- numbers beyond the end of the buffer\n  local diagnostics = M._store.get_diagnostics(bufnr, opts --[[@as vim.diagnostic.GetOpts]], false)\n  if opts.format then\n    diagnostics = require('vim.diagnostic._shared').reformat_diagnostics(opts.format, diagnostics)\n  end\n  local items = M.toqflist(diagnostics)\n  local qf_id = nil\n  if loclist then\n    vim.fn.setloclist(winnr, {}, 'u', { title = title, items = items })\n  else\n    qf_id = get_qf_id_for_title(title)\n    -- If we already have a diagnostics quickfix, update it rather than creating a new one.\n    -- This avoids polluting the finite set of quickfix lists, and preserves the currently selected\n    -- entry.\n    vim.fn.setqflist({}, qf_id and 'u' or ' ', {\n      title = title,\n      items = items,\n      id = qf_id,\n    })\n  end\n\n  if open then\n    if not loclist then\n      -- First navigate to the diagnostics quickfix list.\n      local qflist = vim.fn.getqflist({ id = qf_id, nr = 0 }) --- @type { nr: integer }\n      local nr = qflist.nr\n      api.nvim_command(('silent %dchistory'):format(nr))\n      -- Now open the quickfix list.\n      api.nvim_command('botright cwindow')\n    else\n      api.nvim_command('lwindow')\n    end\n  end\nend",
@@ -9613,6 +24884,3384 @@ export const codeSnippets = [
     ]
   },
   {
+    "language": "lua",
+    "name": "lua/neovim_shared_deep_equal.lua",
+    "code": "local function deep_equal(left, right, seen)\n  if left == right then\n    return true\n  end\n\n  if type(left) ~= type(right) then\n    return false\n  end\n\n  if type(left) ~= 'table' then\n    return false\n  end\n\n  seen = seen or {}\n  local seen_left = seen[left]\n  if seen_left and seen_left[right] ~= nil then\n    return seen_left[right]\n  end\n\n  seen_left = seen_left or {}\n  seen[left] = seen_left\n  -- Assume equality while descending so recursive structures can terminate.\n  seen_left[right] = true\n\n  for k, v in pairs(left) do\n    if not deep_equal(v, right[k], seen) then\n      seen_left[right] = false\n      return false\n    end\n  end\n\n  for k in pairs(right) do\n    if left[k] == nil then\n      seen_left[right] = false\n      return false\n    end\n  end\n\n  return true\nend\n\nfunction vim.deep_equal(a, b)\n  return deep_equal(a, b)\nend\n\nfunction vim.list_extend(dst, src, start, finish)\n  vim.validate('dst', dst, 'table')\n  vim.validate('src', src, 'table')\n  vim.validate('start', start, 'number', true)\n  vim.validate('finish', finish, 'number', true)\n  for i = start or 1, finish or #src do\n    table.insert(dst, src[i])\n  end\n  return dst\nend",
+    "spans": [
+      {
+        "start": 0,
+        "end": 5,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 6,
+        "end": 14,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 15,
+        "end": 25,
+        "className": "syntax-function"
+      },
+      {
+        "start": 25,
+        "end": 26,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 30,
+        "end": 31,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 37,
+        "end": 38,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 43,
+        "end": 44,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 50,
+        "end": 54,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 55,
+        "end": 57,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 58,
+        "end": 63,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 73,
+        "end": 79,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 97,
+        "end": 101,
+        "className": "syntax-function"
+      },
+      {
+        "start": 101,
+        "end": 102,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 102,
+        "end": 106,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 106,
+        "end": 107,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 108,
+        "end": 110,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 111,
+        "end": 115,
+        "className": "syntax-function"
+      },
+      {
+        "start": 115,
+        "end": 116,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 116,
+        "end": 121,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 121,
+        "end": 122,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 132,
+        "end": 138,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 157,
+        "end": 161,
+        "className": "syntax-function"
+      },
+      {
+        "start": 161,
+        "end": 162,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 162,
+        "end": 166,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 166,
+        "end": 167,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 168,
+        "end": 170,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 171,
+        "end": 178,
+        "className": "syntax-string"
+      },
+      {
+        "start": 188,
+        "end": 194,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 210,
+        "end": 214,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 215,
+        "end": 216,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 217,
+        "end": 221,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 222,
+        "end": 224,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 225,
+        "end": 227,
+        "className": "syntax-type"
+      },
+      {
+        "start": 230,
+        "end": 235,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 236,
+        "end": 245,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 246,
+        "end": 247,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 248,
+        "end": 252,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 252,
+        "end": 253,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 253,
+        "end": 257,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 257,
+        "end": 258,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 264,
+        "end": 273,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 274,
+        "end": 277,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 278,
+        "end": 287,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 287,
+        "end": 288,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 288,
+        "end": 293,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 293,
+        "end": 294,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 295,
+        "end": 297,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 298,
+        "end": 301,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 311,
+        "end": 317,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 318,
+        "end": 327,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 327,
+        "end": 328,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 328,
+        "end": 333,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 333,
+        "end": 334,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 344,
+        "end": 353,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 354,
+        "end": 355,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 356,
+        "end": 365,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 366,
+        "end": 368,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 369,
+        "end": 371,
+        "className": "syntax-type"
+      },
+      {
+        "start": 374,
+        "end": 378,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 378,
+        "end": 379,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 379,
+        "end": 383,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 383,
+        "end": 384,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 385,
+        "end": 386,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 387,
+        "end": 396,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 399,
+        "end": 473,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 476,
+        "end": 485,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 485,
+        "end": 486,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 486,
+        "end": 491,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 491,
+        "end": 492,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 493,
+        "end": 494,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 507,
+        "end": 508,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 508,
+        "end": 509,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 510,
+        "end": 511,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 512,
+        "end": 514,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 515,
+        "end": 520,
+        "className": "syntax-function"
+      },
+      {
+        "start": 520,
+        "end": 521,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 521,
+        "end": 525,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 525,
+        "end": 526,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 537,
+        "end": 540,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 541,
+        "end": 551,
+        "className": "syntax-function"
+      },
+      {
+        "start": 551,
+        "end": 552,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 552,
+        "end": 553,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 553,
+        "end": 554,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 555,
+        "end": 560,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 560,
+        "end": 561,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 561,
+        "end": 562,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 562,
+        "end": 564,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 565,
+        "end": 569,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 569,
+        "end": 570,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 582,
+        "end": 591,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 591,
+        "end": 592,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 592,
+        "end": 597,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 597,
+        "end": 598,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 599,
+        "end": 600,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 613,
+        "end": 619,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 647,
+        "end": 648,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 649,
+        "end": 651,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 652,
+        "end": 657,
+        "className": "syntax-function"
+      },
+      {
+        "start": 657,
+        "end": 658,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 658,
+        "end": 663,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 663,
+        "end": 664,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 675,
+        "end": 679,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 679,
+        "end": 680,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 680,
+        "end": 681,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 681,
+        "end": 682,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 683,
+        "end": 685,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 686,
+        "end": 689,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 701,
+        "end": 710,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 710,
+        "end": 711,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 711,
+        "end": 716,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 716,
+        "end": 717,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 718,
+        "end": 719,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 732,
+        "end": 738,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 762,
+        "end": 768,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 774,
+        "end": 777,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 779,
+        "end": 787,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 788,
+        "end": 791,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 791,
+        "end": 792,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 792,
+        "end": 802,
+        "className": "syntax-function"
+      },
+      {
+        "start": 802,
+        "end": 803,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 804,
+        "end": 805,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 807,
+        "end": 808,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 811,
+        "end": 817,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 818,
+        "end": 828,
+        "className": "syntax-function"
+      },
+      {
+        "start": 828,
+        "end": 829,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 829,
+        "end": 830,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 830,
+        "end": 831,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 832,
+        "end": 833,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 833,
+        "end": 834,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 835,
+        "end": 838,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 840,
+        "end": 848,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 849,
+        "end": 852,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 852,
+        "end": 853,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 853,
+        "end": 864,
+        "className": "syntax-function"
+      },
+      {
+        "start": 864,
+        "end": 865,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 868,
+        "end": 869,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 873,
+        "end": 874,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 880,
+        "end": 881,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 888,
+        "end": 889,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 892,
+        "end": 895,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 895,
+        "end": 896,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 896,
+        "end": 904,
+        "className": "syntax-function"
+      },
+      {
+        "start": 904,
+        "end": 905,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 905,
+        "end": 910,
+        "className": "syntax-string"
+      },
+      {
+        "start": 910,
+        "end": 911,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 912,
+        "end": 915,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 915,
+        "end": 916,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 917,
+        "end": 924,
+        "className": "syntax-string"
+      },
+      {
+        "start": 924,
+        "end": 925,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 928,
+        "end": 931,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 931,
+        "end": 932,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 932,
+        "end": 940,
+        "className": "syntax-function"
+      },
+      {
+        "start": 940,
+        "end": 941,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 941,
+        "end": 946,
+        "className": "syntax-string"
+      },
+      {
+        "start": 946,
+        "end": 947,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 948,
+        "end": 951,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 951,
+        "end": 952,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 953,
+        "end": 960,
+        "className": "syntax-string"
+      },
+      {
+        "start": 960,
+        "end": 961,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 964,
+        "end": 967,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 967,
+        "end": 968,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 968,
+        "end": 976,
+        "className": "syntax-function"
+      },
+      {
+        "start": 976,
+        "end": 977,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 977,
+        "end": 984,
+        "className": "syntax-string"
+      },
+      {
+        "start": 984,
+        "end": 985,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 986,
+        "end": 991,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 991,
+        "end": 992,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 993,
+        "end": 1001,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1001,
+        "end": 1002,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1007,
+        "end": 1008,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1011,
+        "end": 1014,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1014,
+        "end": 1015,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1015,
+        "end": 1023,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1023,
+        "end": 1024,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1024,
+        "end": 1032,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1032,
+        "end": 1033,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1034,
+        "end": 1040,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1040,
+        "end": 1041,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1042,
+        "end": 1050,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1050,
+        "end": 1051,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1056,
+        "end": 1057,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1064,
+        "end": 1065,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1066,
+        "end": 1067,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1068,
+        "end": 1073,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1074,
+        "end": 1076,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1077,
+        "end": 1078,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1078,
+        "end": 1079,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1080,
+        "end": 1086,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1087,
+        "end": 1089,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1090,
+        "end": 1091,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1091,
+        "end": 1094,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1102,
+        "end": 1107,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1107,
+        "end": 1108,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1108,
+        "end": 1114,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1114,
+        "end": 1115,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1115,
+        "end": 1118,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1118,
+        "end": 1119,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1120,
+        "end": 1123,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1123,
+        "end": 1124,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1124,
+        "end": 1125,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1125,
+        "end": 1127,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1136,
+        "end": 1142,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1143,
+        "end": 1146,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1147,
+        "end": 1150,
+        "className": "syntax-keyword"
+      }
+    ]
+  },
+  {
+    "language": "lua",
+    "name": "lua/neovim_shared_extend.lua",
+    "code": "local function tbl_extend_rec(behavior, deep_extend, ...)\n  local ret = {} --- @type table<any,any>\n  if vim._empty_dict_mt ~= nil and getmetatable(select(1, ...)) == vim._empty_dict_mt then\n    ret = vim.empty_dict()\n  end\n\n  for i = 1, select('#', ...) do\n    local tbl = select(i, ...) --[[@as table<any,any>]]\n    if tbl then\n      for k, v in pairs(tbl) do\n        if deep_extend and can_merge(v) and can_merge(ret[k]) then\n          ret[k] = tbl_extend_rec(behavior, true, ret[k], v)\n        elseif type(behavior) == 'function' then\n          ret[k] = behavior(k, ret[k], v)\n        elseif behavior ~= 'force' and ret[k] ~= nil then\n          if behavior == 'error' then\n            error('key found in more than one map: ' .. k)\n          end -- Else behavior is \"keep\".\n        else\n          ret[k] = v\n        end\n      end\n    end\n  end\n\n  return ret\nend\n\nlocal function tbl_extend(behavior, deep_extend, ...)\n  if\n    behavior ~= 'error'\n    and behavior ~= 'keep'\n    and behavior ~= 'force'\n    and type(behavior) ~= 'function'\n  then\n    error('invalid \"behavior\": ' .. tostring(behavior))\n  end\n\n  local nargs = select('#', ...)\n\n  if nargs < 2 then\n    error(('wrong number of arguments (given %d, expected at least 3)'):format(1 + nargs))\n  end\n\n  for i = 1, nargs do\n    vim.validate('after the second argument', select(i, ...), 'table')\n  end\n\n  return tbl_extend_rec(behavior, deep_extend, ...)\nend",
+    "spans": [
+      {
+        "start": 0,
+        "end": 5,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 6,
+        "end": 14,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 15,
+        "end": 29,
+        "className": "syntax-function"
+      },
+      {
+        "start": 29,
+        "end": 30,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 38,
+        "end": 39,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 51,
+        "end": 52,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 53,
+        "end": 56,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 56,
+        "end": 57,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 60,
+        "end": 65,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 66,
+        "end": 69,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 70,
+        "end": 71,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 72,
+        "end": 74,
+        "className": "syntax-type"
+      },
+      {
+        "start": 75,
+        "end": 99,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 105,
+        "end": 108,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 108,
+        "end": 109,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 124,
+        "end": 126,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 127,
+        "end": 130,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 131,
+        "end": 134,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 135,
+        "end": 147,
+        "className": "syntax-function"
+      },
+      {
+        "start": 147,
+        "end": 148,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 148,
+        "end": 154,
+        "className": "syntax-function"
+      },
+      {
+        "start": 154,
+        "end": 155,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 155,
+        "end": 156,
+        "className": "syntax-number"
+      },
+      {
+        "start": 156,
+        "end": 157,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 158,
+        "end": 161,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 161,
+        "end": 163,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 164,
+        "end": 166,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 167,
+        "end": 170,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 170,
+        "end": 171,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 195,
+        "end": 198,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 199,
+        "end": 200,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 201,
+        "end": 204,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 204,
+        "end": 205,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 205,
+        "end": 215,
+        "className": "syntax-function"
+      },
+      {
+        "start": 215,
+        "end": 217,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 231,
+        "end": 232,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 233,
+        "end": 234,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 235,
+        "end": 236,
+        "className": "syntax-number"
+      },
+      {
+        "start": 236,
+        "end": 237,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 238,
+        "end": 244,
+        "className": "syntax-function"
+      },
+      {
+        "start": 244,
+        "end": 245,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 245,
+        "end": 248,
+        "className": "syntax-string"
+      },
+      {
+        "start": 248,
+        "end": 249,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 250,
+        "end": 253,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 253,
+        "end": 254,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 262,
+        "end": 267,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 268,
+        "end": 271,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 272,
+        "end": 273,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 274,
+        "end": 280,
+        "className": "syntax-function"
+      },
+      {
+        "start": 280,
+        "end": 281,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 281,
+        "end": 282,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 282,
+        "end": 283,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 284,
+        "end": 287,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 287,
+        "end": 288,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 289,
+        "end": 313,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 321,
+        "end": 324,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 340,
+        "end": 341,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 341,
+        "end": 342,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 343,
+        "end": 344,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 345,
+        "end": 347,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 348,
+        "end": 353,
+        "className": "syntax-function"
+      },
+      {
+        "start": 353,
+        "end": 354,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 354,
+        "end": 357,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 357,
+        "end": 358,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 373,
+        "end": 384,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 385,
+        "end": 388,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 389,
+        "end": 398,
+        "className": "syntax-function"
+      },
+      {
+        "start": 398,
+        "end": 399,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 399,
+        "end": 400,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 400,
+        "end": 401,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 402,
+        "end": 405,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 406,
+        "end": 415,
+        "className": "syntax-function"
+      },
+      {
+        "start": 415,
+        "end": 416,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 416,
+        "end": 419,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 419,
+        "end": 420,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 420,
+        "end": 421,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 421,
+        "end": 423,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 439,
+        "end": 442,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 442,
+        "end": 443,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 443,
+        "end": 444,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 444,
+        "end": 445,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 446,
+        "end": 447,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 448,
+        "end": 462,
+        "className": "syntax-function"
+      },
+      {
+        "start": 462,
+        "end": 463,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 463,
+        "end": 471,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 471,
+        "end": 472,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 477,
+        "end": 478,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 479,
+        "end": 482,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 482,
+        "end": 483,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 483,
+        "end": 484,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 484,
+        "end": 486,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 487,
+        "end": 488,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 488,
+        "end": 489,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 505,
+        "end": 509,
+        "className": "syntax-function"
+      },
+      {
+        "start": 509,
+        "end": 510,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 510,
+        "end": 518,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 518,
+        "end": 519,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 520,
+        "end": 522,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 523,
+        "end": 533,
+        "className": "syntax-string"
+      },
+      {
+        "start": 549,
+        "end": 552,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 552,
+        "end": 553,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 553,
+        "end": 554,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 554,
+        "end": 555,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 556,
+        "end": 557,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 558,
+        "end": 566,
+        "className": "syntax-function"
+      },
+      {
+        "start": 566,
+        "end": 567,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 567,
+        "end": 568,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 568,
+        "end": 569,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 570,
+        "end": 573,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 573,
+        "end": 574,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 574,
+        "end": 575,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 575,
+        "end": 577,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 578,
+        "end": 579,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 579,
+        "end": 580,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 596,
+        "end": 604,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 605,
+        "end": 607,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 608,
+        "end": 615,
+        "className": "syntax-string"
+      },
+      {
+        "start": 616,
+        "end": 619,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 620,
+        "end": 623,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 623,
+        "end": 624,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 624,
+        "end": 625,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 625,
+        "end": 626,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 627,
+        "end": 629,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 630,
+        "end": 633,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 652,
+        "end": 660,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 661,
+        "end": 663,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 664,
+        "end": 671,
+        "className": "syntax-string"
+      },
+      {
+        "start": 689,
+        "end": 694,
+        "className": "syntax-function"
+      },
+      {
+        "start": 694,
+        "end": 695,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 695,
+        "end": 729,
+        "className": "syntax-string"
+      },
+      {
+        "start": 730,
+        "end": 732,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 733,
+        "end": 734,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 734,
+        "end": 735,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 750,
+        "end": 777,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 801,
+        "end": 804,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 804,
+        "end": 805,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 805,
+        "end": 806,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 806,
+        "end": 807,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 808,
+        "end": 809,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 810,
+        "end": 811,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 851,
+        "end": 857,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 858,
+        "end": 861,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 862,
+        "end": 865,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 867,
+        "end": 872,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 873,
+        "end": 881,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 882,
+        "end": 892,
+        "className": "syntax-function"
+      },
+      {
+        "start": 892,
+        "end": 893,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 901,
+        "end": 902,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 914,
+        "end": 915,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 916,
+        "end": 919,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 919,
+        "end": 920,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 930,
+        "end": 938,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 939,
+        "end": 941,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 942,
+        "end": 949,
+        "className": "syntax-string"
+      },
+      {
+        "start": 954,
+        "end": 957,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 958,
+        "end": 966,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 967,
+        "end": 969,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 970,
+        "end": 976,
+        "className": "syntax-string"
+      },
+      {
+        "start": 981,
+        "end": 984,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 985,
+        "end": 993,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 994,
+        "end": 996,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 997,
+        "end": 1004,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1009,
+        "end": 1012,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1013,
+        "end": 1017,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1017,
+        "end": 1018,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1018,
+        "end": 1026,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1026,
+        "end": 1027,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1028,
+        "end": 1030,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1031,
+        "end": 1041,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1053,
+        "end": 1058,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1058,
+        "end": 1059,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1059,
+        "end": 1081,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1082,
+        "end": 1084,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1085,
+        "end": 1093,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1093,
+        "end": 1094,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1094,
+        "end": 1102,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1102,
+        "end": 1104,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1114,
+        "end": 1119,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1120,
+        "end": 1125,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1126,
+        "end": 1127,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1128,
+        "end": 1134,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1134,
+        "end": 1135,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1135,
+        "end": 1138,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1138,
+        "end": 1139,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1140,
+        "end": 1143,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1143,
+        "end": 1144,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1151,
+        "end": 1156,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1157,
+        "end": 1158,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1159,
+        "end": 1160,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1170,
+        "end": 1175,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1175,
+        "end": 1177,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1177,
+        "end": 1236,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1236,
+        "end": 1238,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1244,
+        "end": 1245,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1245,
+        "end": 1246,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1247,
+        "end": 1248,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1249,
+        "end": 1254,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1254,
+        "end": 1256,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1270,
+        "end": 1271,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1272,
+        "end": 1273,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1274,
+        "end": 1275,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1275,
+        "end": 1276,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1277,
+        "end": 1282,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1290,
+        "end": 1293,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1293,
+        "end": 1294,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1294,
+        "end": 1302,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1302,
+        "end": 1303,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1303,
+        "end": 1330,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1330,
+        "end": 1331,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1332,
+        "end": 1338,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1338,
+        "end": 1339,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1339,
+        "end": 1340,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1340,
+        "end": 1341,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1342,
+        "end": 1345,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1345,
+        "end": 1347,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1348,
+        "end": 1355,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1355,
+        "end": 1356,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1366,
+        "end": 1372,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1373,
+        "end": 1387,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1387,
+        "end": 1388,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1388,
+        "end": 1396,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1396,
+        "end": 1397,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1398,
+        "end": 1409,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1409,
+        "end": 1410,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1411,
+        "end": 1414,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1414,
+        "end": 1415,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1416,
+        "end": 1419,
+        "className": "syntax-keyword"
+      }
+    ]
+  },
+  {
+    "language": "nix",
+    "name": "nix/nixpkgs_bat.nix",
+    "code": "{\n  lib,\n  rustPlatform,\n  fetchFromGitHub,\n  pkg-config,\n  less,\n  installShellFiles,\n  makeWrapper,\n  zlib,\n  versionCheckHook,\n}:\n\nrustPlatform.buildRustPackage (finalAttrs: {\n  pname = \"bat\";\n  version = \"0.26.1\";\n\n  __structuredAttrs = true;\n\n  src = fetchFromGitHub {\n    owner = \"sharkdp\";\n    repo = \"bat\";\n    tag = \"v${finalAttrs.version}\";\n    hash = \"sha256-IbTvFT37BFo0tKOiApDL9sT+/nMD33MO3TXuho+lF2c=\";\n  };\n\n  cargoHash = \"sha256-WRLCs1hrwFT3tya9CzKUuh5g+6fYqKDtv3yvDx8Wws8=\";\n\n  nativeBuildInputs = [\n    pkg-config\n    installShellFiles\n    makeWrapper\n  ];\n\n  buildInputs = [\n    zlib\n  ];\n\n  postInstall = ''\n    installManPage $releaseDir/build/bat-*/out/assets/manual/bat.1\n    installShellCompletion $releaseDir/build/bat-*/out/assets/completions/bat.{bash,fish,zsh}\n  '';\n\n  postFixup = ''\n    wrapProgram \"$out/bin/bat\" \\\n      --prefix PATH : \"${lib.makeBinPath [ less ]}\"\n  '';\n\n  checkFlags = [\n    \"--skip=alias_pager_disable_long_overrides_short\"\n    \"--skip=config_read_arguments_from_file\"\n    \"--skip=env_var_bat_paging\"\n    \"--skip=pager_arg_override_env_noconfig\"\n    \"--skip=pager_arg_override_env_withconfig\"\n    \"--skip=pager_basic\"\n    \"--skip=pager_basic_arg\"\n    \"--skip=pager_env_bat_pager_override_config\"\n    \"--skip=pager_env_pager_nooverride_config\"\n    \"--skip=pager_more\"\n    \"--skip=pager_most\"\n    \"--skip=pager_overwrite\"\n    \"--skip=file_with_invalid_utf8_filename\"\n  ];\n})",
+    "spans": [
+      {
+        "start": 0,
+        "end": 1,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 4,
+        "end": 7,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 7,
+        "end": 8,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 11,
+        "end": 23,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 23,
+        "end": 24,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 27,
+        "end": 42,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 42,
+        "end": 43,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 46,
+        "end": 56,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 56,
+        "end": 57,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 60,
+        "end": 64,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 64,
+        "end": 65,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 68,
+        "end": 85,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 85,
+        "end": 86,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 89,
+        "end": 100,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 100,
+        "end": 101,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 104,
+        "end": 108,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 108,
+        "end": 109,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 112,
+        "end": 128,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 128,
+        "end": 129,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 130,
+        "end": 131,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 134,
+        "end": 146,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 146,
+        "end": 147,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 147,
+        "end": 163,
+        "className": "syntax-property"
+      },
+      {
+        "start": 164,
+        "end": 165,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 165,
+        "end": 175,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 177,
+        "end": 178,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 181,
+        "end": 186,
+        "className": "syntax-property"
+      },
+      {
+        "start": 187,
+        "end": 188,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 189,
+        "end": 194,
+        "className": "syntax-string"
+      },
+      {
+        "start": 194,
+        "end": 195,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 198,
+        "end": 205,
+        "className": "syntax-property"
+      },
+      {
+        "start": 206,
+        "end": 207,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 208,
+        "end": 216,
+        "className": "syntax-string"
+      },
+      {
+        "start": 216,
+        "end": 217,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 221,
+        "end": 238,
+        "className": "syntax-property"
+      },
+      {
+        "start": 239,
+        "end": 240,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 241,
+        "end": 245,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 245,
+        "end": 246,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 250,
+        "end": 253,
+        "className": "syntax-property"
+      },
+      {
+        "start": 254,
+        "end": 255,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 256,
+        "end": 271,
+        "className": "syntax-function"
+      },
+      {
+        "start": 272,
+        "end": 273,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 278,
+        "end": 283,
+        "className": "syntax-property"
+      },
+      {
+        "start": 284,
+        "end": 285,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 286,
+        "end": 295,
+        "className": "syntax-string"
+      },
+      {
+        "start": 295,
+        "end": 296,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 301,
+        "end": 305,
+        "className": "syntax-property"
+      },
+      {
+        "start": 306,
+        "end": 307,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 308,
+        "end": 313,
+        "className": "syntax-string"
+      },
+      {
+        "start": 313,
+        "end": 314,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 319,
+        "end": 322,
+        "className": "syntax-property"
+      },
+      {
+        "start": 323,
+        "end": 324,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 325,
+        "end": 349,
+        "className": "syntax-string"
+      },
+      {
+        "start": 349,
+        "end": 350,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 355,
+        "end": 359,
+        "className": "syntax-property"
+      },
+      {
+        "start": 360,
+        "end": 361,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 362,
+        "end": 415,
+        "className": "syntax-string"
+      },
+      {
+        "start": 415,
+        "end": 416,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 419,
+        "end": 421,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 425,
+        "end": 434,
+        "className": "syntax-property"
+      },
+      {
+        "start": 435,
+        "end": 436,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 437,
+        "end": 490,
+        "className": "syntax-string"
+      },
+      {
+        "start": 490,
+        "end": 491,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 495,
+        "end": 512,
+        "className": "syntax-property"
+      },
+      {
+        "start": 513,
+        "end": 514,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 515,
+        "end": 516,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 521,
+        "end": 531,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 536,
+        "end": 553,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 558,
+        "end": 569,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 572,
+        "end": 574,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 578,
+        "end": 589,
+        "className": "syntax-property"
+      },
+      {
+        "start": 590,
+        "end": 591,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 592,
+        "end": 593,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 598,
+        "end": 602,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 605,
+        "end": 607,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 611,
+        "end": 622,
+        "className": "syntax-property"
+      },
+      {
+        "start": 623,
+        "end": 624,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 625,
+        "end": 627,
+        "className": "syntax-string"
+      },
+      {
+        "start": 628,
+        "end": 694,
+        "className": "syntax-string"
+      },
+      {
+        "start": 695,
+        "end": 788,
+        "className": "syntax-string"
+      },
+      {
+        "start": 789,
+        "end": 793,
+        "className": "syntax-string"
+      },
+      {
+        "start": 793,
+        "end": 794,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 798,
+        "end": 807,
+        "className": "syntax-property"
+      },
+      {
+        "start": 808,
+        "end": 809,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 810,
+        "end": 812,
+        "className": "syntax-string"
+      },
+      {
+        "start": 813,
+        "end": 845,
+        "className": "syntax-string"
+      },
+      {
+        "start": 846,
+        "end": 897,
+        "className": "syntax-string"
+      },
+      {
+        "start": 898,
+        "end": 902,
+        "className": "syntax-string"
+      },
+      {
+        "start": 902,
+        "end": 903,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 907,
+        "end": 917,
+        "className": "syntax-property"
+      },
+      {
+        "start": 918,
+        "end": 919,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 920,
+        "end": 921,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 926,
+        "end": 975,
+        "className": "syntax-string"
+      },
+      {
+        "start": 980,
+        "end": 1020,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1025,
+        "end": 1052,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1057,
+        "end": 1097,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1102,
+        "end": 1144,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1149,
+        "end": 1169,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1174,
+        "end": 1198,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1203,
+        "end": 1247,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1252,
+        "end": 1294,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1299,
+        "end": 1318,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1323,
+        "end": 1342,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1347,
+        "end": 1371,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1376,
+        "end": 1416,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1419,
+        "end": 1421,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1422,
+        "end": 1424,
+        "className": "syntax-punctuation"
+      }
+    ]
+  },
+  {
+    "language": "nix",
+    "name": "nix/nixpkgs_eza.nix",
+    "code": "{\n  lib,\n  gitSupport ? true,\n  fetchFromGitHub,\n  rustPlatform,\n  cmake,\n  pandoc,\n  pkg-config,\n  zlib,\n  installShellFiles,\n  versionCheckHook,\n  exaAlias ? true,\n}:\n\nrustPlatform.buildRustPackage (finalAttrs: {\n  pname = \"eza\";\n  version = \"0.23.4\";\n\n  __structuredAttrs = true;\n\n  src = fetchFromGitHub {\n    owner = \"eza-community\";\n    repo = \"eza\";\n    tag = \"v${finalAttrs.version}\";\n    hash = \"sha256-zLb2VPfmv9J9UdPAXS+QPHI+hvDRl5UBcvW84J6nUK8=\";\n  };\n\n  cargoHash = \"sha256-3KLjlEZhGEyOcaiBnfIafR509oRbsWllqf1e6Z0M8Sg=\";\n\n  nativeBuildInputs = [\n    cmake\n    pkg-config\n    installShellFiles\n    pandoc\n  ];\n  buildInputs = [ zlib ];\n\n  buildNoDefaultFeatures = true;\n  buildFeatures = lib.optional gitSupport \"git\";\n\n  outputs = [\n    \"out\"\n    \"man\"\n  ];\n\n  postInstall = ''\n    for page in eza.1 eza_colors.5 eza_colors-explanation.5; do\n      sed \"s/\\$version/v${finalAttrs.version}/g\" \"man/$page.md\" |\n        pandoc --standalone -f markdown -t man >\"man/$page\"\n    done\n    installManPage man/eza.1 man/eza_colors.5 man/eza_colors-explanation.5\n    installShellCompletion \\\n      --bash completions/bash/eza \\\n      --fish completions/fish/eza.fish \\\n      --zsh completions/zsh/_eza\n  ''\n  + lib.optionalString exaAlias ''\n    ln -s eza $out/bin/exa\n  '';\n\n  nativeInstallCheckInputs = [ versionCheckHook ];\n  doInstallCheck = true;\n})",
+    "spans": [
+      {
+        "start": 0,
+        "end": 1,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 4,
+        "end": 7,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 7,
+        "end": 8,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 11,
+        "end": 21,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 24,
+        "end": 28,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 28,
+        "end": 29,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 32,
+        "end": 47,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 47,
+        "end": 48,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 51,
+        "end": 63,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 63,
+        "end": 64,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 67,
+        "end": 72,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 72,
+        "end": 73,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 76,
+        "end": 82,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 82,
+        "end": 83,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 86,
+        "end": 96,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 96,
+        "end": 97,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 100,
+        "end": 104,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 104,
+        "end": 105,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 108,
+        "end": 125,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 125,
+        "end": 126,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 129,
+        "end": 145,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 145,
+        "end": 146,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 149,
+        "end": 157,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 160,
+        "end": 164,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 164,
+        "end": 165,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 166,
+        "end": 167,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 170,
+        "end": 182,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 182,
+        "end": 183,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 183,
+        "end": 199,
+        "className": "syntax-property"
+      },
+      {
+        "start": 200,
+        "end": 201,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 201,
+        "end": 211,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 213,
+        "end": 214,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 217,
+        "end": 222,
+        "className": "syntax-property"
+      },
+      {
+        "start": 223,
+        "end": 224,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 225,
+        "end": 230,
+        "className": "syntax-string"
+      },
+      {
+        "start": 230,
+        "end": 231,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 234,
+        "end": 241,
+        "className": "syntax-property"
+      },
+      {
+        "start": 242,
+        "end": 243,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 244,
+        "end": 252,
+        "className": "syntax-string"
+      },
+      {
+        "start": 252,
+        "end": 253,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 257,
+        "end": 274,
+        "className": "syntax-property"
+      },
+      {
+        "start": 275,
+        "end": 276,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 277,
+        "end": 281,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 281,
+        "end": 282,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 286,
+        "end": 289,
+        "className": "syntax-property"
+      },
+      {
+        "start": 290,
+        "end": 291,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 292,
+        "end": 307,
+        "className": "syntax-function"
+      },
+      {
+        "start": 308,
+        "end": 309,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 314,
+        "end": 319,
+        "className": "syntax-property"
+      },
+      {
+        "start": 320,
+        "end": 321,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 322,
+        "end": 337,
+        "className": "syntax-string"
+      },
+      {
+        "start": 337,
+        "end": 338,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 343,
+        "end": 347,
+        "className": "syntax-property"
+      },
+      {
+        "start": 348,
+        "end": 349,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 350,
+        "end": 355,
+        "className": "syntax-string"
+      },
+      {
+        "start": 355,
+        "end": 356,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 361,
+        "end": 364,
+        "className": "syntax-property"
+      },
+      {
+        "start": 365,
+        "end": 366,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 367,
+        "end": 391,
+        "className": "syntax-string"
+      },
+      {
+        "start": 391,
+        "end": 392,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 397,
+        "end": 401,
+        "className": "syntax-property"
+      },
+      {
+        "start": 402,
+        "end": 403,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 404,
+        "end": 457,
+        "className": "syntax-string"
+      },
+      {
+        "start": 457,
+        "end": 458,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 461,
+        "end": 463,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 467,
+        "end": 476,
+        "className": "syntax-property"
+      },
+      {
+        "start": 477,
+        "end": 478,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 479,
+        "end": 532,
+        "className": "syntax-string"
+      },
+      {
+        "start": 532,
+        "end": 533,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 537,
+        "end": 554,
+        "className": "syntax-property"
+      },
+      {
+        "start": 555,
+        "end": 556,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 557,
+        "end": 558,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 563,
+        "end": 568,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 573,
+        "end": 583,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 588,
+        "end": 605,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 610,
+        "end": 616,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 619,
+        "end": 621,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 624,
+        "end": 635,
+        "className": "syntax-property"
+      },
+      {
+        "start": 636,
+        "end": 637,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 638,
+        "end": 639,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 640,
+        "end": 644,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 645,
+        "end": 647,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 651,
+        "end": 673,
+        "className": "syntax-property"
+      },
+      {
+        "start": 674,
+        "end": 675,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 676,
+        "end": 680,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 680,
+        "end": 681,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 684,
+        "end": 697,
+        "className": "syntax-property"
+      },
+      {
+        "start": 698,
+        "end": 699,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 700,
+        "end": 703,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 703,
+        "end": 704,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 704,
+        "end": 712,
+        "className": "syntax-property"
+      },
+      {
+        "start": 713,
+        "end": 723,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 724,
+        "end": 729,
+        "className": "syntax-string"
+      },
+      {
+        "start": 729,
+        "end": 730,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 734,
+        "end": 741,
+        "className": "syntax-property"
+      },
+      {
+        "start": 742,
+        "end": 743,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 744,
+        "end": 745,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 750,
+        "end": 755,
+        "className": "syntax-string"
+      },
+      {
+        "start": 760,
+        "end": 765,
+        "className": "syntax-string"
+      },
+      {
+        "start": 768,
+        "end": 770,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 774,
+        "end": 785,
+        "className": "syntax-property"
+      },
+      {
+        "start": 786,
+        "end": 787,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 788,
+        "end": 790,
+        "className": "syntax-string"
+      },
+      {
+        "start": 791,
+        "end": 854,
+        "className": "syntax-string"
+      },
+      {
+        "start": 855,
+        "end": 920,
+        "className": "syntax-string"
+      },
+      {
+        "start": 921,
+        "end": 980,
+        "className": "syntax-string"
+      },
+      {
+        "start": 981,
+        "end": 989,
+        "className": "syntax-string"
+      },
+      {
+        "start": 990,
+        "end": 1064,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1065,
+        "end": 1093,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1094,
+        "end": 1129,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1130,
+        "end": 1170,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1171,
+        "end": 1203,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1204,
+        "end": 1208,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1211,
+        "end": 1212,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1213,
+        "end": 1216,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1216,
+        "end": 1217,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1217,
+        "end": 1231,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1232,
+        "end": 1240,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1241,
+        "end": 1243,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1244,
+        "end": 1270,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1271,
+        "end": 1275,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1275,
+        "end": 1276,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1280,
+        "end": 1304,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1305,
+        "end": 1306,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1307,
+        "end": 1308,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1309,
+        "end": 1325,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1326,
+        "end": 1328,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1331,
+        "end": 1345,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1346,
+        "end": 1347,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1348,
+        "end": 1352,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1352,
+        "end": 1353,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1354,
+        "end": 1356,
+        "className": "syntax-punctuation"
+      }
+    ]
+  },
+  {
     "language": "nix",
     "name": "nix/nixpkgs_fd.nix",
     "code": "{\n  stdenv,\n  lib,\n  rustPlatform,\n  fetchFromGitHub,\n  installShellFiles,\n  rust-jemalloc-sys,\n  testers,\n  fd,\n}:\n\nrustPlatform.buildRustPackage (finalAttrs: {\n  pname = \"fd\";\n  version = \"10.4.2\";\n\n  src = fetchFromGitHub {\n    owner = \"sharkdp\";\n    repo = \"fd\";\n    rev = \"v${finalAttrs.version}\";\n    hash = \"sha256-D1FCry69KqXgLxU4rVmgKjkM3JqeBRQDfbp3sJtVAbU=\";\n  };\n\n  cargoHash = \"sha256-nsFtnt8z1qohOtHpLk3cstrVXi/yOMMPCTt/SEEB1F0=\";\n\n  nativeBuildInputs = [ installShellFiles ];\n\n  buildInputs = [ rust-jemalloc-sys ];\n\n  # skip flaky test\n  checkFlags = [\n    \"--skip=test_owner_current_group\"\n    # Fails if the filesystem performs UTF-8 validation (such as ZFS with utf8only=on)\n    \"--skip=test_exec_invalid_utf8\"\n    \"--skip=test_invalid_utf8\"\n  ];\n\n  postInstall = ''\n    installManPage doc/fd.1\n  ''\n  + lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''\n    installShellCompletion --cmd fd \\\n      --bash <($out/bin/fd --gen-completions bash) \\\n      --fish <($out/bin/fd --gen-completions fish)\n    installShellCompletion --zsh contrib/completion/_fd\n  '';\n\n  passthru.tests.version = testers.testVersion {\n    package = fd;\n  };\n\n  meta = {\n    description = \"Simple, fast and user-friendly alternative to find\";\n    longDescription = ''\n      `fd` is a simple, fast and user-friendly alternative to `find`.\n\n      While it does not seek to mirror all of `find`'s powerful functionality,\n      it provides sensible (opinionated) defaults for 80% of the use cases.\n    '';\n    homepage = \"https://github.com/sharkdp/fd\";\n    changelog = \"https://github.com/sharkdp/fd/blob/v${finalAttrs.version}/CHANGELOG.md\";\n    license = with lib.licenses; [\n      asl20 # or\n      mit\n    ];\n    maintainers = with lib.maintainers; [\n      dywedir\n      ma27\n      zowoq\n      matthiasbeyer\n    ];\n    mainProgram = \"fd\";\n  };\n})",
@@ -10470,6 +29119,1685 @@ export const codeSnippets = [
       {
         "start": 1860,
         "end": 1862,
+        "className": "syntax-punctuation"
+      }
+    ]
+  },
+  {
+    "language": "nix",
+    "name": "nix/nixpkgs_fzf.nix",
+    "code": "{\n  lib,\n  buildGoModule,\n  fetchFromGitHub,\n  runtimeShell,\n  installShellFiles,\n  bc,\n  ncurses,\n  versionCheckHook,\n}:\n\nbuildGoModule (finalAttrs: {\n  pname = \"fzf\";\n  version = \"0.73.1\";\n\n  __structuredAttrs = true;\n\n  src = fetchFromGitHub {\n    owner = \"junegunn\";\n    repo = \"fzf\";\n    tag = \"v${finalAttrs.version}\";\n    hash = \"sha256-xdhlbokeCzeBUP3YHA5u5tr3NTQz7n5TKPlJANp7yvM=\";\n  };\n\n  vendorHash = \"sha256-MLuoKPEAqrpCbUphYOCpHdo8MdW5kvueeDU/3loK33Q=\";\n\n  env.CGO_ENABLED = 0;\n\n  outputs = [\n    \"out\"\n    \"man\"\n  ];\n\n  nativeBuildInputs = [ installShellFiles ];\n\n  buildInputs = [ ncurses ];\n\n  ldflags = [\n    \"-s\"\n    \"-w\"\n    \"-X main.version=${finalAttrs.version} -X main.revision=${finalAttrs.src.rev}\"\n  ];\n\n  postPatch = ''\n    sed -i -e \"s|expand('<sfile>:h:h')|'$out'|\" plugin/fzf.vim\n\n    if ! grep -q $out plugin/fzf.vim; then\n        echo \"Failed to replace vim base_dir path with $out\"\n        exit 1\n    fi\n\n    substituteInPlace bin/fzf-tmux \\\n      --replace-fail \"bc\" \"${lib.getExe bc}\"\n  '';\n\n  postInstall = ''\n    install bin/fzf-tmux $out/bin\n\n    installManPage man/man1/fzf.1 man/man1/fzf-tmux.1\n\n    install -D plugin/* -t $out/share/vim-plugins/fzf/plugin\n    mkdir -p $out/share/nvim\n    ln -s $out/share/vim-plugins/fzf $out/share/nvim/site\n  '';\n})",
+    "spans": [
+      {
+        "start": 0,
+        "end": 1,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 4,
+        "end": 7,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 7,
+        "end": 8,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 11,
+        "end": 24,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 24,
+        "end": 25,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 28,
+        "end": 43,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 43,
+        "end": 44,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 47,
+        "end": 59,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 59,
+        "end": 60,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 63,
+        "end": 80,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 80,
+        "end": 81,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 84,
+        "end": 86,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 86,
+        "end": 87,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 90,
+        "end": 97,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 97,
+        "end": 98,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 101,
+        "end": 117,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 117,
+        "end": 118,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 119,
+        "end": 120,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 123,
+        "end": 136,
+        "className": "syntax-function"
+      },
+      {
+        "start": 137,
+        "end": 138,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 138,
+        "end": 148,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 150,
+        "end": 151,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 154,
+        "end": 159,
+        "className": "syntax-property"
+      },
+      {
+        "start": 160,
+        "end": 161,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 162,
+        "end": 167,
+        "className": "syntax-string"
+      },
+      {
+        "start": 167,
+        "end": 168,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 171,
+        "end": 178,
+        "className": "syntax-property"
+      },
+      {
+        "start": 179,
+        "end": 180,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 181,
+        "end": 189,
+        "className": "syntax-string"
+      },
+      {
+        "start": 189,
+        "end": 190,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 194,
+        "end": 211,
+        "className": "syntax-property"
+      },
+      {
+        "start": 212,
+        "end": 213,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 214,
+        "end": 218,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 218,
+        "end": 219,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 223,
+        "end": 226,
+        "className": "syntax-property"
+      },
+      {
+        "start": 227,
+        "end": 228,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 229,
+        "end": 244,
+        "className": "syntax-function"
+      },
+      {
+        "start": 245,
+        "end": 246,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 251,
+        "end": 256,
+        "className": "syntax-property"
+      },
+      {
+        "start": 257,
+        "end": 258,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 259,
+        "end": 269,
+        "className": "syntax-string"
+      },
+      {
+        "start": 269,
+        "end": 270,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 275,
+        "end": 279,
+        "className": "syntax-property"
+      },
+      {
+        "start": 280,
+        "end": 281,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 282,
+        "end": 287,
+        "className": "syntax-string"
+      },
+      {
+        "start": 287,
+        "end": 288,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 293,
+        "end": 296,
+        "className": "syntax-property"
+      },
+      {
+        "start": 297,
+        "end": 298,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 299,
+        "end": 323,
+        "className": "syntax-string"
+      },
+      {
+        "start": 323,
+        "end": 324,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 329,
+        "end": 333,
+        "className": "syntax-property"
+      },
+      {
+        "start": 334,
+        "end": 335,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 336,
+        "end": 389,
+        "className": "syntax-string"
+      },
+      {
+        "start": 389,
+        "end": 390,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 393,
+        "end": 395,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 399,
+        "end": 409,
+        "className": "syntax-property"
+      },
+      {
+        "start": 410,
+        "end": 411,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 412,
+        "end": 465,
+        "className": "syntax-string"
+      },
+      {
+        "start": 465,
+        "end": 466,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 470,
+        "end": 473,
+        "className": "syntax-property"
+      },
+      {
+        "start": 473,
+        "end": 474,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 474,
+        "end": 485,
+        "className": "syntax-property"
+      },
+      {
+        "start": 486,
+        "end": 487,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 488,
+        "end": 489,
+        "className": "syntax-number"
+      },
+      {
+        "start": 489,
+        "end": 490,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 494,
+        "end": 501,
+        "className": "syntax-property"
+      },
+      {
+        "start": 502,
+        "end": 503,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 504,
+        "end": 505,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 510,
+        "end": 515,
+        "className": "syntax-string"
+      },
+      {
+        "start": 520,
+        "end": 525,
+        "className": "syntax-string"
+      },
+      {
+        "start": 528,
+        "end": 530,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 534,
+        "end": 551,
+        "className": "syntax-property"
+      },
+      {
+        "start": 552,
+        "end": 553,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 554,
+        "end": 555,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 556,
+        "end": 573,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 574,
+        "end": 576,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 580,
+        "end": 591,
+        "className": "syntax-property"
+      },
+      {
+        "start": 592,
+        "end": 593,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 594,
+        "end": 595,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 596,
+        "end": 603,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 604,
+        "end": 606,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 610,
+        "end": 617,
+        "className": "syntax-property"
+      },
+      {
+        "start": 618,
+        "end": 619,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 620,
+        "end": 621,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 626,
+        "end": 630,
+        "className": "syntax-string"
+      },
+      {
+        "start": 635,
+        "end": 639,
+        "className": "syntax-string"
+      },
+      {
+        "start": 644,
+        "end": 722,
+        "className": "syntax-string"
+      },
+      {
+        "start": 725,
+        "end": 727,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 731,
+        "end": 740,
+        "className": "syntax-property"
+      },
+      {
+        "start": 741,
+        "end": 742,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 743,
+        "end": 745,
+        "className": "syntax-string"
+      },
+      {
+        "start": 746,
+        "end": 808,
+        "className": "syntax-string"
+      },
+      {
+        "start": 810,
+        "end": 814,
+        "className": "syntax-string"
+      },
+      {
+        "start": 814,
+        "end": 816,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 816,
+        "end": 848,
+        "className": "syntax-string"
+      },
+      {
+        "start": 848,
+        "end": 852,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 853,
+        "end": 913,
+        "className": "syntax-string"
+      },
+      {
+        "start": 914,
+        "end": 928,
+        "className": "syntax-string"
+      },
+      {
+        "start": 929,
+        "end": 933,
+        "className": "syntax-string"
+      },
+      {
+        "start": 933,
+        "end": 935,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 937,
+        "end": 973,
+        "className": "syntax-string"
+      },
+      {
+        "start": 974,
+        "end": 1018,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1019,
+        "end": 1023,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1023,
+        "end": 1024,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1028,
+        "end": 1039,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1040,
+        "end": 1041,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1042,
+        "end": 1044,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1045,
+        "end": 1078,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1080,
+        "end": 1133,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1135,
+        "end": 1195,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1196,
+        "end": 1224,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1225,
+        "end": 1282,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1283,
+        "end": 1287,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1287,
+        "end": 1288,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1289,
+        "end": 1291,
+        "className": "syntax-punctuation"
+      }
+    ]
+  },
+  {
+    "language": "nix",
+    "name": "nix/nixpkgs_nushell.nix",
+    "code": "{\n  stdenv,\n  lib,\n  fetchFromGitHub,\n  rustPlatform,\n  openssl,\n  zlib,\n  zstd,\n  pkg-config,\n  python3,\n  libx11,\n  nghttp2,\n  libgit2,\n  withDefaultFeatures ? true,\n  additionalFeatures ? (p: p),\n  nix-update-script,\n  curlMinimal,\n  versionCheckHook,\n  writableTmpDirAsHomeHook,\n}:\n\nrustPlatform.buildRustPackage (finalAttrs: {\n  pname = \"nushell\";\n  version = \"0.113.1\";\n\n  src = fetchFromGitHub {\n    owner = \"nushell\";\n    repo = \"nushell\";\n    tag = finalAttrs.version;\n    hash = \"sha256-sV2fN9TOWQVyPVFSWdNLPOtOdLuynPTvt9+uqJsgtds=\";\n  };\n\n  cargoHash = \"sha256-yfJPhx+Y+Y3vkIQU/w3DCKJpH4LsEmzDzyEuyor5PDc=\";\n\n  nativeBuildInputs = [\n    pkg-config\n  ]\n  ++ lib.optionals (withDefaultFeatures && stdenv.hostPlatform.isLinux) [ python3 ]\n  ++ lib.optionals stdenv.hostPlatform.isDarwin [ rustPlatform.bindgenHook ];\n\n  buildInputs = [\n    zstd\n  ]\n  ++ lib.optionals stdenv.hostPlatform.isDarwin [ zlib ]\n  ++ lib.optionals (withDefaultFeatures && stdenv.hostPlatform.isLinux) [ libx11 ]\n  ++ lib.optionals (withDefaultFeatures && stdenv.hostPlatform.isDarwin) [\n    nghttp2\n    libgit2\n  ];\n\n  buildNoDefaultFeatures = !withDefaultFeatures;\n  buildFeatures = additionalFeatures [ ];\n\n  preCheck = ''\n    export NU_TEST_LOCALE_OVERRIDE=\"en_US.UTF-8\"\n  '';\n\n  nativeCheckInputs = [\n    versionCheckHook\n    writableTmpDirAsHomeHook\n  ];\n  checkInputs =\n    lib.optionals stdenv.hostPlatform.isDarwin [ curlMinimal ]\n    ++ lib.optionals stdenv.hostPlatform.isLinux [ openssl ];\n})",
+    "spans": [
+      {
+        "start": 0,
+        "end": 1,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 4,
+        "end": 10,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 10,
+        "end": 11,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 14,
+        "end": 17,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 17,
+        "end": 18,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 21,
+        "end": 36,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 36,
+        "end": 37,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 40,
+        "end": 52,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 52,
+        "end": 53,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 56,
+        "end": 63,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 63,
+        "end": 64,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 67,
+        "end": 71,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 71,
+        "end": 72,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 75,
+        "end": 79,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 79,
+        "end": 80,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 83,
+        "end": 93,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 93,
+        "end": 94,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 97,
+        "end": 104,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 104,
+        "end": 105,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 108,
+        "end": 114,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 114,
+        "end": 115,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 118,
+        "end": 125,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 125,
+        "end": 126,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 129,
+        "end": 136,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 136,
+        "end": 137,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 140,
+        "end": 159,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 162,
+        "end": 166,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 166,
+        "end": 167,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 170,
+        "end": 188,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 191,
+        "end": 192,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 192,
+        "end": 193,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 195,
+        "end": 196,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 196,
+        "end": 198,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 201,
+        "end": 218,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 218,
+        "end": 219,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 222,
+        "end": 233,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 233,
+        "end": 234,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 237,
+        "end": 253,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 253,
+        "end": 254,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 257,
+        "end": 281,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 281,
+        "end": 282,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 283,
+        "end": 284,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 287,
+        "end": 299,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 299,
+        "end": 300,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 300,
+        "end": 316,
+        "className": "syntax-property"
+      },
+      {
+        "start": 317,
+        "end": 318,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 318,
+        "end": 328,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 330,
+        "end": 331,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 334,
+        "end": 339,
+        "className": "syntax-property"
+      },
+      {
+        "start": 340,
+        "end": 341,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 342,
+        "end": 351,
+        "className": "syntax-string"
+      },
+      {
+        "start": 351,
+        "end": 352,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 355,
+        "end": 362,
+        "className": "syntax-property"
+      },
+      {
+        "start": 363,
+        "end": 364,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 365,
+        "end": 374,
+        "className": "syntax-string"
+      },
+      {
+        "start": 374,
+        "end": 375,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 379,
+        "end": 382,
+        "className": "syntax-property"
+      },
+      {
+        "start": 383,
+        "end": 384,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 385,
+        "end": 400,
+        "className": "syntax-function"
+      },
+      {
+        "start": 401,
+        "end": 402,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 407,
+        "end": 412,
+        "className": "syntax-property"
+      },
+      {
+        "start": 413,
+        "end": 414,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 415,
+        "end": 424,
+        "className": "syntax-string"
+      },
+      {
+        "start": 424,
+        "end": 425,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 430,
+        "end": 434,
+        "className": "syntax-property"
+      },
+      {
+        "start": 435,
+        "end": 436,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 437,
+        "end": 446,
+        "className": "syntax-string"
+      },
+      {
+        "start": 446,
+        "end": 447,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 452,
+        "end": 455,
+        "className": "syntax-property"
+      },
+      {
+        "start": 456,
+        "end": 457,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 458,
+        "end": 468,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 468,
+        "end": 469,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 469,
+        "end": 476,
+        "className": "syntax-property"
+      },
+      {
+        "start": 476,
+        "end": 477,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 482,
+        "end": 486,
+        "className": "syntax-property"
+      },
+      {
+        "start": 487,
+        "end": 488,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 489,
+        "end": 542,
+        "className": "syntax-string"
+      },
+      {
+        "start": 542,
+        "end": 543,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 546,
+        "end": 548,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 552,
+        "end": 561,
+        "className": "syntax-property"
+      },
+      {
+        "start": 562,
+        "end": 563,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 564,
+        "end": 617,
+        "className": "syntax-string"
+      },
+      {
+        "start": 617,
+        "end": 618,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 622,
+        "end": 639,
+        "className": "syntax-property"
+      },
+      {
+        "start": 640,
+        "end": 641,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 642,
+        "end": 643,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 648,
+        "end": 658,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 661,
+        "end": 662,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 665,
+        "end": 667,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 668,
+        "end": 671,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 671,
+        "end": 672,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 672,
+        "end": 681,
+        "className": "syntax-property"
+      },
+      {
+        "start": 682,
+        "end": 683,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 683,
+        "end": 702,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 703,
+        "end": 705,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 706,
+        "end": 712,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 712,
+        "end": 713,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 713,
+        "end": 725,
+        "className": "syntax-property"
+      },
+      {
+        "start": 725,
+        "end": 726,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 726,
+        "end": 733,
+        "className": "syntax-property"
+      },
+      {
+        "start": 733,
+        "end": 734,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 735,
+        "end": 736,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 737,
+        "end": 744,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 745,
+        "end": 746,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 749,
+        "end": 751,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 752,
+        "end": 755,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 755,
+        "end": 756,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 756,
+        "end": 765,
+        "className": "syntax-property"
+      },
+      {
+        "start": 766,
+        "end": 772,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 772,
+        "end": 773,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 773,
+        "end": 785,
+        "className": "syntax-property"
+      },
+      {
+        "start": 785,
+        "end": 786,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 786,
+        "end": 794,
+        "className": "syntax-property"
+      },
+      {
+        "start": 795,
+        "end": 796,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 797,
+        "end": 809,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 809,
+        "end": 810,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 810,
+        "end": 821,
+        "className": "syntax-property"
+      },
+      {
+        "start": 822,
+        "end": 824,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 828,
+        "end": 839,
+        "className": "syntax-property"
+      },
+      {
+        "start": 840,
+        "end": 841,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 842,
+        "end": 843,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 848,
+        "end": 852,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 855,
+        "end": 856,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 859,
+        "end": 861,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 862,
+        "end": 865,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 865,
+        "end": 866,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 866,
+        "end": 875,
+        "className": "syntax-property"
+      },
+      {
+        "start": 876,
+        "end": 882,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 882,
+        "end": 883,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 883,
+        "end": 895,
+        "className": "syntax-property"
+      },
+      {
+        "start": 895,
+        "end": 896,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 896,
+        "end": 904,
+        "className": "syntax-property"
+      },
+      {
+        "start": 905,
+        "end": 906,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 907,
+        "end": 911,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 912,
+        "end": 913,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 916,
+        "end": 918,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 919,
+        "end": 922,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 922,
+        "end": 923,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 923,
+        "end": 932,
+        "className": "syntax-property"
+      },
+      {
+        "start": 933,
+        "end": 934,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 934,
+        "end": 953,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 954,
+        "end": 956,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 957,
+        "end": 963,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 963,
+        "end": 964,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 964,
+        "end": 976,
+        "className": "syntax-property"
+      },
+      {
+        "start": 976,
+        "end": 977,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 977,
+        "end": 984,
+        "className": "syntax-property"
+      },
+      {
+        "start": 984,
+        "end": 985,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 986,
+        "end": 987,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 988,
+        "end": 994,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 995,
+        "end": 996,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 999,
+        "end": 1001,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1002,
+        "end": 1005,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1005,
+        "end": 1006,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1006,
+        "end": 1015,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1016,
+        "end": 1017,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1017,
+        "end": 1036,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1037,
+        "end": 1039,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1040,
+        "end": 1046,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1046,
+        "end": 1047,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1047,
+        "end": 1059,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1059,
+        "end": 1060,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1060,
+        "end": 1068,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1068,
+        "end": 1069,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1070,
+        "end": 1071,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1076,
+        "end": 1083,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1088,
+        "end": 1095,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1098,
+        "end": 1100,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1104,
+        "end": 1126,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1127,
+        "end": 1128,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1129,
+        "end": 1130,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1130,
+        "end": 1149,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1149,
+        "end": 1150,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1153,
+        "end": 1166,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1167,
+        "end": 1168,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1169,
+        "end": 1187,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1188,
+        "end": 1189,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1190,
+        "end": 1192,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1196,
+        "end": 1204,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1205,
+        "end": 1206,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1207,
+        "end": 1209,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1210,
+        "end": 1214,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1214,
+        "end": 1220,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1220,
+        "end": 1258,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1259,
+        "end": 1263,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1263,
+        "end": 1264,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1268,
+        "end": 1285,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1286,
+        "end": 1287,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1288,
+        "end": 1289,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1294,
+        "end": 1310,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1315,
+        "end": 1339,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1342,
+        "end": 1344,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1347,
+        "end": 1358,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1359,
+        "end": 1360,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1365,
+        "end": 1368,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1368,
+        "end": 1369,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1369,
+        "end": 1378,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1379,
+        "end": 1385,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1385,
+        "end": 1386,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1386,
+        "end": 1398,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1398,
+        "end": 1399,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1399,
+        "end": 1407,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1408,
+        "end": 1409,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1410,
+        "end": 1421,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1422,
+        "end": 1423,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1428,
+        "end": 1430,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1431,
+        "end": 1434,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1434,
+        "end": 1435,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1435,
+        "end": 1444,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1445,
+        "end": 1451,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1451,
+        "end": 1452,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1452,
+        "end": 1464,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1464,
+        "end": 1465,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1465,
+        "end": 1472,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1473,
+        "end": 1474,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1475,
+        "end": 1482,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1483,
+        "end": 1485,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1486,
+        "end": 1488,
         "className": "syntax-punctuation"
       }
     ]
@@ -11487,6 +31815,723 @@ export const codeSnippets = [
       {
         "start": 2019,
         "end": 2021,
+        "className": "syntax-punctuation"
+      }
+    ]
+  },
+  {
+    "language": "nix",
+    "name": "nix/nixpkgs_starship.nix",
+    "code": "{\n  lib,\n  stdenv,\n  fetchFromGitHub,\n  rustPlatform,\n  installShellFiles,\n  writableTmpDirAsHomeHook,\n  gitMinimal,\n  nixosTests,\n  buildPackages,\n}:\n\nrustPlatform.buildRustPackage (finalAttrs: {\n  pname = \"starship\";\n  version = \"1.25.1\";\n\n  src = fetchFromGitHub {\n    owner = \"starship\";\n    repo = \"starship\";\n    tag = \"v${finalAttrs.version}\";\n    hash = \"sha256-eIiBKsk27h42Lr1ecXeyQXfBbB73vgQRpD99fOuPGlE=\";\n  };\n\n  nativeBuildInputs = [ installShellFiles ];\n\n  buildInputs = lib.optionals (stdenv.hostPlatform.isDarwin && stdenv.hostPlatform.isAarch64) [\n    writableTmpDirAsHomeHook\n  ];\n\n  postInstall = ''\n    presetdir=$out/share/starship/presets/\n    mkdir -p $presetdir\n    cp docs/public/presets/toml/*.toml $presetdir\n  ''\n  + lib.optionalString (stdenv.hostPlatform.emulatorAvailable buildPackages) (\n    let\n      emulator = stdenv.hostPlatform.emulator buildPackages;\n    in\n    ''\n      installShellCompletion --cmd starship \\\n        --bash <(${emulator} $out/bin/starship completions bash) \\\n        --fish <(${emulator} $out/bin/starship completions fish) \\\n        --zsh <(${emulator} $out/bin/starship completions zsh)\n    ''\n  );\n\n  cargoHash = \"sha256-mHRlGMYSeLpPR50Gr/AJY/PN7hA4znL9URaz+sbBYAs=\";\n\n  nativeCheckInputs = [\n    gitMinimal\n    writableTmpDirAsHomeHook\n  ];\n\n  passthru.tests = {\n    inherit (nixosTests) starship;\n  };\n})",
+    "spans": [
+      {
+        "start": 0,
+        "end": 1,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 4,
+        "end": 7,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 7,
+        "end": 8,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 11,
+        "end": 17,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 17,
+        "end": 18,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 21,
+        "end": 36,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 36,
+        "end": 37,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 40,
+        "end": 52,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 52,
+        "end": 53,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 56,
+        "end": 73,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 73,
+        "end": 74,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 77,
+        "end": 101,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 101,
+        "end": 102,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 105,
+        "end": 115,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 115,
+        "end": 116,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 119,
+        "end": 129,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 129,
+        "end": 130,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 133,
+        "end": 146,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 146,
+        "end": 147,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 148,
+        "end": 149,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 152,
+        "end": 164,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 164,
+        "end": 165,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 165,
+        "end": 181,
+        "className": "syntax-property"
+      },
+      {
+        "start": 182,
+        "end": 183,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 183,
+        "end": 193,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 195,
+        "end": 196,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 199,
+        "end": 204,
+        "className": "syntax-property"
+      },
+      {
+        "start": 205,
+        "end": 206,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 207,
+        "end": 217,
+        "className": "syntax-string"
+      },
+      {
+        "start": 217,
+        "end": 218,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 221,
+        "end": 228,
+        "className": "syntax-property"
+      },
+      {
+        "start": 229,
+        "end": 230,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 231,
+        "end": 239,
+        "className": "syntax-string"
+      },
+      {
+        "start": 239,
+        "end": 240,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 244,
+        "end": 247,
+        "className": "syntax-property"
+      },
+      {
+        "start": 248,
+        "end": 249,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 250,
+        "end": 265,
+        "className": "syntax-function"
+      },
+      {
+        "start": 266,
+        "end": 267,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 272,
+        "end": 277,
+        "className": "syntax-property"
+      },
+      {
+        "start": 278,
+        "end": 279,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 280,
+        "end": 290,
+        "className": "syntax-string"
+      },
+      {
+        "start": 290,
+        "end": 291,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 296,
+        "end": 300,
+        "className": "syntax-property"
+      },
+      {
+        "start": 301,
+        "end": 302,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 303,
+        "end": 313,
+        "className": "syntax-string"
+      },
+      {
+        "start": 313,
+        "end": 314,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 319,
+        "end": 322,
+        "className": "syntax-property"
+      },
+      {
+        "start": 323,
+        "end": 324,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 325,
+        "end": 349,
+        "className": "syntax-string"
+      },
+      {
+        "start": 349,
+        "end": 350,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 355,
+        "end": 359,
+        "className": "syntax-property"
+      },
+      {
+        "start": 360,
+        "end": 361,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 362,
+        "end": 415,
+        "className": "syntax-string"
+      },
+      {
+        "start": 415,
+        "end": 416,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 419,
+        "end": 421,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 425,
+        "end": 442,
+        "className": "syntax-property"
+      },
+      {
+        "start": 443,
+        "end": 444,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 445,
+        "end": 446,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 447,
+        "end": 464,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 465,
+        "end": 467,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 471,
+        "end": 482,
+        "className": "syntax-property"
+      },
+      {
+        "start": 483,
+        "end": 484,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 485,
+        "end": 488,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 488,
+        "end": 489,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 489,
+        "end": 498,
+        "className": "syntax-property"
+      },
+      {
+        "start": 499,
+        "end": 500,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 500,
+        "end": 506,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 506,
+        "end": 507,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 507,
+        "end": 519,
+        "className": "syntax-property"
+      },
+      {
+        "start": 519,
+        "end": 520,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 520,
+        "end": 528,
+        "className": "syntax-property"
+      },
+      {
+        "start": 529,
+        "end": 531,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 532,
+        "end": 538,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 538,
+        "end": 539,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 539,
+        "end": 551,
+        "className": "syntax-property"
+      },
+      {
+        "start": 551,
+        "end": 552,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 552,
+        "end": 561,
+        "className": "syntax-property"
+      },
+      {
+        "start": 561,
+        "end": 562,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 563,
+        "end": 564,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 569,
+        "end": 593,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 596,
+        "end": 598,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 602,
+        "end": 613,
+        "className": "syntax-property"
+      },
+      {
+        "start": 614,
+        "end": 615,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 616,
+        "end": 618,
+        "className": "syntax-string"
+      },
+      {
+        "start": 619,
+        "end": 661,
+        "className": "syntax-string"
+      },
+      {
+        "start": 662,
+        "end": 685,
+        "className": "syntax-string"
+      },
+      {
+        "start": 686,
+        "end": 735,
+        "className": "syntax-string"
+      },
+      {
+        "start": 736,
+        "end": 740,
+        "className": "syntax-string"
+      },
+      {
+        "start": 743,
+        "end": 744,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 745,
+        "end": 748,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 748,
+        "end": 749,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 749,
+        "end": 763,
+        "className": "syntax-property"
+      },
+      {
+        "start": 764,
+        "end": 765,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 765,
+        "end": 771,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 771,
+        "end": 772,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 772,
+        "end": 784,
+        "className": "syntax-property"
+      },
+      {
+        "start": 784,
+        "end": 785,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 785,
+        "end": 802,
+        "className": "syntax-property"
+      },
+      {
+        "start": 803,
+        "end": 816,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 816,
+        "end": 817,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 818,
+        "end": 819,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 824,
+        "end": 827,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 834,
+        "end": 842,
+        "className": "syntax-property"
+      },
+      {
+        "start": 843,
+        "end": 844,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 845,
+        "end": 851,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 851,
+        "end": 852,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 852,
+        "end": 864,
+        "className": "syntax-property"
+      },
+      {
+        "start": 864,
+        "end": 865,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 865,
+        "end": 873,
+        "className": "syntax-property"
+      },
+      {
+        "start": 874,
+        "end": 887,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 887,
+        "end": 888,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 893,
+        "end": 895,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 900,
+        "end": 902,
+        "className": "syntax-string"
+      },
+      {
+        "start": 903,
+        "end": 948,
+        "className": "syntax-string"
+      },
+      {
+        "start": 949,
+        "end": 1015,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1016,
+        "end": 1082,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1083,
+        "end": 1145,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1146,
+        "end": 1152,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1155,
+        "end": 1157,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1161,
+        "end": 1170,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1171,
+        "end": 1172,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1173,
+        "end": 1226,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1226,
+        "end": 1227,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1231,
+        "end": 1248,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1249,
+        "end": 1250,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1251,
+        "end": 1252,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1257,
+        "end": 1267,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1272,
+        "end": 1296,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1299,
+        "end": 1301,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1305,
+        "end": 1313,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1313,
+        "end": 1314,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1314,
+        "end": 1319,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1320,
+        "end": 1321,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1322,
+        "end": 1323,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1328,
+        "end": 1335,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1336,
+        "end": 1337,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1337,
+        "end": 1347,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1347,
+        "end": 1348,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1349,
+        "end": 1357,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1357,
+        "end": 1358,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1361,
+        "end": 1363,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1364,
+        "end": 1366,
         "className": "syntax-punctuation"
       }
     ]
@@ -12605,6 +33650,1278 @@ export const codeSnippets = [
   },
   {
     "language": "python",
+    "name": "python/cpython_getopt_options.py",
+    "code": "def do_longs(opts, opt, longopts, args):\n    try:\n        i = opt.index('=')\n    except ValueError:\n        optarg = None\n    else:\n        opt, optarg = opt[:i], opt[i+1:]\n\n    has_arg, opt = long_has_args(opt, longopts)\n    if has_arg:\n        if optarg is None:\n            if not args:\n                raise GetoptError(_('option --%s requires argument') % opt, opt)\n            optarg, args = args[0], args[1:]\n    elif optarg is not None:\n        raise GetoptError(_('option --%s must not have an argument') % opt, opt)\n    opts.append(('--' + opt, optarg or ''))\n    return opts, args\n\n# Return:\n#   has_arg?\n#   full option name\ndef long_has_args(opt, longopts):\n    possibilities = [o for o in longopts if o.startswith(opt)]\n    if not possibilities:\n        raise GetoptError(_('option --%s not recognized') % opt, opt)\n    # Is there an exact match?\n    if opt in possibilities:\n        return False, opt\n    elif opt + '=' in possibilities:\n        return True, opt\n    # No exact match, so better be unique.\n    if len(possibilities) > 1:\n        # XXX since possibilities contains all valid continuations, might be\n        # nice to work them into the error msg\n        raise GetoptError(_('option --%s not a unique prefix') % opt, opt)\n    assert len(possibilities) == 1\n    unique_match = possibilities[0]\n    has_arg = unique_match.endswith('=')\n    if has_arg:\n        unique_match = unique_match[:-1]\n    return has_arg, unique_match\n\ndef do_shorts(opts, optstring, shortopts, args):\n    while optstring != '':\n        opt, optstring = optstring[0], optstring[1:]\n        if short_has_arg(opt, shortopts):\n            if optstring == '':\n                if not args:\n                    raise GetoptError(_('option -%s requires argument') % opt,\n                                      opt)\n                optstring, args = args[0], args[1:]\n            optarg, optstring = optstring, ''\n        else:\n            optarg = ''\n        opts.append(('-' + opt, optarg))\n    return opts, args\n\ndef short_has_arg(opt, shortopts):\n    for i in range(len(shortopts)):\n        if opt == shortopts[i] != ':':\n            return shortopts.startswith(':', i+1)\n    raise GetoptError(_('option -%s not recognized') % opt, opt)",
+    "spans": [
+      {
+        "start": 0,
+        "end": 3,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 4,
+        "end": 12,
+        "className": "syntax-function"
+      },
+      {
+        "start": 13,
+        "end": 17,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 19,
+        "end": 22,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 24,
+        "end": 32,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 34,
+        "end": 38,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 45,
+        "end": 48,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 58,
+        "end": 59,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 60,
+        "end": 61,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 62,
+        "end": 65,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 66,
+        "end": 71,
+        "className": "syntax-property"
+      },
+      {
+        "start": 72,
+        "end": 75,
+        "className": "syntax-string"
+      },
+      {
+        "start": 81,
+        "end": 87,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 88,
+        "end": 98,
+        "className": "syntax-type"
+      },
+      {
+        "start": 108,
+        "end": 114,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 115,
+        "end": 116,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 117,
+        "end": 121,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 126,
+        "end": 130,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 140,
+        "end": 143,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 145,
+        "end": 151,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 152,
+        "end": 153,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 154,
+        "end": 157,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 159,
+        "end": 160,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 163,
+        "end": 166,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 167,
+        "end": 168,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 168,
+        "end": 169,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 169,
+        "end": 170,
+        "className": "syntax-number"
+      },
+      {
+        "start": 178,
+        "end": 185,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 187,
+        "end": 190,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 191,
+        "end": 192,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 193,
+        "end": 206,
+        "className": "syntax-function"
+      },
+      {
+        "start": 207,
+        "end": 210,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 212,
+        "end": 220,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 226,
+        "end": 228,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 229,
+        "end": 236,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 246,
+        "end": 248,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 249,
+        "end": 255,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 256,
+        "end": 258,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 259,
+        "end": 263,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 277,
+        "end": 279,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 280,
+        "end": 283,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 284,
+        "end": 288,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 306,
+        "end": 311,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 312,
+        "end": 323,
+        "className": "syntax-function"
+      },
+      {
+        "start": 324,
+        "end": 325,
+        "className": "syntax-function"
+      },
+      {
+        "start": 326,
+        "end": 357,
+        "className": "syntax-string"
+      },
+      {
+        "start": 359,
+        "end": 360,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 361,
+        "end": 364,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 366,
+        "end": 369,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 383,
+        "end": 389,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 391,
+        "end": 395,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 396,
+        "end": 397,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 398,
+        "end": 402,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 403,
+        "end": 404,
+        "className": "syntax-number"
+      },
+      {
+        "start": 407,
+        "end": 411,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 412,
+        "end": 413,
+        "className": "syntax-number"
+      },
+      {
+        "start": 420,
+        "end": 424,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 425,
+        "end": 431,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 432,
+        "end": 438,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 439,
+        "end": 443,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 453,
+        "end": 458,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 459,
+        "end": 470,
+        "className": "syntax-function"
+      },
+      {
+        "start": 471,
+        "end": 472,
+        "className": "syntax-function"
+      },
+      {
+        "start": 473,
+        "end": 512,
+        "className": "syntax-string"
+      },
+      {
+        "start": 514,
+        "end": 515,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 516,
+        "end": 519,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 521,
+        "end": 524,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 530,
+        "end": 534,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 535,
+        "end": 541,
+        "className": "syntax-property"
+      },
+      {
+        "start": 543,
+        "end": 547,
+        "className": "syntax-string"
+      },
+      {
+        "start": 548,
+        "end": 549,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 550,
+        "end": 553,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 555,
+        "end": 561,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 562,
+        "end": 564,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 565,
+        "end": 567,
+        "className": "syntax-string"
+      },
+      {
+        "start": 574,
+        "end": 580,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 581,
+        "end": 585,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 587,
+        "end": 591,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 593,
+        "end": 602,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 603,
+        "end": 615,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 616,
+        "end": 636,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 637,
+        "end": 640,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 641,
+        "end": 654,
+        "className": "syntax-function"
+      },
+      {
+        "start": 655,
+        "end": 658,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 660,
+        "end": 668,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 675,
+        "end": 688,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 689,
+        "end": 690,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 692,
+        "end": 693,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 694,
+        "end": 697,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 698,
+        "end": 699,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 700,
+        "end": 702,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 703,
+        "end": 711,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 712,
+        "end": 714,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 715,
+        "end": 716,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 717,
+        "end": 727,
+        "className": "syntax-property"
+      },
+      {
+        "start": 728,
+        "end": 731,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 738,
+        "end": 740,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 741,
+        "end": 744,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 745,
+        "end": 758,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 768,
+        "end": 773,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 774,
+        "end": 785,
+        "className": "syntax-function"
+      },
+      {
+        "start": 786,
+        "end": 787,
+        "className": "syntax-function"
+      },
+      {
+        "start": 788,
+        "end": 816,
+        "className": "syntax-string"
+      },
+      {
+        "start": 818,
+        "end": 819,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 820,
+        "end": 823,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 825,
+        "end": 828,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 834,
+        "end": 860,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 865,
+        "end": 867,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 868,
+        "end": 871,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 872,
+        "end": 874,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 875,
+        "end": 888,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 898,
+        "end": 904,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 905,
+        "end": 910,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 912,
+        "end": 915,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 920,
+        "end": 924,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 925,
+        "end": 928,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 929,
+        "end": 930,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 931,
+        "end": 934,
+        "className": "syntax-string"
+      },
+      {
+        "start": 935,
+        "end": 937,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 938,
+        "end": 951,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 961,
+        "end": 967,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 968,
+        "end": 972,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 974,
+        "end": 977,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 982,
+        "end": 1020,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1025,
+        "end": 1027,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1028,
+        "end": 1031,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1032,
+        "end": 1045,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1047,
+        "end": 1048,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1049,
+        "end": 1050,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1060,
+        "end": 1128,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1137,
+        "end": 1175,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1184,
+        "end": 1189,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1190,
+        "end": 1201,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1202,
+        "end": 1203,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1204,
+        "end": 1237,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1239,
+        "end": 1240,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1241,
+        "end": 1244,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1246,
+        "end": 1249,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1255,
+        "end": 1261,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1262,
+        "end": 1265,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1266,
+        "end": 1279,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1281,
+        "end": 1283,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1284,
+        "end": 1285,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1290,
+        "end": 1302,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1303,
+        "end": 1304,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1305,
+        "end": 1318,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1319,
+        "end": 1320,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1326,
+        "end": 1333,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1334,
+        "end": 1335,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1336,
+        "end": 1348,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1349,
+        "end": 1357,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1358,
+        "end": 1361,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1367,
+        "end": 1369,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1370,
+        "end": 1377,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1387,
+        "end": 1399,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1400,
+        "end": 1401,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1402,
+        "end": 1414,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1416,
+        "end": 1417,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1417,
+        "end": 1418,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1424,
+        "end": 1430,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1431,
+        "end": 1438,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1440,
+        "end": 1452,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1454,
+        "end": 1457,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1458,
+        "end": 1467,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1468,
+        "end": 1472,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1474,
+        "end": 1483,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1485,
+        "end": 1494,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1496,
+        "end": 1500,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1507,
+        "end": 1512,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1513,
+        "end": 1522,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1523,
+        "end": 1525,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1526,
+        "end": 1528,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1538,
+        "end": 1541,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1543,
+        "end": 1552,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1553,
+        "end": 1554,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1555,
+        "end": 1564,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1565,
+        "end": 1566,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1569,
+        "end": 1578,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1579,
+        "end": 1580,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1591,
+        "end": 1593,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1594,
+        "end": 1607,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1608,
+        "end": 1611,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1613,
+        "end": 1622,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1637,
+        "end": 1639,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1640,
+        "end": 1649,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1650,
+        "end": 1652,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1653,
+        "end": 1655,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1673,
+        "end": 1675,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1676,
+        "end": 1679,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1680,
+        "end": 1684,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1706,
+        "end": 1711,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1712,
+        "end": 1723,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1724,
+        "end": 1725,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1726,
+        "end": 1756,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1758,
+        "end": 1759,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1760,
+        "end": 1763,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1803,
+        "end": 1806,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1824,
+        "end": 1833,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1835,
+        "end": 1839,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1840,
+        "end": 1841,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1842,
+        "end": 1846,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1847,
+        "end": 1848,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1851,
+        "end": 1855,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1856,
+        "end": 1857,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1872,
+        "end": 1878,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1880,
+        "end": 1889,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1890,
+        "end": 1891,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1892,
+        "end": 1901,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1903,
+        "end": 1905,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1914,
+        "end": 1918,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1932,
+        "end": 1938,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1939,
+        "end": 1940,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1941,
+        "end": 1943,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1952,
+        "end": 1956,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1957,
+        "end": 1963,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1965,
+        "end": 1968,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1969,
+        "end": 1970,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1971,
+        "end": 1974,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1976,
+        "end": 1982,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1989,
+        "end": 1995,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1996,
+        "end": 2000,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2002,
+        "end": 2006,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2008,
+        "end": 2011,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2012,
+        "end": 2025,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2026,
+        "end": 2029,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2031,
+        "end": 2040,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2047,
+        "end": 2050,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2051,
+        "end": 2052,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2053,
+        "end": 2055,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2056,
+        "end": 2061,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2062,
+        "end": 2065,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2066,
+        "end": 2075,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2087,
+        "end": 2089,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2090,
+        "end": 2093,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2094,
+        "end": 2096,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2097,
+        "end": 2106,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2107,
+        "end": 2108,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2110,
+        "end": 2112,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2113,
+        "end": 2116,
+        "className": "syntax-string"
+      },
+      {
+        "start": 2130,
+        "end": 2136,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2137,
+        "end": 2146,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2147,
+        "end": 2157,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2158,
+        "end": 2161,
+        "className": "syntax-string"
+      },
+      {
+        "start": 2163,
+        "end": 2164,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2164,
+        "end": 2165,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2165,
+        "end": 2166,
+        "className": "syntax-number"
+      },
+      {
+        "start": 2172,
+        "end": 2177,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2178,
+        "end": 2189,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2190,
+        "end": 2191,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2192,
+        "end": 2219,
+        "className": "syntax-string"
+      },
+      {
+        "start": 2221,
+        "end": 2222,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2223,
+        "end": 2226,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2228,
+        "end": 2231,
+        "className": "syntax-variable"
+      }
+    ]
+  },
+  {
+    "language": "python",
     "name": "python/cpython_inspect_finddoc.py",
     "code": "def _finddoc(obj):\n    if isclass(obj):\n        for base in obj.__mro__:\n            if base is not object:\n                try:\n                    doc = base.__doc__\n                except AttributeError:\n                    continue\n                if doc is not None:\n                    return doc\n        return None\n\n    if ismethod(obj):\n        name = obj.__func__.__name__\n        self = obj.__self__\n        if (isclass(self) and\n            getattr(getattr(self, name, None), '__func__') is obj.__func__):\n            # classmethod\n            cls = self\n        else:\n            cls = self.__class__\n    elif isfunction(obj):\n        name = obj.__name__\n        cls = _findclass(obj)\n        if cls is None or getattr(cls, name) is not obj:\n            return None\n    elif isbuiltin(obj):\n        name = obj.__name__\n        self = obj.__self__\n        if (isclass(self) and\n            self.__qualname__ + '.' + name == obj.__qualname__):\n            # classmethod\n            cls = self\n        else:\n            cls = self.__class__\n    # Should be tested before isdatadescriptor().\n    elif isinstance(obj, property):\n        name = obj.__name__\n        cls = _findclass(obj.fget)\n        if cls is None or getattr(cls, name) is not obj:\n            return None\n    elif ismethoddescriptor(obj) or isdatadescriptor(obj):\n        name = obj.__name__\n        cls = obj.__objclass__\n        if getattr(cls, name) is not obj:\n            return None\n        if ismemberdescriptor(obj):\n            slots = getattr(cls, '__slots__', None)\n            if isinstance(slots, dict) and name in slots:\n                return slots[name]\n    else:\n        return None\n    for base in cls.__mro__:\n        try:\n            doc = getattr(base, name).__doc__\n        except AttributeError:\n            continue\n        if doc is not None:\n            return doc\n    return None",
     "spans": [
@@ -13686,6 +36003,1228 @@ export const codeSnippets = [
     ]
   },
   {
+    "language": "python",
+    "name": "python/cpython_locale_grouping.py",
+    "code": "def _grouping_intervals(grouping):\n    last_interval = None\n    for interval in grouping:\n        # if grouping is -1, we are done\n        if interval == CHAR_MAX:\n            return\n        # 0: re-use last group ad infinitum\n        if interval == 0:\n            if last_interval is None:\n                raise ValueError(\"invalid grouping\")\n            while True:\n                yield last_interval\n        yield interval\n        last_interval = interval\n\n#perform the grouping from right to left\ndef _group(s, monetary=False):\n    conv = localeconv()\n    thousands_sep = conv[monetary and 'mon_thousands_sep' or 'thousands_sep']\n    grouping = conv[monetary and 'mon_grouping' or 'grouping']\n    if not grouping:\n        return (s, 0)\n    if s[-1] == ' ':\n        stripped = s.rstrip()\n        right_spaces = s[len(stripped):]\n        s = stripped\n    else:\n        right_spaces = ''\n    left_spaces = ''\n    groups = []\n    for interval in _grouping_intervals(grouping):\n        if not s or s[-1] not in \"0123456789\":\n            # only non-digit characters remain (sign, spaces)\n            left_spaces = s\n            s = ''\n            break\n        groups.append(s[-interval:])\n        s = s[:-interval]\n    if s:\n        groups.append(s)\n    groups.reverse()\n    return (\n        left_spaces + thousands_sep.join(groups) + right_spaces,\n        len(thousands_sep) * (len(groups) - 1)\n    )\n\n# Strip a given amount of excess padding from the given string\ndef _strip_padding(s, amount):\n    lpos = 0\n    while amount and s[lpos] == ' ':\n        lpos += 1\n        amount -= 1\n    rpos = len(s) - 1\n    while amount and s[rpos] == ' ':\n        rpos -= 1\n        amount -= 1\n    return s[lpos:rpos+1]\n\n_percent_re = re.compile(r'%(?:\\((?P<key>.*?)\\))?'\n                         r'(?P<modifiers>[-#0-9 +*.hlL]*?)[eEfFgGdiouxXcrs%]')\n\ndef _format(percent, value, grouping=False, monetary=False, *additional):\n    if additional:\n        formatted = percent % ((value,) + additional)\n    else:\n        formatted = percent % value\n    if percent[-1] in 'eEfFgGdiu':\n        formatted = _localize(formatted, grouping, monetary)\n    return formatted",
+    "spans": [
+      {
+        "start": 0,
+        "end": 3,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 4,
+        "end": 23,
+        "className": "syntax-function"
+      },
+      {
+        "start": 24,
+        "end": 32,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 39,
+        "end": 52,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 53,
+        "end": 54,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 55,
+        "end": 59,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 64,
+        "end": 67,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 68,
+        "end": 76,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 77,
+        "end": 79,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 80,
+        "end": 88,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 98,
+        "end": 130,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 139,
+        "end": 141,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 142,
+        "end": 150,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 151,
+        "end": 153,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 154,
+        "end": 162,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 176,
+        "end": 182,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 191,
+        "end": 226,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 235,
+        "end": 237,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 238,
+        "end": 246,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 247,
+        "end": 249,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 250,
+        "end": 251,
+        "className": "syntax-number"
+      },
+      {
+        "start": 265,
+        "end": 267,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 268,
+        "end": 281,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 282,
+        "end": 284,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 285,
+        "end": 289,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 307,
+        "end": 312,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 313,
+        "end": 323,
+        "className": "syntax-function"
+      },
+      {
+        "start": 324,
+        "end": 342,
+        "className": "syntax-string"
+      },
+      {
+        "start": 356,
+        "end": 361,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 362,
+        "end": 366,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 384,
+        "end": 389,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 390,
+        "end": 403,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 412,
+        "end": 417,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 418,
+        "end": 426,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 435,
+        "end": 448,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 449,
+        "end": 450,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 451,
+        "end": 459,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 461,
+        "end": 501,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 502,
+        "end": 505,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 506,
+        "end": 512,
+        "className": "syntax-function"
+      },
+      {
+        "start": 513,
+        "end": 514,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 516,
+        "end": 524,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 524,
+        "end": 525,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 525,
+        "end": 530,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 537,
+        "end": 541,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 542,
+        "end": 543,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 544,
+        "end": 554,
+        "className": "syntax-function"
+      },
+      {
+        "start": 561,
+        "end": 574,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 575,
+        "end": 576,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 577,
+        "end": 581,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 582,
+        "end": 590,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 591,
+        "end": 594,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 595,
+        "end": 614,
+        "className": "syntax-string"
+      },
+      {
+        "start": 615,
+        "end": 617,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 618,
+        "end": 633,
+        "className": "syntax-string"
+      },
+      {
+        "start": 639,
+        "end": 647,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 648,
+        "end": 649,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 650,
+        "end": 654,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 655,
+        "end": 663,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 664,
+        "end": 667,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 668,
+        "end": 682,
+        "className": "syntax-string"
+      },
+      {
+        "start": 683,
+        "end": 685,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 686,
+        "end": 696,
+        "className": "syntax-string"
+      },
+      {
+        "start": 702,
+        "end": 704,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 705,
+        "end": 708,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 709,
+        "end": 717,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 727,
+        "end": 733,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 735,
+        "end": 736,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 738,
+        "end": 739,
+        "className": "syntax-number"
+      },
+      {
+        "start": 745,
+        "end": 747,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 748,
+        "end": 749,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 750,
+        "end": 751,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 751,
+        "end": 752,
+        "className": "syntax-number"
+      },
+      {
+        "start": 754,
+        "end": 756,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 757,
+        "end": 760,
+        "className": "syntax-string"
+      },
+      {
+        "start": 770,
+        "end": 778,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 779,
+        "end": 780,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 781,
+        "end": 782,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 783,
+        "end": 789,
+        "className": "syntax-property"
+      },
+      {
+        "start": 800,
+        "end": 812,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 813,
+        "end": 814,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 815,
+        "end": 816,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 817,
+        "end": 820,
+        "className": "syntax-function"
+      },
+      {
+        "start": 821,
+        "end": 829,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 841,
+        "end": 842,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 843,
+        "end": 844,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 845,
+        "end": 853,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 858,
+        "end": 862,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 872,
+        "end": 884,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 885,
+        "end": 886,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 887,
+        "end": 889,
+        "className": "syntax-string"
+      },
+      {
+        "start": 894,
+        "end": 905,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 906,
+        "end": 907,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 908,
+        "end": 910,
+        "className": "syntax-string"
+      },
+      {
+        "start": 915,
+        "end": 921,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 922,
+        "end": 923,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 931,
+        "end": 934,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 935,
+        "end": 943,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 944,
+        "end": 946,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 947,
+        "end": 966,
+        "className": "syntax-function"
+      },
+      {
+        "start": 967,
+        "end": 975,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 986,
+        "end": 988,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 989,
+        "end": 992,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 993,
+        "end": 994,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 995,
+        "end": 997,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 998,
+        "end": 999,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1000,
+        "end": 1001,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1001,
+        "end": 1002,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1004,
+        "end": 1010,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1011,
+        "end": 1023,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1037,
+        "end": 1086,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1099,
+        "end": 1110,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1111,
+        "end": 1112,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1113,
+        "end": 1114,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1127,
+        "end": 1128,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1129,
+        "end": 1130,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1131,
+        "end": 1133,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1146,
+        "end": 1151,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1160,
+        "end": 1166,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1167,
+        "end": 1173,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1174,
+        "end": 1175,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1176,
+        "end": 1177,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1177,
+        "end": 1185,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1197,
+        "end": 1198,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1199,
+        "end": 1200,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1201,
+        "end": 1202,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1204,
+        "end": 1205,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1205,
+        "end": 1213,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1219,
+        "end": 1221,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1222,
+        "end": 1223,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1233,
+        "end": 1239,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1240,
+        "end": 1246,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1247,
+        "end": 1248,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1254,
+        "end": 1260,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1261,
+        "end": 1268,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1275,
+        "end": 1281,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1292,
+        "end": 1303,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1304,
+        "end": 1305,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1306,
+        "end": 1319,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1320,
+        "end": 1324,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1325,
+        "end": 1331,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1333,
+        "end": 1334,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1335,
+        "end": 1347,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1357,
+        "end": 1360,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1361,
+        "end": 1374,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1376,
+        "end": 1377,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1379,
+        "end": 1382,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1383,
+        "end": 1389,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1391,
+        "end": 1392,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1393,
+        "end": 1394,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1403,
+        "end": 1465,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1466,
+        "end": 1469,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1470,
+        "end": 1484,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1485,
+        "end": 1486,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1488,
+        "end": 1494,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1501,
+        "end": 1505,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1506,
+        "end": 1507,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1508,
+        "end": 1509,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1514,
+        "end": 1519,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1520,
+        "end": 1526,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1527,
+        "end": 1530,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1531,
+        "end": 1532,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1533,
+        "end": 1537,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1539,
+        "end": 1541,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1542,
+        "end": 1545,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1555,
+        "end": 1559,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1560,
+        "end": 1562,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1563,
+        "end": 1564,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1573,
+        "end": 1579,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1580,
+        "end": 1582,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1583,
+        "end": 1584,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1589,
+        "end": 1593,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1594,
+        "end": 1595,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1596,
+        "end": 1599,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1600,
+        "end": 1601,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1603,
+        "end": 1604,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1605,
+        "end": 1606,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1611,
+        "end": 1616,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1617,
+        "end": 1623,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1624,
+        "end": 1627,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1628,
+        "end": 1629,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1630,
+        "end": 1634,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1636,
+        "end": 1638,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1639,
+        "end": 1642,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1652,
+        "end": 1656,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1657,
+        "end": 1659,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1660,
+        "end": 1661,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1670,
+        "end": 1676,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1677,
+        "end": 1679,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1680,
+        "end": 1681,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1686,
+        "end": 1692,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1693,
+        "end": 1694,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1695,
+        "end": 1699,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1700,
+        "end": 1704,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1704,
+        "end": 1705,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1705,
+        "end": 1706,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1709,
+        "end": 1720,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1721,
+        "end": 1722,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1723,
+        "end": 1725,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1726,
+        "end": 1733,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1734,
+        "end": 1759,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1785,
+        "end": 1837,
+        "className": "syntax-string"
+      },
+      {
+        "start": 1840,
+        "end": 1843,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1844,
+        "end": 1851,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1852,
+        "end": 1859,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1861,
+        "end": 1866,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1868,
+        "end": 1876,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1876,
+        "end": 1877,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1877,
+        "end": 1882,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1884,
+        "end": 1892,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1892,
+        "end": 1893,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1893,
+        "end": 1898,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1900,
+        "end": 1901,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1901,
+        "end": 1911,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1918,
+        "end": 1920,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1921,
+        "end": 1931,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1941,
+        "end": 1950,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1951,
+        "end": 1952,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1953,
+        "end": 1960,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1961,
+        "end": 1962,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1965,
+        "end": 1970,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1973,
+        "end": 1974,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1975,
+        "end": 1985,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1991,
+        "end": 1995,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2005,
+        "end": 2014,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2015,
+        "end": 2016,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2017,
+        "end": 2024,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2025,
+        "end": 2026,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2027,
+        "end": 2032,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2037,
+        "end": 2039,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2040,
+        "end": 2047,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2048,
+        "end": 2049,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2049,
+        "end": 2050,
+        "className": "syntax-number"
+      },
+      {
+        "start": 2052,
+        "end": 2054,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2055,
+        "end": 2066,
+        "className": "syntax-string"
+      },
+      {
+        "start": 2076,
+        "end": 2085,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2086,
+        "end": 2087,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2088,
+        "end": 2097,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2098,
+        "end": 2107,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2109,
+        "end": 2117,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2119,
+        "end": 2127,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2133,
+        "end": 2139,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2140,
+        "end": 2149,
+        "className": "syntax-variable"
+      }
+    ]
+  },
+  {
     "language": "shell",
     "name": "shell/nixpkgs_setup.sh",
     "code": "# All provided arguments are joined with a space, then prefixed by the name of the function which invoked `nixLog` (or\n# the hook name if the caller was an implicit hook), then directed to $NIX_LOG_FD, if it's set.\nnixLog() {\n  # Return a value explicitly instead of the implicit return of the last command (result of the test).\n  # NOTE: By requiring NIX_LOG_FD be set, we avoid dumping logging inside of nix-shell.\n  [[ -z ${NIX_LOG_FD-} ]] && return 0\n\n  # Use the function name of the caller, unless it is _callImplicitHook, in which case use the name of the hook.\n  local callerName=\"${FUNCNAME[1]}\"\n  if [[ $callerName == \"_callImplicitHook\" ]]; then\n    callerName=\"${hookName:?}\"\n  fi\n  printf \"%s: %s\\n\" \"$callerName\" \"$*\" >&\"$NIX_LOG_FD\"\n}\n\n# Identical to nixLog, but additionally prefixed by the logLevel.\n# NOTE: This function is only every meant to be called from the nix*Log family of functions.\n_nixLogWithLevel() {\n  # Return a value explicitly instead of the implicit return of the last command (result of the test).\n  # NOTE: By requiring NIX_LOG_FD be set, we avoid dumping logging inside of nix-shell.\n  [[ -z ${NIX_LOG_FD-} || ${NIX_DEBUG:-0} -lt ${1:?} ]] && return 0\n\n  local logLevel\n  case \"${1:?}\" in\n  0) logLevel=ERROR ;;\n  1) logLevel=WARN ;;\n  2) logLevel=NOTICE ;;\n  3) logLevel=INFO ;;\n  4) logLevel=TALKATIVE ;;\n  5) logLevel=CHATTY ;;\n  6) logLevel=DEBUG ;;\n  7) logLevel=VOMIT ;;\n  *)\n    echo \"_nixLogWithLevel: called with invalid log level: ${1:?}\" >&\"$NIX_LOG_FD\"\n    return 1\n    ;;\n  esac\n\n  # Use the function name of the caller, unless it is _callImplicitHook, in which case use the name of the hook.\n  # NOTE: Our index into FUNCNAME is 2, not 1, because we are only ever to be called from the nix*Log family of\n  # functions, never directly.\n  local callerName=\"${FUNCNAME[2]}\"\n  if [[ $callerName == \"_callImplicitHook\" ]]; then\n    callerName=\"${hookName:?}\"\n  fi\n\n  # Use the function name of the caller's caller, since we should only every be invoked by nix*Log functions.\n  printf \"%s: %s: %s\\n\" \"$logLevel\" \"$callerName\" \"${2:?}\" >&\"$NIX_LOG_FD\"\n}\n\n# All provided arguments are joined with a space then directed to $NIX_LOG_FD, if it's set.\n# Corresponds to `Verbosity::lvlError` in the Nix source.\nnixErrorLog() {\n  _nixLogWithLevel 0 \"$*\"\n}\n\n# All provided arguments are joined with a space then directed to $NIX_LOG_FD, if it's set.\n# Corresponds to `Verbosity::lvlWarn` in the Nix source.\nnixWarnLog() {\n  _nixLogWithLevel 1 \"$*\"\n}\n\n# All provided arguments are joined with a space then directed to $NIX_LOG_FD, if it's set.\n# Corresponds to `Verbosity::lvlNotice` in the Nix source.\nnixNoticeLog() {\n  _nixLogWithLevel 2 \"$*\"\n}\n\n# All provided arguments are joined with a space then directed to $NIX_LOG_FD, if it's set.\n# Corresponds to `Verbosity::lvlInfo` in the Nix source.\nnixInfoLog() {\n  _nixLogWithLevel 3 \"$*\"\n}\n\n# All provided arguments are joined with a space then directed to $NIX_LOG_FD, if it's set.\n# Corresponds to `Verbosity::lvlTalkative` in the Nix source.\nnixTalkativeLog() {\n  _nixLogWithLevel 4 \"$*\"\n}\n\n# All provided arguments are joined with a space then directed to $NIX_LOG_FD, if it's set.\n# Corresponds to `Verbosity::lvlChatty` in the Nix source.\nnixChattyLog() {\n  _nixLogWithLevel 5 \"$*\"\n}\n\n# All provided arguments are joined with a space then directed to $NIX_LOG_FD, if it's set.\n# Corresponds to `Verbosity::lvlDebug` in the Nix source.\nnixDebugLog() {\n  _nixLogWithLevel 6 \"$*\"\n}\n\n# All provided arguments are joined with a space then directed to $NIX_LOG_FD, if it's set.\n# Corresponds to `Verbosity::lvlVomit` in the Nix source.\nnixVomitLog() {\n  _nixLogWithLevel 7 \"$*\"\n}",
@@ -14244,6 +37783,5662 @@ export const codeSnippets = [
         "start": 3660,
         "end": 3664,
         "className": "syntax-string"
+      }
+    ]
+  },
+  {
+    "language": "typescript",
+    "name": "typescript/typescript_add_range.ts",
+    "code": "export function addRange<T>(to: T[] | undefined, from: readonly T[] | undefined, start?: number, end?: number): T[] | undefined {\n    if (from === undefined || from.length === 0) return to;\n    if (to === undefined) return from.slice(start, end);\n    start = start === undefined ? 0 : toOffset(from, start);\n    end = end === undefined ? from.length : toOffset(from, end);\n    for (let i = start; i < end && i < from.length; i++) {\n        if (from[i] !== undefined) {\n            to.push(from[i]);\n        }\n    }\n    return to;\n}\n\nexport function pushIfUnique<T>(array: T[], toAdd: T, equalityComparer?: EqualityComparer<T>): boolean {\n    if (contains(array, toAdd, equalityComparer)) {\n        return false;\n    }\n    else {\n        array.push(toAdd);\n        return true;\n    }\n}\n\nexport function appendIfUnique<T>(array: T[] | undefined, toAdd: T, equalityComparer?: EqualityComparer<T>): T[] {\n    if (array !== undefined) {\n        pushIfUnique(array, toAdd, equalityComparer);\n        return array;\n    }\n    else {\n        return [toAdd];\n    }\n}\n\nfunction stableSortIndices<T>(array: readonly T[], indices: number[], comparer: Comparer<T>) {\n    // sort indices by value then position\n    indices.sort((x, y) => comparer(array[x], array[y]) || compareValues(x, y));\n}\n\nexport function toSorted<T>(array: readonly T[], comparer?: Comparer<T>): SortedReadonlyArray<T> {\n    return (array.length === 0 ? emptyArray : array.slice().sort(comparer)) as readonly T[] as SortedReadonlyArray<T>;\n}\n\nexport function* arrayReverseIterator<T>(array: readonly T[]): Generator<T, void, unknown> {\n    for (let i = array.length - 1; i >= 0; i--) {\n        yield array[i];\n    }\n}",
+    "spans": [
+      {
+        "start": 0,
+        "end": 6,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 7,
+        "end": 15,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 16,
+        "end": 24,
+        "className": "syntax-function"
+      },
+      {
+        "start": 24,
+        "end": 25,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 25,
+        "end": 26,
+        "className": "syntax-type"
+      },
+      {
+        "start": 26,
+        "end": 27,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 27,
+        "end": 28,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 28,
+        "end": 30,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 32,
+        "end": 33,
+        "className": "syntax-type"
+      },
+      {
+        "start": 33,
+        "end": 35,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 36,
+        "end": 37,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 38,
+        "end": 47,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 47,
+        "end": 48,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 49,
+        "end": 53,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 55,
+        "end": 63,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 64,
+        "end": 65,
+        "className": "syntax-type"
+      },
+      {
+        "start": 65,
+        "end": 67,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 68,
+        "end": 69,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 70,
+        "end": 79,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 79,
+        "end": 80,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 81,
+        "end": 86,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 89,
+        "end": 95,
+        "className": "syntax-type"
+      },
+      {
+        "start": 95,
+        "end": 96,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 97,
+        "end": 100,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 103,
+        "end": 109,
+        "className": "syntax-type"
+      },
+      {
+        "start": 109,
+        "end": 110,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 112,
+        "end": 113,
+        "className": "syntax-type"
+      },
+      {
+        "start": 113,
+        "end": 115,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 116,
+        "end": 117,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 118,
+        "end": 127,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 128,
+        "end": 129,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 134,
+        "end": 136,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 137,
+        "end": 138,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 138,
+        "end": 142,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 143,
+        "end": 146,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 147,
+        "end": 156,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 157,
+        "end": 159,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 160,
+        "end": 164,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 164,
+        "end": 165,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 165,
+        "end": 171,
+        "className": "syntax-property"
+      },
+      {
+        "start": 172,
+        "end": 175,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 176,
+        "end": 177,
+        "className": "syntax-number"
+      },
+      {
+        "start": 177,
+        "end": 178,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 179,
+        "end": 185,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 186,
+        "end": 188,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 188,
+        "end": 189,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 194,
+        "end": 196,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 197,
+        "end": 198,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 198,
+        "end": 200,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 201,
+        "end": 204,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 205,
+        "end": 214,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 214,
+        "end": 215,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 216,
+        "end": 222,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 223,
+        "end": 227,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 227,
+        "end": 228,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 228,
+        "end": 233,
+        "className": "syntax-function"
+      },
+      {
+        "start": 233,
+        "end": 234,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 234,
+        "end": 239,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 239,
+        "end": 240,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 241,
+        "end": 244,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 244,
+        "end": 246,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 251,
+        "end": 256,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 257,
+        "end": 258,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 259,
+        "end": 264,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 265,
+        "end": 268,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 269,
+        "end": 278,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 281,
+        "end": 282,
+        "className": "syntax-number"
+      },
+      {
+        "start": 285,
+        "end": 293,
+        "className": "syntax-function"
+      },
+      {
+        "start": 293,
+        "end": 294,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 294,
+        "end": 298,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 298,
+        "end": 299,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 300,
+        "end": 305,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 305,
+        "end": 307,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 312,
+        "end": 315,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 316,
+        "end": 317,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 318,
+        "end": 321,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 322,
+        "end": 325,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 326,
+        "end": 335,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 338,
+        "end": 342,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 342,
+        "end": 343,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 343,
+        "end": 349,
+        "className": "syntax-property"
+      },
+      {
+        "start": 352,
+        "end": 360,
+        "className": "syntax-function"
+      },
+      {
+        "start": 360,
+        "end": 361,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 361,
+        "end": 365,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 365,
+        "end": 366,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 367,
+        "end": 370,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 370,
+        "end": 372,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 377,
+        "end": 380,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 381,
+        "end": 382,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 382,
+        "end": 385,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 386,
+        "end": 387,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 388,
+        "end": 389,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 390,
+        "end": 395,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 395,
+        "end": 396,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 397,
+        "end": 398,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 399,
+        "end": 400,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 401,
+        "end": 404,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 405,
+        "end": 407,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 408,
+        "end": 409,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 410,
+        "end": 411,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 412,
+        "end": 416,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 416,
+        "end": 417,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 417,
+        "end": 423,
+        "className": "syntax-property"
+      },
+      {
+        "start": 423,
+        "end": 424,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 425,
+        "end": 426,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 426,
+        "end": 428,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 428,
+        "end": 429,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 430,
+        "end": 431,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 440,
+        "end": 442,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 443,
+        "end": 444,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 444,
+        "end": 448,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 448,
+        "end": 449,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 449,
+        "end": 450,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 450,
+        "end": 451,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 452,
+        "end": 455,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 456,
+        "end": 465,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 465,
+        "end": 466,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 467,
+        "end": 468,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 481,
+        "end": 483,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 483,
+        "end": 484,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 484,
+        "end": 488,
+        "className": "syntax-function"
+      },
+      {
+        "start": 488,
+        "end": 489,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 489,
+        "end": 493,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 493,
+        "end": 494,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 494,
+        "end": 495,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 495,
+        "end": 498,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 507,
+        "end": 508,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 513,
+        "end": 514,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 519,
+        "end": 525,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 526,
+        "end": 528,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 528,
+        "end": 529,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 530,
+        "end": 531,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 533,
+        "end": 539,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 540,
+        "end": 548,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 549,
+        "end": 561,
+        "className": "syntax-function"
+      },
+      {
+        "start": 561,
+        "end": 562,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 562,
+        "end": 563,
+        "className": "syntax-type"
+      },
+      {
+        "start": 563,
+        "end": 564,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 564,
+        "end": 565,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 565,
+        "end": 570,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 572,
+        "end": 573,
+        "className": "syntax-type"
+      },
+      {
+        "start": 573,
+        "end": 576,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 577,
+        "end": 582,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 584,
+        "end": 585,
+        "className": "syntax-type"
+      },
+      {
+        "start": 585,
+        "end": 586,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 587,
+        "end": 603,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 606,
+        "end": 622,
+        "className": "syntax-type"
+      },
+      {
+        "start": 622,
+        "end": 623,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 623,
+        "end": 624,
+        "className": "syntax-type"
+      },
+      {
+        "start": 624,
+        "end": 625,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 625,
+        "end": 626,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 628,
+        "end": 635,
+        "className": "syntax-type"
+      },
+      {
+        "start": 636,
+        "end": 637,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 642,
+        "end": 644,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 645,
+        "end": 646,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 646,
+        "end": 654,
+        "className": "syntax-function"
+      },
+      {
+        "start": 654,
+        "end": 655,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 655,
+        "end": 660,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 660,
+        "end": 661,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 662,
+        "end": 667,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 667,
+        "end": 668,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 669,
+        "end": 685,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 685,
+        "end": 687,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 688,
+        "end": 689,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 698,
+        "end": 704,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 705,
+        "end": 710,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 710,
+        "end": 711,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 716,
+        "end": 717,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 722,
+        "end": 726,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 727,
+        "end": 728,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 737,
+        "end": 742,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 742,
+        "end": 743,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 743,
+        "end": 747,
+        "className": "syntax-function"
+      },
+      {
+        "start": 747,
+        "end": 748,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 748,
+        "end": 753,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 753,
+        "end": 755,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 764,
+        "end": 770,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 771,
+        "end": 775,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 775,
+        "end": 776,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 781,
+        "end": 782,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 783,
+        "end": 784,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 786,
+        "end": 792,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 793,
+        "end": 801,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 802,
+        "end": 816,
+        "className": "syntax-function"
+      },
+      {
+        "start": 816,
+        "end": 817,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 817,
+        "end": 818,
+        "className": "syntax-type"
+      },
+      {
+        "start": 818,
+        "end": 819,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 819,
+        "end": 820,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 820,
+        "end": 825,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 827,
+        "end": 828,
+        "className": "syntax-type"
+      },
+      {
+        "start": 828,
+        "end": 830,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 831,
+        "end": 832,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 833,
+        "end": 842,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 842,
+        "end": 843,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 844,
+        "end": 849,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 851,
+        "end": 852,
+        "className": "syntax-type"
+      },
+      {
+        "start": 852,
+        "end": 853,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 854,
+        "end": 870,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 873,
+        "end": 889,
+        "className": "syntax-type"
+      },
+      {
+        "start": 889,
+        "end": 890,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 890,
+        "end": 891,
+        "className": "syntax-type"
+      },
+      {
+        "start": 891,
+        "end": 892,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 892,
+        "end": 893,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 895,
+        "end": 896,
+        "className": "syntax-type"
+      },
+      {
+        "start": 896,
+        "end": 898,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 899,
+        "end": 900,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 905,
+        "end": 907,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 908,
+        "end": 909,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 909,
+        "end": 914,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 915,
+        "end": 918,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 919,
+        "end": 928,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 928,
+        "end": 929,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 930,
+        "end": 931,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 940,
+        "end": 952,
+        "className": "syntax-function"
+      },
+      {
+        "start": 952,
+        "end": 953,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 953,
+        "end": 958,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 958,
+        "end": 959,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 960,
+        "end": 965,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 965,
+        "end": 966,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 967,
+        "end": 983,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 983,
+        "end": 985,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 994,
+        "end": 1000,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1001,
+        "end": 1006,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1006,
+        "end": 1007,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1012,
+        "end": 1013,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1018,
+        "end": 1022,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1023,
+        "end": 1024,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1033,
+        "end": 1039,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1040,
+        "end": 1041,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1041,
+        "end": 1046,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1046,
+        "end": 1048,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1053,
+        "end": 1054,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1055,
+        "end": 1056,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1058,
+        "end": 1066,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1067,
+        "end": 1084,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1084,
+        "end": 1085,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1085,
+        "end": 1086,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1086,
+        "end": 1087,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1087,
+        "end": 1088,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1088,
+        "end": 1093,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1095,
+        "end": 1103,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1104,
+        "end": 1105,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1105,
+        "end": 1108,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1109,
+        "end": 1116,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1118,
+        "end": 1124,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1124,
+        "end": 1127,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1128,
+        "end": 1136,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1138,
+        "end": 1146,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1146,
+        "end": 1147,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1147,
+        "end": 1148,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1148,
+        "end": 1149,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1149,
+        "end": 1150,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1151,
+        "end": 1152,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1157,
+        "end": 1195,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1200,
+        "end": 1207,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1207,
+        "end": 1208,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1208,
+        "end": 1212,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1212,
+        "end": 1214,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1214,
+        "end": 1215,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1215,
+        "end": 1216,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1217,
+        "end": 1218,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1218,
+        "end": 1219,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1220,
+        "end": 1222,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1223,
+        "end": 1231,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1231,
+        "end": 1232,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1232,
+        "end": 1237,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1237,
+        "end": 1238,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1238,
+        "end": 1239,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1239,
+        "end": 1241,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1242,
+        "end": 1247,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1247,
+        "end": 1248,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1248,
+        "end": 1249,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1249,
+        "end": 1251,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1252,
+        "end": 1254,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1255,
+        "end": 1268,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1268,
+        "end": 1269,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1269,
+        "end": 1270,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1270,
+        "end": 1271,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1272,
+        "end": 1273,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1273,
+        "end": 1276,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1277,
+        "end": 1278,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1280,
+        "end": 1286,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1287,
+        "end": 1295,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1296,
+        "end": 1304,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1304,
+        "end": 1305,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1305,
+        "end": 1306,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1306,
+        "end": 1307,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1307,
+        "end": 1308,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1308,
+        "end": 1313,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1315,
+        "end": 1323,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1324,
+        "end": 1325,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1325,
+        "end": 1328,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1329,
+        "end": 1337,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1340,
+        "end": 1348,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1348,
+        "end": 1349,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1349,
+        "end": 1350,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1350,
+        "end": 1351,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1351,
+        "end": 1352,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1354,
+        "end": 1373,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1373,
+        "end": 1374,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1374,
+        "end": 1375,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1375,
+        "end": 1376,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1377,
+        "end": 1378,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1383,
+        "end": 1389,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1390,
+        "end": 1391,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1391,
+        "end": 1396,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1396,
+        "end": 1397,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1397,
+        "end": 1403,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1404,
+        "end": 1407,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1408,
+        "end": 1409,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1412,
+        "end": 1422,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1425,
+        "end": 1430,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1430,
+        "end": 1431,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1431,
+        "end": 1436,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1436,
+        "end": 1439,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1439,
+        "end": 1443,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1443,
+        "end": 1444,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1444,
+        "end": 1452,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1452,
+        "end": 1454,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1455,
+        "end": 1457,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1458,
+        "end": 1466,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1467,
+        "end": 1468,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1468,
+        "end": 1470,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1471,
+        "end": 1473,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1474,
+        "end": 1493,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1493,
+        "end": 1494,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1494,
+        "end": 1495,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1495,
+        "end": 1496,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1496,
+        "end": 1497,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1498,
+        "end": 1499,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1501,
+        "end": 1507,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1508,
+        "end": 1516,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1516,
+        "end": 1517,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1518,
+        "end": 1538,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1538,
+        "end": 1539,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1539,
+        "end": 1540,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1540,
+        "end": 1541,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1541,
+        "end": 1542,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1542,
+        "end": 1547,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1549,
+        "end": 1557,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1558,
+        "end": 1559,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1559,
+        "end": 1562,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1564,
+        "end": 1573,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1573,
+        "end": 1574,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1574,
+        "end": 1575,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1575,
+        "end": 1576,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1577,
+        "end": 1581,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1581,
+        "end": 1582,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1583,
+        "end": 1590,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1590,
+        "end": 1591,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1592,
+        "end": 1593,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1598,
+        "end": 1601,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1602,
+        "end": 1603,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1603,
+        "end": 1606,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1607,
+        "end": 1608,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1609,
+        "end": 1610,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1611,
+        "end": 1616,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1616,
+        "end": 1617,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1617,
+        "end": 1623,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1624,
+        "end": 1625,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1626,
+        "end": 1627,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1627,
+        "end": 1628,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1629,
+        "end": 1630,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1631,
+        "end": 1633,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1634,
+        "end": 1635,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1635,
+        "end": 1636,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1637,
+        "end": 1638,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1638,
+        "end": 1640,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1640,
+        "end": 1641,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1642,
+        "end": 1643,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1652,
+        "end": 1657,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1658,
+        "end": 1663,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1663,
+        "end": 1664,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1664,
+        "end": 1665,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1665,
+        "end": 1667,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1672,
+        "end": 1673,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1674,
+        "end": 1675,
+        "className": "syntax-punctuation"
+      }
+    ]
+  },
+  {
+    "language": "typescript",
+    "name": "typescript/typescript_array_compact.ts",
+    "code": "export function arrayIsEqualTo<T>(\n    array1: readonly T[] | undefined,\n    array2: readonly T[] | undefined,\n    equalityComparer: (a: T, b: T, index: number) => boolean = equateValues,\n): boolean {\n    if (array1 === undefined || array2 === undefined) {\n        return array1 === array2;\n    }\n\n    if (array1.length !== array2.length) {\n        return false;\n    }\n\n    for (let i = 0; i < array1.length; i++) {\n        if (!equalityComparer(array1[i], array2[i], i)) {\n            return false;\n        }\n    }\n\n    return true;\n}\n\nexport function compact<T>(array: readonly T[]): readonly T[] {\n    let result: T[] | undefined;\n    if (array !== undefined) {\n        for (let i = 0; i < array.length; i++) {\n            const v = array[i];\n            // Either the result has been initialized (and is looking to collect truthy values separately),\n            // or we've hit our first falsy value and need to copy over the current stretch of truthy values.\n            if (result ?? !v) {\n                result ??= array.slice(0, i);\n                if (v) {\n                    result.push(v);\n                }\n            }\n        }\n    }\n    return result ?? array;\n}\n\nexport function relativeComplement<T>(arrayA: T[] | undefined, arrayB: T[] | undefined, comparer: Comparer<T>): T[] | undefined {\n    if (!arrayB || !arrayA || arrayB.length === 0 || arrayA.length === 0) return arrayB;\n    const result: T[] = [];\n    loopB:\n    for (let offsetA = 0, offsetB = 0; offsetB < arrayB.length; offsetB++) {\n        if (offsetB > 0) {\n            // Ensure `arrayB` is properly sorted.\n            Debug.assertGreaterThanOrEqual(comparer(arrayB[offsetB], arrayB[offsetB - 1]), Comparison.EqualTo);\n        }\n\n        loopA:\n        for (const startA = offsetA; offsetA < arrayA.length; offsetA++) {\n            if (offsetA > startA) {\n                // Ensure `arrayA` is properly sorted. We only need to perform this check if\n                // `offsetA` has changed since we entered the loop.\n                Debug.assertGreaterThanOrEqual(comparer(arrayA[offsetA], arrayA[offsetA - 1]), Comparison.EqualTo);\n            }\n\n            switch (comparer(arrayB[offsetB], arrayA[offsetA])) {\n                case Comparison.LessThan:\n                    result.push(arrayB[offsetB]);\n                    continue loopB;\n                case Comparison.EqualTo:\n                    continue loopB;\n                case Comparison.GreaterThan:\n                    continue loopA;\n            }\n        }\n    }\n    return result;\n}",
+    "spans": [
+      {
+        "start": 0,
+        "end": 6,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 7,
+        "end": 15,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 16,
+        "end": 30,
+        "className": "syntax-function"
+      },
+      {
+        "start": 30,
+        "end": 31,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 31,
+        "end": 32,
+        "className": "syntax-type"
+      },
+      {
+        "start": 32,
+        "end": 33,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 33,
+        "end": 34,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 39,
+        "end": 45,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 47,
+        "end": 55,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 56,
+        "end": 57,
+        "className": "syntax-type"
+      },
+      {
+        "start": 57,
+        "end": 59,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 60,
+        "end": 61,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 62,
+        "end": 71,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 71,
+        "end": 72,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 77,
+        "end": 83,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 85,
+        "end": 93,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 94,
+        "end": 95,
+        "className": "syntax-type"
+      },
+      {
+        "start": 95,
+        "end": 97,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 98,
+        "end": 99,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 100,
+        "end": 109,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 109,
+        "end": 110,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 115,
+        "end": 131,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 133,
+        "end": 134,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 134,
+        "end": 135,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 137,
+        "end": 138,
+        "className": "syntax-type"
+      },
+      {
+        "start": 138,
+        "end": 139,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 140,
+        "end": 141,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 143,
+        "end": 144,
+        "className": "syntax-type"
+      },
+      {
+        "start": 144,
+        "end": 145,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 146,
+        "end": 151,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 153,
+        "end": 159,
+        "className": "syntax-type"
+      },
+      {
+        "start": 159,
+        "end": 160,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 161,
+        "end": 163,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 164,
+        "end": 171,
+        "className": "syntax-type"
+      },
+      {
+        "start": 172,
+        "end": 173,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 174,
+        "end": 186,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 186,
+        "end": 187,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 188,
+        "end": 189,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 191,
+        "end": 198,
+        "className": "syntax-type"
+      },
+      {
+        "start": 199,
+        "end": 200,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 205,
+        "end": 207,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 208,
+        "end": 209,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 209,
+        "end": 215,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 216,
+        "end": 219,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 220,
+        "end": 229,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 230,
+        "end": 232,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 233,
+        "end": 239,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 240,
+        "end": 243,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 244,
+        "end": 253,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 253,
+        "end": 254,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 255,
+        "end": 256,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 265,
+        "end": 271,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 272,
+        "end": 278,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 279,
+        "end": 282,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 283,
+        "end": 289,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 289,
+        "end": 290,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 295,
+        "end": 296,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 302,
+        "end": 304,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 305,
+        "end": 306,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 306,
+        "end": 312,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 312,
+        "end": 313,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 313,
+        "end": 319,
+        "className": "syntax-property"
+      },
+      {
+        "start": 320,
+        "end": 323,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 324,
+        "end": 330,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 330,
+        "end": 331,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 331,
+        "end": 337,
+        "className": "syntax-property"
+      },
+      {
+        "start": 337,
+        "end": 338,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 339,
+        "end": 340,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 349,
+        "end": 355,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 356,
+        "end": 361,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 361,
+        "end": 362,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 367,
+        "end": 368,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 374,
+        "end": 377,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 378,
+        "end": 379,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 379,
+        "end": 382,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 383,
+        "end": 384,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 385,
+        "end": 386,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 387,
+        "end": 388,
+        "className": "syntax-number"
+      },
+      {
+        "start": 388,
+        "end": 389,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 390,
+        "end": 391,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 392,
+        "end": 393,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 394,
+        "end": 400,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 400,
+        "end": 401,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 401,
+        "end": 407,
+        "className": "syntax-property"
+      },
+      {
+        "start": 407,
+        "end": 408,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 409,
+        "end": 410,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 410,
+        "end": 412,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 412,
+        "end": 413,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 414,
+        "end": 415,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 424,
+        "end": 426,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 427,
+        "end": 428,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 428,
+        "end": 429,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 429,
+        "end": 445,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 445,
+        "end": 446,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 446,
+        "end": 452,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 452,
+        "end": 453,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 453,
+        "end": 454,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 454,
+        "end": 456,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 457,
+        "end": 463,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 463,
+        "end": 464,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 464,
+        "end": 465,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 465,
+        "end": 467,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 468,
+        "end": 469,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 469,
+        "end": 471,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 472,
+        "end": 473,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 486,
+        "end": 492,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 493,
+        "end": 498,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 498,
+        "end": 499,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 508,
+        "end": 509,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 514,
+        "end": 515,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 521,
+        "end": 527,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 528,
+        "end": 532,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 532,
+        "end": 533,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 534,
+        "end": 535,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 537,
+        "end": 543,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 544,
+        "end": 552,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 553,
+        "end": 560,
+        "className": "syntax-function"
+      },
+      {
+        "start": 560,
+        "end": 561,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 561,
+        "end": 562,
+        "className": "syntax-type"
+      },
+      {
+        "start": 562,
+        "end": 563,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 563,
+        "end": 564,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 564,
+        "end": 569,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 571,
+        "end": 579,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 580,
+        "end": 581,
+        "className": "syntax-type"
+      },
+      {
+        "start": 581,
+        "end": 584,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 586,
+        "end": 594,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 595,
+        "end": 596,
+        "className": "syntax-type"
+      },
+      {
+        "start": 596,
+        "end": 598,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 599,
+        "end": 600,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 605,
+        "end": 608,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 609,
+        "end": 615,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 617,
+        "end": 618,
+        "className": "syntax-type"
+      },
+      {
+        "start": 618,
+        "end": 620,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 621,
+        "end": 622,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 623,
+        "end": 632,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 632,
+        "end": 633,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 638,
+        "end": 640,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 641,
+        "end": 642,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 642,
+        "end": 647,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 648,
+        "end": 651,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 652,
+        "end": 661,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 661,
+        "end": 662,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 663,
+        "end": 664,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 673,
+        "end": 676,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 677,
+        "end": 678,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 678,
+        "end": 681,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 682,
+        "end": 683,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 684,
+        "end": 685,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 686,
+        "end": 687,
+        "className": "syntax-number"
+      },
+      {
+        "start": 687,
+        "end": 688,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 689,
+        "end": 690,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 691,
+        "end": 692,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 693,
+        "end": 698,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 698,
+        "end": 699,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 699,
+        "end": 705,
+        "className": "syntax-property"
+      },
+      {
+        "start": 705,
+        "end": 706,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 707,
+        "end": 708,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 708,
+        "end": 710,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 710,
+        "end": 711,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 712,
+        "end": 713,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 726,
+        "end": 731,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 732,
+        "end": 733,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 734,
+        "end": 735,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 736,
+        "end": 741,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 741,
+        "end": 742,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 742,
+        "end": 743,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 743,
+        "end": 745,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 758,
+        "end": 853,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 866,
+        "end": 963,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 976,
+        "end": 978,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 979,
+        "end": 980,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 980,
+        "end": 986,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 987,
+        "end": 989,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 990,
+        "end": 991,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 991,
+        "end": 992,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 992,
+        "end": 993,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 994,
+        "end": 995,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1012,
+        "end": 1018,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1019,
+        "end": 1022,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1023,
+        "end": 1028,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1028,
+        "end": 1029,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1029,
+        "end": 1034,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1034,
+        "end": 1035,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1035,
+        "end": 1036,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1036,
+        "end": 1037,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1038,
+        "end": 1039,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1039,
+        "end": 1041,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1058,
+        "end": 1060,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1061,
+        "end": 1062,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1062,
+        "end": 1063,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1063,
+        "end": 1064,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1065,
+        "end": 1066,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1087,
+        "end": 1093,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1093,
+        "end": 1094,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1094,
+        "end": 1098,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1098,
+        "end": 1099,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1099,
+        "end": 1100,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1100,
+        "end": 1102,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1119,
+        "end": 1120,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1133,
+        "end": 1134,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1143,
+        "end": 1144,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1149,
+        "end": 1150,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1155,
+        "end": 1161,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1162,
+        "end": 1168,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1169,
+        "end": 1171,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1172,
+        "end": 1177,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1177,
+        "end": 1178,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1179,
+        "end": 1180,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1182,
+        "end": 1188,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1189,
+        "end": 1197,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1198,
+        "end": 1216,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1216,
+        "end": 1217,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1217,
+        "end": 1218,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1218,
+        "end": 1219,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1219,
+        "end": 1220,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1220,
+        "end": 1226,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1228,
+        "end": 1229,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1229,
+        "end": 1231,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1232,
+        "end": 1233,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1234,
+        "end": 1243,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1243,
+        "end": 1244,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1245,
+        "end": 1251,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1253,
+        "end": 1254,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1254,
+        "end": 1256,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1257,
+        "end": 1258,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1259,
+        "end": 1268,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1268,
+        "end": 1269,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1270,
+        "end": 1278,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1280,
+        "end": 1288,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1288,
+        "end": 1289,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1289,
+        "end": 1290,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1290,
+        "end": 1291,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1291,
+        "end": 1292,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1294,
+        "end": 1295,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1295,
+        "end": 1297,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1298,
+        "end": 1299,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1300,
+        "end": 1309,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1310,
+        "end": 1311,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1316,
+        "end": 1318,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1319,
+        "end": 1320,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1320,
+        "end": 1321,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1321,
+        "end": 1327,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1328,
+        "end": 1330,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1331,
+        "end": 1332,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1332,
+        "end": 1338,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1339,
+        "end": 1341,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1342,
+        "end": 1348,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1348,
+        "end": 1349,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1349,
+        "end": 1355,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1356,
+        "end": 1359,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1360,
+        "end": 1361,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1362,
+        "end": 1364,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1365,
+        "end": 1371,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1371,
+        "end": 1372,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1372,
+        "end": 1378,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1379,
+        "end": 1382,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1383,
+        "end": 1384,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1384,
+        "end": 1385,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1386,
+        "end": 1392,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1393,
+        "end": 1399,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1399,
+        "end": 1400,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1405,
+        "end": 1410,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1411,
+        "end": 1417,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1419,
+        "end": 1420,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1420,
+        "end": 1422,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1423,
+        "end": 1424,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1425,
+        "end": 1428,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1444,
+        "end": 1447,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1448,
+        "end": 1449,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1449,
+        "end": 1452,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1453,
+        "end": 1460,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1461,
+        "end": 1462,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1463,
+        "end": 1464,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1464,
+        "end": 1465,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1466,
+        "end": 1473,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1474,
+        "end": 1475,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1476,
+        "end": 1477,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1477,
+        "end": 1478,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1479,
+        "end": 1486,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1487,
+        "end": 1488,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1489,
+        "end": 1495,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1495,
+        "end": 1496,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1496,
+        "end": 1502,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1502,
+        "end": 1503,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1504,
+        "end": 1511,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1511,
+        "end": 1513,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1513,
+        "end": 1514,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1515,
+        "end": 1516,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1525,
+        "end": 1527,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1528,
+        "end": 1529,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1529,
+        "end": 1536,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1537,
+        "end": 1538,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1539,
+        "end": 1540,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1540,
+        "end": 1541,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1542,
+        "end": 1543,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1556,
+        "end": 1594,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1607,
+        "end": 1612,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1612,
+        "end": 1613,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1613,
+        "end": 1637,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1637,
+        "end": 1638,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1638,
+        "end": 1646,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1646,
+        "end": 1647,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1647,
+        "end": 1653,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1653,
+        "end": 1654,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1654,
+        "end": 1661,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1661,
+        "end": 1663,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1664,
+        "end": 1670,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1670,
+        "end": 1671,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1671,
+        "end": 1678,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1679,
+        "end": 1680,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1681,
+        "end": 1682,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1682,
+        "end": 1685,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1686,
+        "end": 1696,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1696,
+        "end": 1697,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1697,
+        "end": 1704,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1704,
+        "end": 1706,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1715,
+        "end": 1716,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1741,
+        "end": 1744,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1745,
+        "end": 1746,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1746,
+        "end": 1751,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1752,
+        "end": 1758,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1759,
+        "end": 1760,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1761,
+        "end": 1768,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1768,
+        "end": 1769,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1770,
+        "end": 1777,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1778,
+        "end": 1779,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1780,
+        "end": 1786,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1786,
+        "end": 1787,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1787,
+        "end": 1793,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1793,
+        "end": 1794,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1795,
+        "end": 1802,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1802,
+        "end": 1804,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1804,
+        "end": 1805,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1806,
+        "end": 1807,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1820,
+        "end": 1822,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1823,
+        "end": 1824,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1824,
+        "end": 1831,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1832,
+        "end": 1833,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1834,
+        "end": 1840,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1840,
+        "end": 1841,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1842,
+        "end": 1843,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1860,
+        "end": 1936,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 1953,
+        "end": 2004,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 2021,
+        "end": 2026,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2026,
+        "end": 2027,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2027,
+        "end": 2051,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2051,
+        "end": 2052,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2052,
+        "end": 2060,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2060,
+        "end": 2061,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2061,
+        "end": 2067,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2067,
+        "end": 2068,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2068,
+        "end": 2075,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2075,
+        "end": 2077,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2078,
+        "end": 2084,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2084,
+        "end": 2085,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2085,
+        "end": 2092,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2093,
+        "end": 2094,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 2095,
+        "end": 2096,
+        "className": "syntax-number"
+      },
+      {
+        "start": 2096,
+        "end": 2099,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2100,
+        "end": 2110,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2110,
+        "end": 2111,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2111,
+        "end": 2118,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2118,
+        "end": 2120,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2133,
+        "end": 2134,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2148,
+        "end": 2154,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2155,
+        "end": 2156,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2156,
+        "end": 2164,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2164,
+        "end": 2165,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2165,
+        "end": 2171,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2171,
+        "end": 2172,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2172,
+        "end": 2179,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2179,
+        "end": 2181,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2182,
+        "end": 2188,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2188,
+        "end": 2189,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2189,
+        "end": 2196,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2196,
+        "end": 2199,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2200,
+        "end": 2201,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2218,
+        "end": 2222,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2223,
+        "end": 2233,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2233,
+        "end": 2234,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2234,
+        "end": 2242,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2264,
+        "end": 2270,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2270,
+        "end": 2271,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2271,
+        "end": 2275,
+        "className": "syntax-function"
+      },
+      {
+        "start": 2275,
+        "end": 2276,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2276,
+        "end": 2282,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2282,
+        "end": 2283,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2283,
+        "end": 2290,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2290,
+        "end": 2293,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2314,
+        "end": 2322,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2328,
+        "end": 2329,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2346,
+        "end": 2350,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2351,
+        "end": 2361,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2361,
+        "end": 2362,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2362,
+        "end": 2369,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2391,
+        "end": 2399,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2405,
+        "end": 2406,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2423,
+        "end": 2427,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2428,
+        "end": 2438,
+        "className": "syntax-type"
+      },
+      {
+        "start": 2438,
+        "end": 2439,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2439,
+        "end": 2450,
+        "className": "syntax-property"
+      },
+      {
+        "start": 2472,
+        "end": 2480,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2486,
+        "end": 2487,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2500,
+        "end": 2501,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2510,
+        "end": 2511,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2516,
+        "end": 2517,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2522,
+        "end": 2528,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 2529,
+        "end": 2535,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 2535,
+        "end": 2536,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 2537,
+        "end": 2538,
+        "className": "syntax-punctuation"
+      }
+    ]
+  },
+  {
+    "language": "typescript",
+    "name": "typescript/typescript_insert_sorted.ts",
+    "code": "function deduplicateSorted<T>(array: SortedReadonlyArray<T>, comparer: EqualityComparer<T> | Comparer<T>): SortedReadonlyArray<T> {\n    if (array.length === 0) return emptyArray as any as SortedReadonlyArray<T>;\n\n    let last = array[0];\n    const deduplicated: T[] = [last];\n    for (let i = 1; i < array.length; i++) {\n        const next = array[i];\n        switch (comparer(next, last)) {\n            // equality comparison\n            case true:\n\n            // relational comparison\n            // falls through\n            case Comparison.EqualTo:\n                continue;\n\n            case Comparison.LessThan:\n                // If `array` is sorted, `next` should **never** be less than `last`.\n                return Debug.fail(\"Array is unsorted.\");\n        }\n\n        deduplicated.push(last = next);\n    }\n\n    return deduplicated as any as SortedReadonlyArray<T>;\n}\n\nexport function createSortedArray<T>(): SortedArray<T> {\n    return [] as any as SortedArray<T>; // TODO: GH#19873\n}\n\nexport function insertSorted<T>(\n    array: SortedArray<T>,\n    insert: T,\n    compare: Comparer<T>,\n    equalityComparer?: EqualityComparer<T>,\n    allowDuplicates?: boolean,\n): boolean {\n    if (array.length === 0) {\n        array.push(insert);\n        return true;\n    }\n\n    const insertIndex = binarySearch(array, insert, identity, compare);\n    if (insertIndex < 0) {\n        if (equalityComparer && !allowDuplicates) {\n            const idx = ~insertIndex;\n            if (idx > 0 && equalityComparer(insert, array[idx - 1])) {\n                return false;\n            }\n            if (idx < array.length && equalityComparer(insert, array[idx])) {\n                array.splice(idx, 1, insert);\n                return true;\n            }\n        }\n        array.splice(~insertIndex, 0, insert);\n        return true;\n    }\n\n    if (allowDuplicates) {\n        array.splice(insertIndex, 0, insert);\n        return true;\n    }\n\n    return false;\n}",
+    "spans": [
+      {
+        "start": 0,
+        "end": 8,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 9,
+        "end": 26,
+        "className": "syntax-function"
+      },
+      {
+        "start": 26,
+        "end": 27,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 27,
+        "end": 28,
+        "className": "syntax-type"
+      },
+      {
+        "start": 28,
+        "end": 29,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 29,
+        "end": 30,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 30,
+        "end": 35,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 37,
+        "end": 56,
+        "className": "syntax-type"
+      },
+      {
+        "start": 56,
+        "end": 57,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 57,
+        "end": 58,
+        "className": "syntax-type"
+      },
+      {
+        "start": 58,
+        "end": 59,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 59,
+        "end": 60,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 61,
+        "end": 69,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 71,
+        "end": 87,
+        "className": "syntax-type"
+      },
+      {
+        "start": 87,
+        "end": 88,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 88,
+        "end": 89,
+        "className": "syntax-type"
+      },
+      {
+        "start": 89,
+        "end": 90,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 91,
+        "end": 92,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 93,
+        "end": 101,
+        "className": "syntax-type"
+      },
+      {
+        "start": 101,
+        "end": 102,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 102,
+        "end": 103,
+        "className": "syntax-type"
+      },
+      {
+        "start": 103,
+        "end": 104,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 104,
+        "end": 105,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 107,
+        "end": 126,
+        "className": "syntax-type"
+      },
+      {
+        "start": 126,
+        "end": 127,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 127,
+        "end": 128,
+        "className": "syntax-type"
+      },
+      {
+        "start": 128,
+        "end": 129,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 130,
+        "end": 131,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 136,
+        "end": 138,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 139,
+        "end": 140,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 140,
+        "end": 145,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 145,
+        "end": 146,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 146,
+        "end": 152,
+        "className": "syntax-property"
+      },
+      {
+        "start": 153,
+        "end": 156,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 157,
+        "end": 158,
+        "className": "syntax-number"
+      },
+      {
+        "start": 158,
+        "end": 159,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 160,
+        "end": 166,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 167,
+        "end": 177,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 178,
+        "end": 180,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 181,
+        "end": 184,
+        "className": "syntax-type"
+      },
+      {
+        "start": 185,
+        "end": 187,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 188,
+        "end": 207,
+        "className": "syntax-type"
+      },
+      {
+        "start": 207,
+        "end": 208,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 208,
+        "end": 209,
+        "className": "syntax-type"
+      },
+      {
+        "start": 209,
+        "end": 210,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 210,
+        "end": 211,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 217,
+        "end": 220,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 221,
+        "end": 225,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 226,
+        "end": 227,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 228,
+        "end": 233,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 233,
+        "end": 234,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 234,
+        "end": 235,
+        "className": "syntax-number"
+      },
+      {
+        "start": 235,
+        "end": 237,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 242,
+        "end": 247,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 248,
+        "end": 260,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 262,
+        "end": 263,
+        "className": "syntax-type"
+      },
+      {
+        "start": 263,
+        "end": 265,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 266,
+        "end": 267,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 268,
+        "end": 269,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 269,
+        "end": 273,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 273,
+        "end": 275,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 280,
+        "end": 283,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 284,
+        "end": 285,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 285,
+        "end": 288,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 289,
+        "end": 290,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 291,
+        "end": 292,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 293,
+        "end": 294,
+        "className": "syntax-number"
+      },
+      {
+        "start": 294,
+        "end": 295,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 296,
+        "end": 297,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 298,
+        "end": 299,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 300,
+        "end": 305,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 305,
+        "end": 306,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 306,
+        "end": 312,
+        "className": "syntax-property"
+      },
+      {
+        "start": 312,
+        "end": 313,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 314,
+        "end": 315,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 315,
+        "end": 317,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 317,
+        "end": 318,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 319,
+        "end": 320,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 329,
+        "end": 334,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 335,
+        "end": 339,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 340,
+        "end": 341,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 342,
+        "end": 347,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 347,
+        "end": 348,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 348,
+        "end": 349,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 349,
+        "end": 351,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 360,
+        "end": 366,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 367,
+        "end": 368,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 368,
+        "end": 376,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 376,
+        "end": 377,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 377,
+        "end": 381,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 381,
+        "end": 382,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 383,
+        "end": 387,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 387,
+        "end": 389,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 390,
+        "end": 391,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 404,
+        "end": 426,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 439,
+        "end": 443,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 444,
+        "end": 448,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 463,
+        "end": 487,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 500,
+        "end": 516,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 529,
+        "end": 533,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 534,
+        "end": 544,
+        "className": "syntax-type"
+      },
+      {
+        "start": 544,
+        "end": 545,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 545,
+        "end": 552,
+        "className": "syntax-property"
+      },
+      {
+        "start": 570,
+        "end": 578,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 578,
+        "end": 579,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 593,
+        "end": 597,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 598,
+        "end": 608,
+        "className": "syntax-type"
+      },
+      {
+        "start": 608,
+        "end": 609,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 609,
+        "end": 617,
+        "className": "syntax-property"
+      },
+      {
+        "start": 635,
+        "end": 704,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 721,
+        "end": 727,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 728,
+        "end": 733,
+        "className": "syntax-type"
+      },
+      {
+        "start": 733,
+        "end": 734,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 734,
+        "end": 738,
+        "className": "syntax-function"
+      },
+      {
+        "start": 738,
+        "end": 739,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 739,
+        "end": 759,
+        "className": "syntax-string"
+      },
+      {
+        "start": 759,
+        "end": 761,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 770,
+        "end": 771,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 781,
+        "end": 793,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 793,
+        "end": 794,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 794,
+        "end": 798,
+        "className": "syntax-function"
+      },
+      {
+        "start": 798,
+        "end": 799,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 799,
+        "end": 803,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 804,
+        "end": 805,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 806,
+        "end": 810,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 810,
+        "end": 812,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 817,
+        "end": 818,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 824,
+        "end": 830,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 831,
+        "end": 843,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 844,
+        "end": 846,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 847,
+        "end": 850,
+        "className": "syntax-type"
+      },
+      {
+        "start": 851,
+        "end": 853,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 854,
+        "end": 873,
+        "className": "syntax-type"
+      },
+      {
+        "start": 873,
+        "end": 874,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 874,
+        "end": 875,
+        "className": "syntax-type"
+      },
+      {
+        "start": 875,
+        "end": 876,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 876,
+        "end": 877,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 878,
+        "end": 879,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 881,
+        "end": 887,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 888,
+        "end": 896,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 897,
+        "end": 914,
+        "className": "syntax-function"
+      },
+      {
+        "start": 914,
+        "end": 915,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 915,
+        "end": 916,
+        "className": "syntax-type"
+      },
+      {
+        "start": 916,
+        "end": 917,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 917,
+        "end": 919,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 921,
+        "end": 932,
+        "className": "syntax-type"
+      },
+      {
+        "start": 932,
+        "end": 933,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 933,
+        "end": 934,
+        "className": "syntax-type"
+      },
+      {
+        "start": 934,
+        "end": 935,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 936,
+        "end": 937,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 942,
+        "end": 948,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 949,
+        "end": 951,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 952,
+        "end": 954,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 955,
+        "end": 958,
+        "className": "syntax-type"
+      },
+      {
+        "start": 959,
+        "end": 961,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 962,
+        "end": 973,
+        "className": "syntax-type"
+      },
+      {
+        "start": 973,
+        "end": 974,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 974,
+        "end": 975,
+        "className": "syntax-type"
+      },
+      {
+        "start": 975,
+        "end": 976,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 976,
+        "end": 977,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 978,
+        "end": 995,
+        "className": "syntax-comment"
+      },
+      {
+        "start": 996,
+        "end": 997,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 999,
+        "end": 1005,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1006,
+        "end": 1014,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1015,
+        "end": 1027,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1027,
+        "end": 1028,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1028,
+        "end": 1029,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1029,
+        "end": 1030,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1030,
+        "end": 1031,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1036,
+        "end": 1041,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1043,
+        "end": 1054,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1054,
+        "end": 1055,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1055,
+        "end": 1056,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1056,
+        "end": 1057,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1057,
+        "end": 1058,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1063,
+        "end": 1069,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1071,
+        "end": 1072,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1072,
+        "end": 1073,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1078,
+        "end": 1085,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1087,
+        "end": 1095,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1095,
+        "end": 1096,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1096,
+        "end": 1097,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1097,
+        "end": 1098,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1098,
+        "end": 1099,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1104,
+        "end": 1120,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1123,
+        "end": 1139,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1139,
+        "end": 1140,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1140,
+        "end": 1141,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1141,
+        "end": 1142,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1142,
+        "end": 1143,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1148,
+        "end": 1163,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1166,
+        "end": 1173,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1173,
+        "end": 1174,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1175,
+        "end": 1176,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1178,
+        "end": 1185,
+        "className": "syntax-type"
+      },
+      {
+        "start": 1186,
+        "end": 1187,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1192,
+        "end": 1194,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1195,
+        "end": 1196,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1196,
+        "end": 1201,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1201,
+        "end": 1202,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1202,
+        "end": 1208,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1209,
+        "end": 1212,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1213,
+        "end": 1214,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1214,
+        "end": 1215,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1216,
+        "end": 1217,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1226,
+        "end": 1231,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1231,
+        "end": 1232,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1232,
+        "end": 1236,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1236,
+        "end": 1237,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1237,
+        "end": 1243,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1243,
+        "end": 1245,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1254,
+        "end": 1260,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1261,
+        "end": 1265,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1265,
+        "end": 1266,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1271,
+        "end": 1272,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1278,
+        "end": 1283,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1284,
+        "end": 1295,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1296,
+        "end": 1297,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1298,
+        "end": 1310,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1310,
+        "end": 1311,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1311,
+        "end": 1316,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1316,
+        "end": 1317,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1318,
+        "end": 1324,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1324,
+        "end": 1325,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1326,
+        "end": 1334,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1334,
+        "end": 1335,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1336,
+        "end": 1343,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1343,
+        "end": 1345,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1350,
+        "end": 1352,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1353,
+        "end": 1354,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1354,
+        "end": 1365,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1366,
+        "end": 1367,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1368,
+        "end": 1369,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1369,
+        "end": 1370,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1371,
+        "end": 1372,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1381,
+        "end": 1383,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1384,
+        "end": 1385,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1385,
+        "end": 1401,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1402,
+        "end": 1404,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1405,
+        "end": 1406,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1406,
+        "end": 1421,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1421,
+        "end": 1422,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1423,
+        "end": 1424,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1437,
+        "end": 1442,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1443,
+        "end": 1446,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1447,
+        "end": 1448,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1449,
+        "end": 1450,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1450,
+        "end": 1461,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1461,
+        "end": 1462,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1475,
+        "end": 1477,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1478,
+        "end": 1479,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1479,
+        "end": 1482,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1483,
+        "end": 1484,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1485,
+        "end": 1486,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1487,
+        "end": 1489,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1490,
+        "end": 1506,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1506,
+        "end": 1507,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1507,
+        "end": 1513,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1513,
+        "end": 1514,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1515,
+        "end": 1520,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1520,
+        "end": 1521,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1521,
+        "end": 1524,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1525,
+        "end": 1526,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1527,
+        "end": 1528,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1528,
+        "end": 1531,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1532,
+        "end": 1533,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1550,
+        "end": 1556,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1557,
+        "end": 1562,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1562,
+        "end": 1563,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1576,
+        "end": 1577,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1590,
+        "end": 1592,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1593,
+        "end": 1594,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1594,
+        "end": 1597,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1598,
+        "end": 1599,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1600,
+        "end": 1605,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1605,
+        "end": 1606,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1606,
+        "end": 1612,
+        "className": "syntax-property"
+      },
+      {
+        "start": 1613,
+        "end": 1615,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1616,
+        "end": 1632,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1632,
+        "end": 1633,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1633,
+        "end": 1639,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1639,
+        "end": 1640,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1641,
+        "end": 1646,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1646,
+        "end": 1647,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1647,
+        "end": 1650,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1650,
+        "end": 1653,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1654,
+        "end": 1655,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1672,
+        "end": 1677,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1677,
+        "end": 1678,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1678,
+        "end": 1684,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1684,
+        "end": 1685,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1685,
+        "end": 1688,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1688,
+        "end": 1689,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1690,
+        "end": 1691,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1691,
+        "end": 1692,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1693,
+        "end": 1699,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1699,
+        "end": 1701,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1718,
+        "end": 1724,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1725,
+        "end": 1729,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1729,
+        "end": 1730,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1743,
+        "end": 1744,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1753,
+        "end": 1754,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1763,
+        "end": 1768,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1768,
+        "end": 1769,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1769,
+        "end": 1775,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1775,
+        "end": 1776,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1776,
+        "end": 1777,
+        "className": "syntax-operator"
+      },
+      {
+        "start": 1777,
+        "end": 1788,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1788,
+        "end": 1789,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1790,
+        "end": 1791,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1791,
+        "end": 1792,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1793,
+        "end": 1799,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1799,
+        "end": 1801,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1810,
+        "end": 1816,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1817,
+        "end": 1821,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1821,
+        "end": 1822,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1827,
+        "end": 1828,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1834,
+        "end": 1836,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1837,
+        "end": 1838,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1838,
+        "end": 1853,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1853,
+        "end": 1854,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1855,
+        "end": 1856,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1865,
+        "end": 1870,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1870,
+        "end": 1871,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1871,
+        "end": 1877,
+        "className": "syntax-function"
+      },
+      {
+        "start": 1877,
+        "end": 1878,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1878,
+        "end": 1889,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1889,
+        "end": 1890,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1891,
+        "end": 1892,
+        "className": "syntax-number"
+      },
+      {
+        "start": 1892,
+        "end": 1893,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1894,
+        "end": 1900,
+        "className": "syntax-variable"
+      },
+      {
+        "start": 1900,
+        "end": 1902,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1911,
+        "end": 1917,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1918,
+        "end": 1922,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1922,
+        "end": 1923,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1928,
+        "end": 1929,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1935,
+        "end": 1941,
+        "className": "syntax-keyword"
+      },
+      {
+        "start": 1942,
+        "end": 1947,
+        "className": "syntax-constant"
+      },
+      {
+        "start": 1947,
+        "end": 1948,
+        "className": "syntax-punctuation"
+      },
+      {
+        "start": 1949,
+        "end": 1950,
+        "className": "syntax-punctuation"
       }
     ]
   },
