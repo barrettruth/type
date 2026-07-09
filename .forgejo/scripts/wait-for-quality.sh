@@ -17,7 +17,6 @@ if [ -z "$token" ] || [ -z "$api_url" ] || [ -z "$repository" ] || [ -z "$sha" ]
 fi
 
 required_contexts='quality / Format (push)
-quality / Check (push)
 quality / Lint (push)
 quality / Build (push)'
 

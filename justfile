@@ -8,11 +8,8 @@ format:
     biome format public/index.html public/main.js public/main.css biome.json
     shfmt -i 2 -d scripts
 
-check:
-    biome check public/index.html public/main.js public/main.css biome.json
-
 lint:
-    biome lint public/index.html public/main.js public/main.css biome.json
+    biome check public/index.html public/main.js public/main.css biome.json
     shellcheck scripts/*.sh
 
 build:
@@ -21,5 +18,5 @@ build:
     install -d dist
     rsync -a --delete public/ dist/
 
-ci: format check lint build
+ci: format lint build
     @:
