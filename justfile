@@ -10,16 +10,16 @@ format:
 
 lint:
     biome check public/index.html public/main.js public/main.css biome.json
-    shellcheck scripts/*.sh
+    shellcheck scripts/corpus/*.sh
 
 build:
-    scripts/update-corpus.sh public
-    scripts/update-code-corpus.sh public
+    scripts/corpus/update-corpus.sh public
+    scripts/corpus/update-code-corpus.sh public
     install -d dist
     rsync -a --delete public/ dist/
 
 audit-highlights:
-    python3 scripts/audit-nvim-highlights.py
+    python3 scripts/corpus/audit-nvim-highlights.py
 
 ci: format lint build
     @:

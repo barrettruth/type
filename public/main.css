@@ -12,7 +12,7 @@
   --muted: #888888;
   --quiet: #b0b0b0;
   --red: #d84f4f;
-  --syntax-attribute: var(--text);
+  --syntax-attribute: var(--syntax-keyword);
   --syntax-comment: #6b6b6b;
   --syntax-constant: #2d7f3e;
   --syntax-function: var(--text);
@@ -39,7 +39,7 @@
     --muted: #666666;
     --quiet: #555555;
     --red: #ff6b6b;
-    --syntax-attribute: var(--text);
+    --syntax-attribute: var(--syntax-keyword);
     --syntax-comment: #666666;
     --syntax-constant: #98c379;
     --syntax-function: var(--text);

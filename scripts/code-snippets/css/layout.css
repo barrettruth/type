@@ -1,5 +1,0 @@
-.layout {
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: 1.5rem;
-}

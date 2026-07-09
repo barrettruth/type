@@ -75,6 +75,7 @@ let levelId = readLevelId();
 let currentWords = [];
 let cursor = 0;
 let wrongIndexes = new Set();
+let blocked = false;
 let startedAt = null;
 let now = performance.now();
 
@@ -479,6 +480,20 @@ function printableKey(key) {
   return Array.from(key).length === 1 ? key : null;
 }
 
+function advancesCursor(expected, typed) {
+  if (expected === " ") {
+    return typed === " ";
+  }
+  if (expected === "\n") {
+    return typed === " " || typed === "\n";
+  }
+  return true;
+}
+
+function matchesExpected(expected, typed) {
+  return typed === expected || (expected === "\n" && typed === " ");
+}
+
 function charClass(index, char, syntaxClass) {
   const classNames = ["char"];
   if (syntaxClass) {
@@ -628,6 +643,18 @@ function revealCurrent() {
   }
 }
 
+function spaceCursorWidth(current, previous, x, lineHeight) {
+  const next = current.nextElementSibling === cursorElement ? null : current.nextElementSibling;
+  const linePeer = previous ?? current;
+  if (next !== null && Math.abs(next.offsetTop - linePeer.offsetTop) < lineHeight / 2) {
+    const width = next.offsetLeft - x;
+    if (width > 0) {
+      return `${width}px`;
+    }
+  }
+  return current.offsetWidth > 0 ? `${current.offsetWidth}px` : "1ch";
+}
+
 function positionCursor() {
   const current = document.getElementById("current-char");
   if (current === null) {
@@ -649,6 +676,9 @@ function positionCursor() {
   const y =
     (lineStart?.offsetTop ?? (anchor === null ? current.offsetTop : anchor.offsetTop)) +
     lineHeight * 0.78;
+  cursorElement.style.width = current.classList.contains("space")
+    ? spaceCursorWidth(current, previous, x, lineHeight)
+    : "1ch";
   cursorElement.style.transform = `translate(${x}px, ${y}px)`;
 }
 
@@ -680,6 +710,7 @@ function renderStream() {
   }
 
   practiceWindow.classList.toggle("syntax-highlighting", isCodeLevel());
+  practiceWindow.classList.toggle("blocked", blocked);
   wordStream.replaceChildren(fragment, cursorElement);
   requestAnimationFrame(() => {
     positionCursor();
@@ -700,6 +731,7 @@ function reset() {
   currentWords = activeLevel().words();
   cursor = 0;
   wrongIndexes = new Set();
+  blocked = false;
   startedAt = null;
   now = performance.now();
   renderLayouts();
@@ -714,6 +746,11 @@ function handleKeydown(event) {
 
   if (event.key === "Backspace") {
     event.preventDefault();
+    if (blocked) {
+      blocked = false;
+      render();
+      return;
+    }
     const previous = previousTypingCursor(cursor);
     for (let index = previous; index < cursor; index += 1) {
       wrongIndexes.delete(index);
@@ -739,7 +776,13 @@ function handleKeydown(event) {
     startedAt = performance.now();
     now = startedAt;
   }
-  if (typed === expected) {
+  if (!advancesCursor(expected, typed)) {
+    blocked = true;
+    render();
+    return;
+  }
+  blocked = false;
+  if (matchesExpected(expected, typed)) {
     wrongIndexes.delete(cursor);
   } else {
     wrongIndexes.add(cursor);
