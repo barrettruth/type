@@ -175,6 +175,8 @@ def validate(path, language, code):
         fail(f"{path}: snippet length outside 800-3800 characters")
     if "\r" in code or "\t" in code:
         fail(f"{path}: snippets must use Unix newlines and spaces")
+    if any(char != "\n" and not (" " <= char <= "~") for char in code):
+        fail(f"{path}: snippets must only use printable ASCII characters")
     if any(len(line) > 160 for line in code.splitlines()):
         fail(f"{path}: snippet line exceeds 160 characters")
     if re.search(r"password|secret|token|api[_-]?key", code, re.IGNORECASE):
