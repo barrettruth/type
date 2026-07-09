@@ -51,16 +51,6 @@ export const codeSnippets = [
       },
       {
         "start": 62,
-        "end": 63,
-        "className": "syntax-string"
-      },
-      {
-        "start": 65,
-        "end": 70,
-        "className": "syntax-property"
-      },
-      {
-        "start": 74,
         "end": 75,
         "className": "syntax-string"
       },
@@ -81,16 +71,6 @@ export const codeSnippets = [
       },
       {
         "start": 96,
-        "end": 97,
-        "className": "syntax-string"
-      },
-      {
-        "start": 99,
-        "end": 103,
-        "className": "syntax-property"
-      },
-      {
-        "start": 106,
         "end": 107,
         "className": "syntax-string"
       },
@@ -123,16 +103,6 @@ export const codeSnippets = [
       },
       {
         "start": 24,
-        "end": 25,
-        "className": "syntax-string"
-      },
-      {
-        "start": 27,
-        "end": 28,
-        "className": "syntax-property"
-      },
-      {
-        "start": 31,
         "end": 32,
         "className": "syntax-string"
       },
@@ -173,21 +143,6 @@ export const codeSnippets = [
       },
       {
         "start": 117,
-        "end": 118,
-        "className": "syntax-string"
-      },
-      {
-        "start": 118,
-        "end": 119,
-        "className": "syntax-operator"
-      },
-      {
-        "start": 119,
-        "end": 125,
-        "className": "syntax-property"
-      },
-      {
-        "start": 125,
         "end": 126,
         "className": "syntax-string"
       }
@@ -970,13 +925,8 @@ export const codeSnippets = [
       },
       {
         "start": 32,
-        "end": 36,
-        "className": "syntax-number"
-      },
-      {
-        "start": 36,
         "end": 39,
-        "className": "syntax-type"
+        "className": "syntax-number"
       },
       {
         "start": 39,
@@ -995,13 +945,8 @@ export const codeSnippets = [
       },
       {
         "start": 52,
-        "end": 53,
-        "className": "syntax-number"
-      },
-      {
-        "start": 53,
         "end": 56,
-        "className": "syntax-type"
+        "className": "syntax-number"
       },
       {
         "start": 56,
@@ -1020,13 +965,8 @@ export const codeSnippets = [
       },
       {
         "start": 75,
-        "end": 78,
-        "className": "syntax-number"
-      },
-      {
-        "start": 78,
         "end": 81,
-        "className": "syntax-type"
+        "className": "syntax-number"
       },
       {
         "start": 81,
@@ -1092,13 +1032,8 @@ export const codeSnippets = [
       },
       {
         "start": 45,
-        "end": 46,
-        "className": "syntax-number"
-      },
-      {
-        "start": 46,
         "end": 48,
-        "className": "syntax-type"
+        "className": "syntax-number"
       },
       {
         "start": 48,
@@ -1137,13 +1072,8 @@ export const codeSnippets = [
       },
       {
         "start": 93,
-        "end": 96,
-        "className": "syntax-number"
-      },
-      {
-        "start": 96,
         "end": 99,
-        "className": "syntax-type"
+        "className": "syntax-number"
       },
       {
         "start": 99,
@@ -1648,7 +1578,7 @@ export const codeSnippets = [
       {
         "start": 6,
         "end": 14,
-        "className": "syntax-function"
+        "className": "syntax-keyword"
       },
       {
         "start": 15,
@@ -1753,7 +1683,7 @@ export const codeSnippets = [
       {
         "start": 85,
         "end": 88,
-        "className": "syntax-function"
+        "className": "syntax-keyword"
       },
       {
         "start": 90,
@@ -1835,7 +1765,7 @@ export const codeSnippets = [
       {
         "start": 50,
         "end": 58,
-        "className": "syntax-function"
+        "className": "syntax-keyword"
       },
       {
         "start": 58,
@@ -1895,7 +1825,7 @@ export const codeSnippets = [
       {
         "start": 100,
         "end": 103,
-        "className": "syntax-function"
+        "className": "syntax-keyword"
       },
       {
         "start": 103,
@@ -1917,7 +1847,7 @@ export const codeSnippets = [
       {
         "start": 6,
         "end": 14,
-        "className": "syntax-function"
+        "className": "syntax-keyword"
       },
       {
         "start": 15,
@@ -2062,7 +1992,7 @@ export const codeSnippets = [
       {
         "start": 129,
         "end": 132,
-        "className": "syntax-function"
+        "className": "syntax-keyword"
       },
       {
         "start": 134,
@@ -2109,7 +2039,7 @@ export const codeSnippets = [
       {
         "start": 16,
         "end": 23,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 24,
@@ -2119,7 +2049,7 @@ export const codeSnippets = [
       {
         "start": 28,
         "end": 36,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 37,
@@ -2144,7 +2074,7 @@ export const codeSnippets = [
       {
         "start": 50,
         "end": 54,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 59,
@@ -2159,7 +2089,7 @@ export const codeSnippets = [
       {
         "start": 64,
         "end": 75,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 78,
@@ -2216,7 +2146,7 @@ export const codeSnippets = [
       {
         "start": 27,
         "end": 34,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 34,
@@ -2226,7 +2156,7 @@ export const codeSnippets = [
       {
         "start": 35,
         "end": 43,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 43,
@@ -2236,7 +2166,7 @@ export const codeSnippets = [
       {
         "start": 44,
         "end": 48,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 48,
@@ -2246,7 +2176,7 @@ export const codeSnippets = [
       {
         "start": 49,
         "end": 55,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 56,
@@ -2266,7 +2196,7 @@ export const codeSnippets = [
       {
         "start": 62,
         "end": 76,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 77,
@@ -2281,7 +2211,7 @@ export const codeSnippets = [
       {
         "start": 87,
         "end": 93,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 93,
@@ -2291,7 +2221,7 @@ export const codeSnippets = [
       {
         "start": 94,
         "end": 102,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 102,
@@ -2301,7 +2231,7 @@ export const codeSnippets = [
       {
         "start": 103,
         "end": 108,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 108,
@@ -2311,7 +2241,7 @@ export const codeSnippets = [
       {
         "start": 109,
         "end": 115,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 116,
@@ -2331,7 +2261,7 @@ export const codeSnippets = [
       {
         "start": 125,
         "end": 133,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 133,
@@ -2341,7 +2271,7 @@ export const codeSnippets = [
       {
         "start": 134,
         "end": 138,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 138,
@@ -2351,7 +2281,7 @@ export const codeSnippets = [
       {
         "start": 139,
         "end": 145,
-        "className": "syntax-variable"
+        "className": "syntax-property"
       },
       {
         "start": 145,
@@ -2823,36 +2753,6 @@ export const codeSnippets = [
       },
       {
         "start": 17,
-        "end": 18,
-        "className": "syntax-string"
-      },
-      {
-        "start": 18,
-        "end": 19,
-        "className": "syntax-operator"
-      },
-      {
-        "start": 19,
-        "end": 30,
-        "className": "syntax-property"
-      },
-      {
-        "start": 30,
-        "end": 40,
-        "className": "syntax-string"
-      },
-      {
-        "start": 40,
-        "end": 41,
-        "className": "syntax-operator"
-      },
-      {
-        "start": 41,
-        "end": 49,
-        "className": "syntax-property"
-      },
-      {
-        "start": 49,
         "end": 50,
         "className": "syntax-string"
       },
@@ -2868,21 +2768,6 @@ export const codeSnippets = [
       },
       {
         "start": 60,
-        "end": 61,
-        "className": "syntax-string"
-      },
-      {
-        "start": 61,
-        "end": 62,
-        "className": "syntax-operator"
-      },
-      {
-        "start": 62,
-        "end": 69,
-        "className": "syntax-property"
-      },
-      {
-        "start": 69,
         "end": 70,
         "className": "syntax-string"
       },
@@ -2903,41 +2788,11 @@ export const codeSnippets = [
       },
       {
         "start": 89,
-        "end": 90,
-        "className": "syntax-string"
-      },
-      {
-        "start": 90,
-        "end": 91,
-        "className": "syntax-operator"
-      },
-      {
-        "start": 91,
-        "end": 100,
-        "className": "syntax-property"
-      },
-      {
-        "start": 100,
         "end": 101,
         "className": "syntax-string"
       },
       {
         "start": 103,
-        "end": 104,
-        "className": "syntax-string"
-      },
-      {
-        "start": 104,
-        "end": 105,
-        "className": "syntax-operator"
-      },
-      {
-        "start": 105,
-        "end": 112,
-        "className": "syntax-property"
-      },
-      {
-        "start": 112,
         "end": 113,
         "className": "syntax-string"
       }
@@ -2975,16 +2830,6 @@ export const codeSnippets = [
       },
       {
         "start": 21,
-        "end": 22,
-        "className": "syntax-string"
-      },
-      {
-        "start": 22,
-        "end": 23,
-        "className": "syntax-operator"
-      },
-      {
-        "start": 23,
         "end": 25,
         "className": "syntax-string"
       },
@@ -2995,21 +2840,6 @@ export const codeSnippets = [
       },
       {
         "start": 37,
-        "end": 38,
-        "className": "syntax-string"
-      },
-      {
-        "start": 38,
-        "end": 39,
-        "className": "syntax-operator"
-      },
-      {
-        "start": 39,
-        "end": 43,
-        "className": "syntax-property"
-      },
-      {
-        "start": 43,
         "end": 44,
         "className": "syntax-string"
       },
@@ -3030,21 +2860,6 @@ export const codeSnippets = [
       },
       {
         "start": 75,
-        "end": 76,
-        "className": "syntax-string"
-      },
-      {
-        "start": 76,
-        "end": 77,
-        "className": "syntax-operator"
-      },
-      {
-        "start": 77,
-        "end": 81,
-        "className": "syntax-property"
-      },
-      {
-        "start": 81,
         "end": 82,
         "className": "syntax-string"
       },

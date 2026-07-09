@@ -57,10 +57,15 @@ capture_class = {
     "variable": "syntax-variable",
 }
 
+class_priority = {}
+for index, capture in enumerate(capture_priority):
+    class_priority.setdefault(capture_class[capture], index)
+
 
 class HighlightParser(HTMLParser):
-    def __init__(self):
+    def __init__(self, language):
         super().__init__()
+        self.language = language
         self.in_line = False
         self.stack = []
         self.text = []
@@ -85,12 +90,21 @@ class HighlightParser(HTMLParser):
     def handle_data(self, data):
         if not self.in_line:
             return
-        class_name = self.stack[-1] if self.stack else None
+        class_name = strongest_capture(self.stack)
+        if self.language == "lua" and class_name == "syntax-function" and data in {"function", "end"}:
+            class_name = "syntax-keyword"
         self.text.append(data)
         self.classes.extend([class_name] * len(data))
 
     def result(self):
         return "".join(self.text), self.classes
+
+
+def strongest_capture(classes):
+    choices = [class_name for class_name in classes if class_name is not None]
+    if not choices:
+        return None
+    return min(choices, key=lambda class_name: class_priority[class_name])
 
 
 def normalize_capture(classes):
@@ -131,7 +145,7 @@ def validate(path, language, code):
         fail(f"{path}: snippets must not contain comments")
 
 
-def highlighted(config_path, path, code):
+def highlighted(config_path, path, code, language):
     env = os.environ.copy()
     env.setdefault("XDG_CACHE_HOME", str(Path(config_path).parent / "cache"))
     result = subprocess.run(
@@ -152,7 +166,7 @@ def highlighted(config_path, path, code):
     )
     if result.returncode != 0:
         fail(f"{path}: tree-sitter highlight failed\n{result.stderr}")
-    parser = HighlightParser()
+    parser = HighlightParser(language)
     parser.feed(result.stdout)
     text, classes = parser.result()
     if text != code:
@@ -197,7 +211,7 @@ def main():
         if code in seen:
             fail(f"{path}: duplicate snippet")
         seen.add(code)
-        classes = highlighted(config_path, path, code)
+        classes = highlighted(config_path, path, code, language)
         snippets.append(
             {
                 "language": language,

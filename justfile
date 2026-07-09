@@ -18,5 +18,8 @@ build:
     install -d dist
     rsync -a --delete public/ dist/
 
+audit-highlights:
+    python3 scripts/audit-nvim-highlights.py
+
 ci: format lint build
     @:
