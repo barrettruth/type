@@ -354,24 +354,26 @@ button.selected {
   }
 
   .stage {
-    grid-template-columns: minmax(0, var(--content-width));
-    align-content: center;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-content: start;
+    align-items: start;
+    column-gap: clamp(2rem, 5vw, 4rem);
     justify-content: stretch;
-    row-gap: 2rem;
-  }
-
-  .sidebar,
-  .practice-window {
-    grid-column: 1;
+    margin-top: clamp(2.5rem, 7vh, 4.5rem);
   }
 
   .sidebar {
+    align-self: start;
     justify-self: start;
   }
 
+  .practice-window {
+    grid-column: 2;
+    align-self: start;
+  }
+
   .levels {
-    grid-template-columns: repeat(3, max-content);
-    column-gap: 1.5rem;
+    grid-template-columns: 1fr;
   }
 
   .rail {
@@ -388,6 +390,27 @@ button.selected {
   .topline {
     align-items: start;
     gap: 1rem;
+  }
+
+  .stage {
+    grid-template-columns: minmax(0, var(--content-width));
+    row-gap: 2rem;
+  }
+
+  .sidebar,
+  .practice-window {
+    grid-column: 1;
+  }
+
+  .sidebar {
+    justify-self: start;
+    padding-right: 0;
+    border-right: 0;
+  }
+
+  .levels {
+    grid-template-columns: repeat(3, max-content);
+    column-gap: 1.5rem;
   }
 
   .practice-window {
